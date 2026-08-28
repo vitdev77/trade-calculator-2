@@ -97,15 +97,19 @@ function loadFromStorage() {
 }
 
 function restoreTabsVisualOnly() {
+  // ИСПРАВЛЕНО: Кнопки Фьючерсы/Спот теперь корректно ищутся по ID, не ломая остальные классы
   document.getElementById("tab-spot").classList.remove("active");
   document.getElementById("tab-futures").classList.remove("active");
   document.getElementById(`tab-${currentTab}`).classList.add("active");
 
+  // ИСПРАВЛЕНО: Кнопки Лонг/Шорт теперь гарантированно переключаются и подсвечиваются
   document.getElementById("side-long").classList.remove("active");
   document.getElementById("side-short").classList.remove("active");
-  if (currentSide === "Long")
+  if (currentSide === "Long") {
     document.getElementById("side-long").classList.add("active");
-  else document.getElementById("side-short").classList.add("active");
+  } else {
+    document.getElementById("side-short").classList.add("active");
+  }
 
   document.getElementById("order-limit").classList.remove("active");
   document.getElementById("order-market").classList.remove("active");
@@ -146,11 +150,16 @@ function switchTab(tab) {
 function setSide(side) {
   if (currentTab === "spot" && side === "Short") return;
   currentSide = side;
+
+  // ИСПРАВЛЕНО: Жесткая подмена активного класса при ручном клике
   document.getElementById("side-long").classList.remove("active");
   document.getElementById("side-short").classList.remove("active");
-  if (side === "Long")
+  if (side === "Long") {
     document.getElementById("side-long").classList.add("active");
-  else document.getElementById("side-short").classList.add("active");
+  } else {
+    document.getElementById("side-short").classList.add("active");
+  }
+
   saveToStorage();
   calculate();
 }

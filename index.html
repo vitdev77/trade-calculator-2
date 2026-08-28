@@ -27,43 +27,41 @@
     <div class="glass-container">
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
-        <!-- Выбор глобального рынка -->
+        <!-- ПРИОРИТЕТ №1: Глобальный переключатель рынков с исходными именами -->
         <div class="input-item full-width">
-          <div class="tabs tabs-large">
+          <div class="market-king-tabs">
             <button
-              class="tab-btn"
+              class="market-king-btn"
               id="tab-futures"
               onclick="switchTab('futures')"
             >
               Фьючерсы
             </button>
-            <button class="tab-btn" id="tab-spot" onclick="switchTab('spot')">
+            <button
+              class="market-king-btn"
+              id="tab-spot"
+              onclick="switchTab('spot')"
+            >
               Спот
             </button>
           </div>
         </div>
 
-        <!-- Выбор направления (Лонг / Шорт) -->
-        <div class="side-fade-wrapper" id="side-item-wrapper">
-          <div class="input-item full-width">
-            <div class="toggle-container container-medium" id="side-container">
-              <button class="side-btn" id="side-long" onclick="setSide('Long')">
-                Лонг
-              </button>
-              <button
-                class="side-btn"
-                id="side-short"
-                onclick="setSide('Short')"
-              >
-                Шорт
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Сетка параметров ввода с иерархией приоритетов -->
+        <!-- Сетка параметров ввода -->
         <div class="fields-grid-priority">
-          <!-- Тип ордера -->
+          <!-- Баланс аккаунта отдельно на всю ширину -->
+          <div class="input-item full-width compact-row">
+            <label class="label-priority">Баланс (USDT)</label>
+            <input
+              type="number"
+              id="balance"
+              value="100"
+              oninput="calculate()"
+              class="compact-input"
+            />
+          </div>
+
+          <!-- Настройка типа ордера на всю ширину -->
           <div class="input-item full-width">
             <label class="label-priority">Тип ордера</label>
             <div class="order-type-container">
@@ -84,42 +82,13 @@
             </div>
           </div>
 
-          <!-- ГЛАВНЫЙ АКЦЕНТ: Цена входа -->
-          <div class="input-item full-width input-group-king">
-            <label class="label-priority king-label" id="entry-label"
-              >Цена входа (USDT)</label
-            >
-            <div class="king-input-wrapper">
-              <input
-                type="number"
-                id="entry-price"
-                value="79670"
-                oninput="calculate()"
-                class="king-input"
-              />
-            </div>
-          </div>
-
-          <!-- ВТОРОСТЕПЕННЫЙ РЯД: Кошелек и Монета -->
-          <div class="input-row compact-row">
-            <div class="input-item">
-              <label class="label-priority">Баланс (USDT)</label>
-              <input
-                type="number"
-                id="balance"
-                value="100"
-                oninput="calculate()"
-                class="compact-input"
-              />
-            </div>
-            <div class="input-item">
+          <!-- Объединенная группа актива и стоимости -->
+          <div class="input-row trade-group-row">
+            <!-- Выбор пары (40% ширины) -->
+            <div class="input-item pair-item-width">
               <label class="label-priority">Торговая пара</label>
               <div class="select-custom-wrapper">
-                <select
-                  id="pair"
-                  onchange="handlePairChange()"
-                  class="compact-select"
-                >
+                <select id="pair" onchange="handlePairChange()">
                   <option value="BTCUSDT">BTC/USDT</option>
                   <option value="ETHUSDT">ETH/USDT</option>
                   <option value="MNTUSDT">MNT/USDT</option>
@@ -128,6 +97,40 @@
                   <option value="SOLUSDT">SOL/USDT</option>
                 </select>
               </div>
+            </div>
+
+            <!-- Поле Цены входа (60% ширины) -->
+            <div class="input-item price-item-width input-group-king">
+              <label class="label-priority king-label" id="entry-label"
+                >Цена входа (USDT)</label
+              >
+              <div class="king-input-wrapper">
+                <input
+                  type="number"
+                  id="entry-price"
+                  value="79670"
+                  oninput="calculate()"
+                  class="king-input"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ПРИОРИТЕТ №3: Финальный триггер действия (Лонг/Шорт) -->
+        <div class="side-fade-wrapper" id="side-item-wrapper">
+          <div class="input-item full-width">
+            <div class="toggle-container container-medium" id="side-container">
+              <button class="side-btn" id="side-long" onclick="setSide('Long')">
+                Лонг
+              </button>
+              <button
+                class="side-btn"
+                id="side-short"
+                onclick="setSide('Short')"
+              >
+                Шорт
+              </button>
             </div>
           </div>
         </div>

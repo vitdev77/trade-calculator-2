@@ -98,6 +98,7 @@ body {
 /* === КОНЕЦ ЧАСТИ 1 === */
 /* === НАЧАЛО ЧАСТИ 2 === */
 
+/* Сдвинуто вниз: Анимация появления/скрытия лонг-шорт блоков */
 .side-fade-wrapper {
   transition:
     opacity 0.25s ease,
@@ -108,6 +109,7 @@ body {
   opacity: 1;
   transform: translateY(0);
   overflow: hidden;
+  margin-top: 4px; /* Легкий отступ от основного блока полей */
 }
 
 html.init-spot-mode .side-fade-wrapper {
@@ -115,7 +117,7 @@ html.init-spot-mode .side-fade-wrapper {
   gap: 0;
   opacity: 0 !important;
   margin: 0 !important;
-  transform: translateY(-10px);
+  transform: translateY(10px); /* Скрывается вниз */
   pointer-events: none;
   transition: none !important;
 }
@@ -131,7 +133,7 @@ html.init-spot-mode #liq-section {
   max-height: 0 !important;
   opacity: 0 !important;
   margin: 0 !important;
-  transform: translateY(-10px);
+  transform: translateY(10px);
   pointer-events: none;
 }
 
@@ -139,7 +141,7 @@ html.init-spot-mode #liq-section {
 .fields-grid-priority {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   flex-grow: 1;
   justify-content: center;
 }
@@ -148,6 +150,10 @@ html.init-spot-mode #liq-section {
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   width: 100%;
+}
+.trade-group-row {
+  grid-template-columns: 0.4fr 0.6fr !important;
+  align-items: flex-end;
 }
 .input-item {
   display: flex;
@@ -159,7 +165,43 @@ html.init-spot-mode #liq-section {
   width: 100%;
 }
 
-/* Глобальные базовые стили элементов ввода (Обеспечивают единство стиля) */
+/* ДИЗАЙН КОРОЛЕВСКИХ ТАБОВ (Уровень приоритета №1 — Фьючерсы / Спот) */
+.market-king-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+.market-king-btn {
+  height: 44px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.market-king-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.04);
+}
+/* Эффект глубокого неонового горения при активации */
+.market-king-btn.active {
+  background: rgba(255, 177, 26, 0.04) !important;
+  border: 1px solid #ffb11a !important;
+  color: #ffb11a !important;
+  box-shadow:
+    0 0 20px rgba(255, 177, 26, 0.15),
+    inset 0 0 10px rgba(255, 177, 26, 0.05) !important;
+  text-shadow: 0 0 8px rgba(255, 177, 26, 0.2);
+}
+
+/* Глобальные базовые стили элементов ввода */
 input,
 select {
   background: rgba(0, 0, 0, 0.5);
@@ -185,9 +227,9 @@ select:focus {
   background: rgba(0, 0, 0, 0.6);
 }
 
-/* Стилизация КУПНОГО поля цены (Уровень 1) с сохранением базовых свойств */
+/* Стилизация КУПНОГО поля цены */
 .input-group-king {
-  margin: 2px 0;
+  margin: 0;
 }
 .king-label {
   color: #ffb11a !important;
@@ -199,8 +241,8 @@ select:focus {
   width: 100%;
 }
 .king-input {
-  height: 48px !important; /* Увеличенная высота */
-  font-size: 18px !important; /* Увеличенный шрифт */
+  height: 38px !important;
+  font-size: 16px !important;
   font-weight: 800 !important;
   border: 1px solid rgba(255, 177, 26, 0.3) !important;
   background: rgba(0, 0, 0, 0.65) !important;
@@ -215,25 +257,23 @@ select:focus {
     inset 0 0 8px rgba(255, 177, 26, 0.1) !important;
 }
 
-/* Стилизация МЕЛКОГО нижнего ряда (Уровень 4) с сохранением базовых свойств */
+/* Стилизация обособленного Баланса */
 .compact-row {
-  opacity: 0.7;
+  opacity: 0.8;
   transition: opacity 0.2s ease;
 }
 .compact-row:hover {
   opacity: 1;
 }
-.compact-input,
-.compact-select {
-  height: 34px !important; /* Уменьшенная высота */
-  font-size: 13px !important;
-  font-weight: 600 !important;
+.compact-input {
+  height: 38px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
   background: rgba(0, 0, 0, 0.4) !important;
-  border-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Контейнеры переключателей */
-.tabs,
+/* Локальные контейнеры переключателей */
 .toggle-container,
 .order-type-container {
   display: flex;
@@ -253,7 +293,6 @@ select:focus {
 }
 
 /* Кнопки внутри контейнеров */
-.tab-btn,
 .side-btn,
 .order-btn {
   flex: 1;
@@ -274,12 +313,7 @@ select:focus {
   font-size: 12px;
 }
 
-/* Состояния активных кнопок */
-.tab-btn.active {
-  background: #ffb11a;
-  color: #000000;
-  box-shadow: 0 0 12px rgba(255, 177, 26, 0.4);
-}
+/* Состояния активных локальных кнопок */
 .side-btn.active {
   color: #ffffff;
 }
@@ -305,7 +339,7 @@ select:focus {
   letter-spacing: 0.5px;
 }
 
-/* Оформление кастомного стрелочки выпадающего списка */
+/* Оформление кастомной стрелочки */
 .select-custom-wrapper {
   position: relative;
   width: 100%;
@@ -378,7 +412,7 @@ input[type="number"] {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  z-index: 200; /* Самый верхний слой */
+  z-index: 200;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .info-mini-btn:hover {
@@ -458,7 +492,7 @@ input[type="number"] {
   align-items: center;
 }
 
-/* Стилизация приглушенных информационных строк */
+/* ОПТИМИЗИРОВАНО: Информационные строки стали утонченными и неброскими */
 .low-accent-row {
   opacity: 0.35;
   transition: opacity 0.25s ease;
@@ -467,12 +501,13 @@ input[type="number"] {
   opacity: 0.85;
 }
 .low-accent-row .display-value {
-  font-size: 22px !important;
-  font-weight: 800 !important;
-  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 15px !important; /* Уменьшен размер цифр */
+  font-weight: 600 !important; /* Тонкое премиальное начертание */
+  color: rgba(255, 255, 255, 0.75) !important; /* Мягкий матовый оттенок */
+  padding-right: 44px; /* Сохранено идеальное выравнивание по правому краю */
 }
 .low-accent-row .field-sub {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .field-info {
@@ -514,7 +549,7 @@ input[type="number"] {
   text-align: right;
 }
 .small-val {
-  font-size: 22px !important;
+  font-size: 15px !important; /* Применено к остатку маржи в долларах */
 }
 .val-green .display-value {
   color: #00ff9d;
@@ -529,7 +564,7 @@ input[type="number"] {
   text-shadow: 0 0 10px rgba(255, 159, 67, 0.2);
 }
 
-/* ОПТИМИЗИРОВАНО: Абсолютно чистая кнопка без обводки и фонов */
+/* Абсолютно чистая кнопка без обводки и фонов */
 .google-copy-btn {
   background: transparent !important;
   border: none !important;
@@ -539,7 +574,7 @@ input[type="number"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50%; /* Для аккуратного свечения при клике */
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
@@ -548,7 +583,7 @@ input[type="number"] {
 .google-copy-btn .icon-copy {
   width: 18px;
   height: 18px;
-  fill: rgba(255, 255, 255, 0.25); /* Максимально ненавязчивая в покое */
+  fill: rgba(255, 255, 255, 0.25);
   transition:
     fill 0.2s ease,
     transform 0.2s ease,
@@ -569,7 +604,7 @@ input[type="number"] {
   filter: drop-shadow(0 0 4px rgba(255, 91, 96, 0.4));
 }
 
-/* Состояние «Успешно скопировано» — неоновая вспышка вокруг самой иконки */
+/* Состояние «Успешно скопировано» */
 .google-copy-btn.copied .icon-copy {
   transform: scale(1.1);
 }
@@ -778,8 +813,12 @@ input:disabled {
   .display-value {
     font-size: 19px;
   }
+  .low-accent-row .display-value {
+    padding-right: 0 !important;
+    font-size: 14px !important;
+  }
   .small-val {
-    font-size: 19px !important;
+    font-size: 14px !important;
   }
   .google-copy-btn {
     width: 28px;
