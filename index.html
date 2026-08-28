@@ -6,19 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bybit Премиум Терминал</title>
     <link rel="stylesheet" href="./style.css" />
-  </head>
-  <body>
     <script>
       (function () {
         const savedTab = localStorage.getItem("bybit_tab") || "futures";
         if (savedTab === "spot") {
           document.documentElement.classList.add("init-spot-mode");
         }
+        const savedTheme = localStorage.getItem("bybit_theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("light-theme");
+        }
       })();
     </script>
-
-    <!-- Микро-кнопка помощи зафиксирована вне контейнеров -->
+  </head>
+  <body>
     <button class="info-mini-btn" onclick="toggleModal(true)">?</button>
+
+    <button
+      class="theme-mini-btn"
+      id="theme-toggle-btn"
+      onclick="toggleTheme()"
+      title="Переключить тему"
+    >
+      <svg class="icon-theme" viewBox="0 0 24 24">
+        <path
+          d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"
+        />
+      </svg>
+    </button>
 
     <div class="glow-sphere sphere-1"></div>
     <div class="glow-sphere sphere-2"></div>
@@ -27,7 +42,6 @@
     <div class="glass-container">
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
-        <!-- ПРИОРИТЕТ №1: Глобальный переключатель рынков с исходными именами -->
         <div class="input-item full-width">
           <div class="market-king-tabs">
             <button
@@ -47,9 +61,7 @@
           </div>
         </div>
 
-        <!-- Сетка параметров ввода -->
         <div class="fields-grid-priority">
-          <!-- Баланс аккаунта отдельно на всю ширину -->
           <div class="input-item full-width compact-row">
             <label class="label-priority">Баланс (USDT)</label>
             <input
@@ -61,7 +73,6 @@
             />
           </div>
 
-          <!-- Настройка типа ордера на всю ширину -->
           <div class="input-item full-width">
             <label class="label-priority">Тип ордера</label>
             <div class="order-type-container">
@@ -82,9 +93,7 @@
             </div>
           </div>
 
-          <!-- Объединенная группа актива и стоимости -->
           <div class="input-row trade-group-row">
-            <!-- Выбор пары (40% ширины) -->
             <div class="input-item pair-item-width">
               <label class="label-priority">Торговая пара</label>
               <div class="select-custom-wrapper">
@@ -99,7 +108,6 @@
               </div>
             </div>
 
-            <!-- Поле Цены входа (60% ширины) -->
             <div class="input-item price-item-width input-group-king">
               <label class="label-priority king-label" id="entry-label"
                 >Цена входа (USDT)</label
@@ -117,7 +125,6 @@
           </div>
         </div>
 
-        <!-- ПРИОРИТЕТ №3: Финальный триггер действия (Лонг/Шорт) -->
         <div class="side-fade-wrapper" id="side-item-wrapper">
           <div class="input-item full-width">
             <div class="toggle-container container-medium" id="side-container">
@@ -135,10 +142,11 @@
           </div>
         </div>
 
-        <!-- Системный сброс -->
-        <button class="reset-link-btn" onclick="resetTerminal()">
-          Сбросить настройки
-        </button>
+        <div class="system-footer-row">
+          <button class="reset-link-btn" onclick="resetTerminal()">
+            Сбросить настройки
+          </button>
+        </div>
       </div>
       <!-- === КОНЕЦ ЧАСТИ 1 === -->
       <!-- === НАЧАЛО ЧАСТИ 2 === -->
@@ -160,9 +168,7 @@
         </div>
 
         <div class="results-display">
-          <!-- СЕКЦИЯ 1: ВСЕ ПАРАМЕТРЫ ПОЗИЦИИ И ПЛЕЧО ОБЪЕДИНЕНЫ ВМЕСТЕ -->
           <div class="results-section">
-            <!-- 1. Главный копируемый объем -->
             <div class="display-row val-orange-text">
               <div class="field-info">
                 <span class="field-name">Объем в USDT (Value)</span>
@@ -172,7 +178,6 @@
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-volume-copy">400.00</span>
-                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
                 <button
                   class="google-copy-btn btn-orange"
                   onclick="copyData('res-volume-copy', this)"
@@ -186,7 +191,6 @@
               </div>
             </div>
 
-            <!-- 2. Количество монет -->
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Количество (Qty в монетах)</span>
@@ -197,7 +201,6 @@
               </div>
             </div>
 
-            <!-- 3. Занятая маржа -->
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Занятая маржа (Cost)</span>
@@ -207,33 +210,8 @@
                 <span class="display-value" id="res-cost">20.00</span>
               </div>
             </div>
-
-            <!-- 4. Рабочее плечо -->
-            <div class="display-row val-orange-text" id="res-leverage-section">
-              <div class="field-info">
-                <span class="field-name">Рабочее плечо Bybit</span>
-                <span class="field-sub" style="color: rgba(255, 159, 67, 0.85)"
-                  >Выставить в терминале биржи</span
-                >
-              </div>
-              <div class="value-action">
-                <span class="display-value" id="res-leverage-copy">20</span>
-                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
-                <button
-                  class="google-copy-btn btn-orange"
-                  onclick="copyData('res-leverage-copy', this)"
-                >
-                  <svg class="icon-copy" viewBox="0 0 24 24">
-                    <path
-                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
           </div>
 
-          <!-- СЕКЦИЯ 2: ЦЕЛЕВЫЕ ТАРГЕТЫ ЗАЩИТЫ (TP / SL) -->
           <div class="results-section">
             <div class="display-row val-green">
               <div class="field-info">
@@ -247,7 +225,6 @@
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-tp">78367</span>
-                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
                 <button
                   class="google-copy-btn btn-green"
                   onclick="copyData('res-tp', this)"
@@ -272,7 +249,6 @@
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-sl">77457</span>
-                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
                 <button
                   class="google-copy-btn btn-red"
                   onclick="copyData('res-sl', this)"
@@ -287,8 +263,28 @@
             </div>
           </div>
 
-          <!-- СЕКЦИЯ 3: ИНФОРМАЦИЯ О РИСКАХ И ЗАПАСАХ -->
           <div class="results-section no-border">
+            <div class="display-row val-orange-text" id="res-leverage-section">
+              <div class="field-info">
+                <span class="field-name">Рабочее плечо Bybit</span>
+                <span class="field-sub" style="color: rgba(255, 159, 67, 0.85)"
+                  >Выставить в терминале биржи</span
+                >
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-leverage-copy">20</span>
+                <button
+                  class="google-copy-btn btn-orange"
+                  onclick="copyData('res-leverage-copy', this)"
+                >
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Цена ликвидации (Liq)</span>

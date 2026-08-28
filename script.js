@@ -3,6 +3,7 @@
 let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
+let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 
 const coinConfig = {
   BTCUSDT: { price: 79670, priceDecimals: 0, qtyDecimals: 5, recLeverage: 20 },
@@ -60,6 +61,7 @@ function saveToStorage() {
   localStorage.setItem("bybit_tab", currentTab);
   localStorage.setItem("bybit_side", currentSide);
   localStorage.setItem("bybit_order_type", currentOrderType);
+  localStorage.setItem("bybit_theme", currentTheme);
   localStorage.setItem(
     "bybit_balance",
     document.getElementById("balance").value,
@@ -71,13 +73,35 @@ function saveToStorage() {
   );
 }
 
+function toggleTheme() {
+  const btn = document.getElementById("theme-toggle-btn");
+  if (currentTheme === "dark") {
+    currentTheme = "light";
+    document.documentElement.classList.add("light-theme");
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
+  } else {
+    currentTheme = "dark";
+    document.documentElement.classList.remove("light-theme");
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+  }
+  saveToStorage();
+}
+
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
+  const btn = document.getElementById("theme-toggle-btn");
+
+  if (currentTheme === "light") {
+    document.documentElement.classList.add("light-theme");
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
+  } else {
+    document.documentElement.classList.remove("light-theme");
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+  }
 
   if (localStorage.getItem("bybit_pair")) {
     document.getElementById("pair").value = localStorage.getItem("bybit_pair");
   }
-
   if (localStorage.getItem("bybit_balance")) {
     document.getElementById("balance").value =
       localStorage.getItem("bybit_balance");
@@ -97,12 +121,10 @@ function loadFromStorage() {
 }
 
 function restoreTabsVisualOnly() {
-  // ИСПРАВЛЕНО: Кнопки Фьючерсы/Спот теперь корректно ищутся по ID, не ломая остальные классы
   document.getElementById("tab-spot").classList.remove("active");
   document.getElementById("tab-futures").classList.remove("active");
   document.getElementById(`tab-${currentTab}`).classList.add("active");
 
-  // ИСПРАВЛЕНО: Кнопки Лонг/Шорт теперь гарантированно переключаются и подсвечиваются
   document.getElementById("side-long").classList.remove("active");
   document.getElementById("side-short").classList.remove("active");
   if (currentSide === "Long") {
@@ -151,7 +173,6 @@ function setSide(side) {
   if (currentTab === "spot" && side === "Short") return;
   currentSide = side;
 
-  // ИСПРАВЛЕНО: Жесткая подмена активного класса при ручном клике
   document.getElementById("side-long").classList.remove("active");
   document.getElementById("side-short").classList.remove("active");
   if (side === "Long") {
@@ -238,6 +259,7 @@ function calculate() {
       netRiskForPriceMove > 0
         ? (netRiskForPriceMove * entryPrice) / totalVolume
         : (riskAmount * 0.05 * entryPrice) / totalVolume;
+
     if (currentSide === "Long") {
       sl = entryPrice - allowedPriceChange;
       tp = entryPrice + allowedPriceChange * 2;
@@ -299,12 +321,15 @@ function calculate() {
     sl,
     config.priceDecimals,
   );
-  if (currentTab === "futures" && liq !== "—")
+
+  if (currentTab === "futures" && liq !== "—") {
     document.getElementById("res-liq").innerText = formatSmartValue(
       liq,
       config.priceDecimals,
     );
-  else document.getElementById("res-liq").innerText = "—";
+  } else {
+    document.getElementById("res-liq").innerText = "—";
+  }
 }
 
 function handlePairChange() {
@@ -315,7 +340,6 @@ function handlePairChange() {
   calculate();
 }
 
-// ОПТИМИЗИРОВАНО: Google-поведение кнопок с динамической подменой SVG
 function copyData(elementId, btnElement) {
   const valueText = document.getElementById(elementId).innerText;
   if (valueText === "—" || btnElement.closest(".disabled-element")) return;
@@ -327,10 +351,7 @@ function copyData(elementId, btnElement) {
 
   navigator.clipboard.writeText(textToCopy);
 
-  // Сохраняем исходную иконку копирования
   const oldSvg = btnElement.innerHTML;
-
-  // Вставляем иконку галочки (Google Done)
   btnElement.innerHTML = `<svg class="icon-copy" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
   btnElement.classList.add("copied");
 
@@ -345,10 +366,19 @@ function resetTerminal() {
   currentTab = "futures";
   currentSide = "Long";
   currentOrderType = "limit";
+  currentTheme = "dark";
   const defaultPair = "BTCUSDT";
+
   document.getElementById("balance").value = "100";
   document.getElementById("pair").value = defaultPair;
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
+
+  document.documentElement.classList.remove("light-theme");
+  const themeBtn = document.getElementById("theme-toggle-btn");
+  if (themeBtn) {
+    themeBtn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+  }
+
   restoreTabsVisualOnly();
   calculate();
 }
