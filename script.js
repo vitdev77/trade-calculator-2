@@ -1,13 +1,115 @@
-let currentTab = "futures";
-let currentSide = "Long";
-let currentOrderType = "limit";
+/* НАЧАЛО ЧАСТИ 1 */
+
+let currentTab = localStorage.getItem("bybit_tab") || "futures";
+let currentSide = localStorage.getItem("bybit_side") || "Long";
+let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 
 const coinConfig = {
-  BTCUSDT: { price: 60000, priceDecimals: 2, qtyDecimals: 5 },
-  ETHUSDT: { price: 3300, priceDecimals: 2, qtyDecimals: 4 },
-  SOLUSDT: { price: 140, priceDecimals: 2, qtyDecimals: 3 },
-  XRPUSDT: { price: 0.55, priceDecimals: 4, qtyDecimals: 1 },
+  BTCUSDT: { price: 79670, priceDecimals: 0, qtyDecimals: 5, recLeverage: 20 },
+  ETHUSDT: { price: 2510, priceDecimals: 0, qtyDecimals: 4, recLeverage: 10 },
+  XAUTUSDT: {
+    price: 4582.6,
+    priceDecimals: 2,
+    qtyDecimals: 4,
+    recLeverage: 10,
+  },
+  SOLUSDT: { price: 106.45, priceDecimals: 2, qtyDecimals: 3, recLeverage: 5 },
+  ZECUSDT: { price: 802.84, priceDecimals: 2, qtyDecimals: 3, recLeverage: 3 },
+  MNTUSDT: { price: 0.5231, priceDecimals: 4, qtyDecimals: 2, recLeverage: 3 },
 };
+
+const TAKER_FEE = 0.00055;
+const MMR = 0.004;
+
+function saveToStorage() {
+  localStorage.setItem("bybit_tab", currentTab);
+  localStorage.setItem("bybit_side", currentSide);
+  localStorage.setItem("bybit_order_type", currentOrderType);
+  localStorage.setItem(
+    "bybit_balance",
+    document.getElementById("balance").value,
+  );
+  localStorage.setItem("bybit_pair", document.getElementById("pair").value);
+  localStorage.setItem(
+    "bybit_leverage",
+    document.getElementById("leverage").value,
+  );
+  localStorage.setItem(
+    "bybit_entry",
+    document.getElementById("entry-price").value,
+  );
+}
+
+// ИСПРАВЛЕНО: Жёсткий и правильный порядок чтения памяти без перезаписи плеча
+function loadFromStorage() {
+  document.documentElement.classList.remove("init-spot-mode");
+
+  // 1. Сначала просто восстанавливаем текстовые значения в полях
+  if (localStorage.getItem("bybit_balance")) {
+    document.getElementById("balance").value =
+      localStorage.getItem("bybit_balance");
+  }
+  if (localStorage.getItem("bybit_pair")) {
+    document.getElementById("pair").value = localStorage.getItem("bybit_pair");
+  }
+  if (localStorage.getItem("bybit_leverage")) {
+    document.getElementById("leverage").value =
+      localStorage.getItem("bybit_leverage");
+  }
+  if (localStorage.getItem("bybit_entry")) {
+    document.getElementById("entry-price").value =
+      localStorage.getItem("bybit_entry");
+  }
+
+  // 2. Затем активируем табы БЕЗ вызова функций автоподстановки цен/плеч
+  restoreTabsVisual();
+  updateLeverageBadge();
+  calculate();
+}
+
+// Новая изолированная функция для включения табов при старте, чтобы не затирать плечи
+function restoreTabsVisual() {
+  document.getElementById("tab-spot").classList.remove("active");
+  document.getElementById("tab-futures").classList.remove("active");
+  document.getElementById(`tab-${currentTab}`).classList.add("active");
+
+  document.getElementById("side-long").classList.remove("active");
+  document.getElementById("side-short").classList.remove("active");
+  if (currentSide === "Long") {
+    document.getElementById("side-long").classList.add("active");
+  } else {
+    document.getElementById("side-short").classList.add("active");
+  }
+
+  document.getElementById("order-limit").classList.remove("active");
+  document.getElementById("order-market").classList.remove("active");
+  document.getElementById(`order-${currentOrderType}`).classList.add("active");
+
+  const sideItemWrapper = document.getElementById("side-item-wrapper");
+  const leverageItem = document.getElementById("leverage-item");
+  const liqSection = document.getElementById("liq-section");
+
+  if (currentTab === "futures") {
+    sideItemWrapper.classList.remove("fade-out");
+    leverageItem.classList.remove("disabled-element");
+    document.getElementById("leverage").disabled = false;
+    liqSection.classList.remove("disabled-element");
+  } else {
+    sideItemWrapper.classList.add("fade-out");
+    leverageItem.classList.add("disabled-element");
+    document.getElementById("leverage").disabled = true;
+    liqSection.classList.add("disabled-element");
+  }
+}
+
+function updateLeverageBadge() {
+  const selectedPair = document.getElementById("pair").value;
+  const config = coinConfig[selectedPair];
+  if (config) {
+    document.getElementById("rec-lev-badge").innerText =
+      `${config.recLeverage}x`;
+  }
+}
 
 function switchTab(tab) {
   currentTab = tab;
@@ -31,6 +133,7 @@ function switchTab(tab) {
     liqSection.classList.add("disabled-element");
     setSide("Long");
   }
+  saveToStorage();
   calculate();
 }
 
@@ -45,8 +148,12 @@ function setSide(side) {
   } else {
     document.getElementById("side-short").classList.add("active");
   }
+  saveToStorage();
   calculate();
 }
+
+/* КОНЕЦ ЧАСТИ 1 */
+/* НАЧАЛО ЧАСТИ 2 */
 
 function setOrderType(type) {
   currentOrderType = type;
@@ -70,12 +177,13 @@ function setOrderType(type) {
   }
 
   entryInput.value = coinConfig[selectedPair].price;
+  saveToStorage();
   calculate();
 }
 
-function formatSmartValue(value, decimals, currentInputPrice) {
+function formatSmartValue(value, decimals) {
   if (value === "—") return "—";
-  if (currentInputPrice >= 1000) {
+  if (decimals === 0) {
     return Math.round(value).toString();
   }
   return value.toFixed(decimals);
@@ -97,12 +205,10 @@ function calculate() {
     priceDecimals: 2,
     qtyDecimals: 2,
   };
+
   const cost = balance / 5;
   const qty = (cost * leverage) / entryPrice;
-
   const totalVolume = cost * leverage;
-  document.getElementById("res-volume").innerText =
-    `$${totalVolume.toFixed(2)}`;
 
   const freeMargin = balance - cost;
   const remainingTrades = Math.floor(freeMargin / cost);
@@ -114,32 +220,71 @@ function calculate() {
   const riskAmount = balance * 0.02;
   document.getElementById("risk-cash").innerText = `$${riskAmount.toFixed(2)}`;
 
-  const allowedPriceChange = (riskAmount * entryPrice) / (cost * leverage);
-
   let sl = 0,
     tp = 0,
-    liq = 0;
+    liq = "—";
+  let pctChangeSL = 0,
+    pctChangeTP = 0;
+  let cashLoss = 0,
+    cashProfit = 0;
 
-  if (currentSide === "Long") {
-    sl = entryPrice - allowedPriceChange;
-    tp = entryPrice + allowedPriceChange * 2;
-    liq = entryPrice * (1 - 1 / leverage + 0.004);
+  if (currentTab === "futures") {
+    const totalFee = totalVolume * TAKER_FEE * 2;
+    const netRiskForPriceMove = riskAmount - totalFee;
+
+    const allowedPriceChange =
+      netRiskForPriceMove > 0
+        ? (netRiskForPriceMove * entryPrice) / totalVolume
+        : (riskAmount * 0.05 * entryPrice) / totalVolume;
+
+    if (currentSide === "Long") {
+      sl = entryPrice - allowedPriceChange;
+      tp = entryPrice + allowedPriceChange * 2;
+      liq = entryPrice * (1 - 1 / leverage + MMR);
+
+      pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
+      pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
+    } else {
+      sl = entryPrice + allowedPriceChange;
+      tp = entryPrice - allowedPriceChange * 2;
+      liq = entryPrice * (1 + 1 / leverage - MMR);
+
+      pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
+      pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
+    }
+
+    cashLoss = riskAmount;
+    cashProfit =
+      netRiskForPriceMove > 0
+        ? netRiskForPriceMove * 2 + totalFee
+        : riskAmount * 2;
   } else {
-    sl = entryPrice + allowedPriceChange;
-    tp = entryPrice - allowedPriceChange * 2;
-    liq = entryPrice * (1 + 1 / leverage - 0.004);
+    const spotPriceStep = (riskAmount * entryPrice) / cost;
+
+    sl = entryPrice - spotPriceStep;
+    tp = entryPrice + spotPriceStep * 2;
+    liq = "—";
+
+    pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
+    pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
+
+    cashLoss = riskAmount;
+    cashProfit = riskAmount * 2;
   }
 
   if (sl < 0) sl = 0;
-  if (liq < 0) liq = 0;
+  if (liq !== "—" && liq < 0) liq = 0;
 
-  const pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
-  const pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
+  document.getElementById("res-volume").innerText =
+    `$${totalVolume.toFixed(2)}`;
 
   document.getElementById("pct-tp").innerText =
     `${pctChangeTP > 0 ? "+" : ""}${pctChangeTP.toFixed(2)}%`;
   document.getElementById("pct-sl").innerText =
     `${pctChangeSL > 0 ? "+" : ""}${pctChangeSL.toFixed(2)}%`;
+
+  document.getElementById("cash-tp").innerText = `(+$${cashProfit.toFixed(2)})`;
+  document.getElementById("cash-sl").innerText = `(-$${cashLoss.toFixed(2)})`;
 
   document.getElementById("res-cost").innerText = cost.toFixed(2);
   document.getElementById("res-qty").innerText = qty.toFixed(
@@ -149,29 +294,36 @@ function calculate() {
   document.getElementById("res-tp").innerText = formatSmartValue(
     tp,
     config.priceDecimals,
-    entryPrice,
   );
   document.getElementById("res-sl").innerText = formatSmartValue(
     sl,
     config.priceDecimals,
-    entryPrice,
   );
 
-  if (currentTab === "futures") {
+  if (currentTab === "futures" && liq !== "—") {
     document.getElementById("res-liq").innerText = formatSmartValue(
       liq,
       config.priceDecimals,
-      entryPrice,
     );
   } else {
     document.getElementById("res-liq").innerText = "—";
   }
 }
 
+// ИСПРАВЛЕНО: Рекомендованное плечо подставляется СТРОГО при ручном выборе пары пользователем
 function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
   const entryInput = document.getElementById("entry-price");
+  const leverageInput = document.getElementById("leverage");
+
   entryInput.value = coinConfig[selectedPair].price;
+
+  if (currentTab === "futures") {
+    leverageInput.value = coinConfig[selectedPair].recLeverage;
+  }
+
+  updateLeverageBadge();
+  saveToStorage();
   calculate();
 }
 
@@ -190,4 +342,29 @@ function copyData(elementId, btnElement) {
   }, 1200);
 }
 
-window.onload = () => switchTab("futures");
+function resetTerminal() {
+  localStorage.clear();
+
+  currentTab = "futures";
+  currentSide = "Long";
+  currentOrderType = "limit";
+
+  const defaultPair = "BTCUSDT";
+  document.getElementById("balance").value = "100";
+  document.getElementById("pair").value = defaultPair;
+  document.getElementById("leverage").value =
+    coinConfig[defaultPair].recLeverage;
+  document.getElementById("entry-price").value = coinConfig[defaultPair].price;
+
+  restoreTabsVisual();
+  updateLeverageBadge();
+  calculate();
+}
+
+document.getElementById("balance").addEventListener("input", saveToStorage);
+document.getElementById("leverage").addEventListener("input", saveToStorage);
+document.getElementById("entry-price").addEventListener("input", saveToStorage);
+
+window.onload = () => loadFromStorage();
+
+/* КОНЕЦ ЧАСТИ 2 */

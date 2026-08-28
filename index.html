@@ -7,6 +7,16 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- Инъекция мгновенного восстановления до рендера элементов (Защита от фликкера) -->
+    <script>
+      (function () {
+        const savedTab = localStorage.getItem("bybit_tab") || "futures";
+        if (savedTab === "spot") {
+          document.documentElement.classList.add("init-spot-mode");
+        }
+      })();
+    </script>
+
     <div class="glow-sphere sphere-1"></div>
     <div class="glow-sphere sphere-2"></div>
     <div class="glow-sphere sphere-3"></div>
@@ -14,10 +24,11 @@
     <div class="glass-container">
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
+        <!-- Верхние табы режима торговли -->
         <div class="input-item">
           <div class="tabs tabs-large">
             <button
-              class="tab-btn active"
+              class="tab-btn"
               id="tab-futures"
               onclick="switchTab('futures')"
             >
@@ -29,14 +40,11 @@
           </div>
         </div>
 
+        <!-- Адаптивный контейнер направления -->
         <div class="side-fade-wrapper" id="side-item-wrapper">
           <div class="input-item">
             <div class="toggle-container container-small" id="side-container">
-              <button
-                class="side-btn active"
-                id="side-long"
-                onclick="setSide('Long')"
-              >
+              <button class="side-btn" id="side-long" onclick="setSide('Long')">
                 Лонг
               </button>
               <button
@@ -63,12 +71,16 @@
             </div>
             <div class="input-item">
               <label>Торговая пара</label>
-              <select id="pair" onchange="handlePairChange()">
-                <option value="BTCUSDT">BTC/USDT</option>
-                <option value="ETHUSDT">ETH/USDT</option>
-                <option value="SOLUSDT">SOL/USDT</option>
-                <option value="XRPUSDT">XRP/USDT</option>
-              </select>
+              <div class="select-custom-wrapper">
+                <select id="pair" onchange="handlePairChange()">
+                  <option value="BTCUSDT">BTC/USDT</option>
+                  <option value="ETHUSDT">ETH/USDT</option>
+                  <option value="MNTUSDT">MNT/USDT</option>
+                  <option value="ZECUSDT">ZEC/USDT</option>
+                  <option value="XAUTUSDT">XAUT/USDT</option>
+                  <option value="SOLUSDT">SOL/USDT</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -76,7 +88,7 @@
             <label>Тип ордера</label>
             <div class="order-type-container">
               <button
-                class="order-btn active"
+                class="order-btn"
                 id="order-limit"
                 onclick="setOrderType('limit')"
               >
@@ -103,18 +115,23 @@
               />
             </div>
             <div class="input-item" id="leverage-item">
-              <label>Плечо (<span id="rec-lev-badge">5x</span>)</label>
+              <!-- ИСПРАВЛЕНО: Плечо по умолчанию синхронизировано со скриптом динамически -->
+              <label>Плечо (<span id="rec-lev-badge">20x</span>)</label>
               <input
                 type="number"
                 id="leverage"
-                value="5"
+                value="20"
                 min="1"
-                max="100"
+                max="125"
                 oninput="calculate()"
               />
             </div>
           </div>
         </div>
+
+        <button class="reset-link-btn" onclick="resetTerminal()">
+          Сбросить настройки
+        </button>
       </div>
 
       <!-- ПРАВАЯ ПАНЕЛЬ: РАСШИРЕННАЯ ПРОЗРАЧНАЯ АНАЛИТИКА -->
@@ -163,7 +180,12 @@
             <div class="display-row val-green">
               <div class="field-info">
                 <span class="field-name">Тейк-профит (TP)</span>
-                <span class="field-sub" id="pct-tp">+6.67%</span>
+                <span class="field-sub"
+                  ><span id="pct-tp">+6.67%</span>
+                  <span id="cash-tp" style="opacity: 0.8; margin-left: 4px"
+                    >(+$4.00)</span
+                  ></span
+                >
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-tp">61200</span>
@@ -178,7 +200,12 @@
             <div class="display-row val-red">
               <div class="field-info">
                 <span class="field-name">Стоп-лосс (SL)</span>
-                <span class="field-sub" id="pct-sl">-3.33%</span>
+                <span class="field-sub"
+                  ><span id="pct-sl">-3.33%</span>
+                  <span id="cash-sl" style="opacity: 0.8; margin-left: 4px"
+                    >(-$2.00)</span
+                  ></span
+                >
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-sl">58800</span>
