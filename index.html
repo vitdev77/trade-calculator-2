@@ -7,6 +7,7 @@
     <title>Bybit Премиум Терминал</title>
     <link rel="stylesheet" href="./style.css" />
     <script>
+      // ЖЕСТКАЯ FLICKER-ЗАЩИТА: Проверяем сохраненную тему ДО рендеринга страницы
       (function () {
         const savedTab = localStorage.getItem("bybit_tab") || "futures";
         if (savedTab === "spot") {
@@ -20,20 +21,44 @@
     </script>
   </head>
   <body>
-    <button class="info-mini-btn" onclick="toggleModal(true)">?</button>
-
-    <button
-      class="theme-mini-btn"
-      id="theme-toggle-btn"
-      onclick="toggleTheme()"
-      title="Переключить тему"
-    >
-      <svg class="icon-theme" viewBox="0 0 24 24">
-        <path
-          d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
+    <div class="terminal-top-bar">
+      <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА С ТЕКСТОВЫМ ЯКОРЕМ -->
+      <div class="clean-balance-widget">
+        <span class="balance-widget-label-dep">DEP</span>
+        <input
+          type="number"
+          id="balance"
+          value="100"
+          oninput="calculate()"
+          title="Кликните, чтобы изменить депозит ордера"
         />
-      </svg>
-    </button>
+        <span class="balance-widget-asset">USDT</span>
+      </div>
+
+      <!-- СЕРВИСНЫЕ КНОПКИ GOOGLE -->
+      <div class="google-utility-capsule">
+        <button
+          class="google-action-icon-btn"
+          id="theme-toggle-btn"
+          onclick="toggleTheme()"
+          title="Переключить тему"
+        >
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12.3 2a10 10 0 0 0-1.9.2 8 8 0 0 1 7.1 11 10 10 0 1 0-5.2-11.2z"
+            />
+          </svg>
+        </button>
+        <button
+          class="google-action-icon-btn help-btn-text"
+          onclick="toggleModal(true)"
+          title="Справка"
+        >
+          ?
+        </button>
+      </div>
+    </div>
 
     <div class="glow-sphere sphere-1"></div>
     <div class="glow-sphere sphere-2"></div>
@@ -42,6 +67,7 @@
     <div class="glass-container">
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
+        <!-- ПРИОРИТЕТ №1: Глобальный переключатель рынков -->
         <div class="input-item full-width">
           <div class="market-king-tabs">
             <button
@@ -61,20 +87,10 @@
           </div>
         </div>
 
+        <!-- Сетка параметров ввода -->
         <div class="fields-grid-priority">
-          <div class="input-item full-width compact-row">
-            <label class="label-priority">Баланс (USDT)</label>
-            <input
-              type="number"
-              id="balance"
-              value="100"
-              oninput="calculate()"
-              class="compact-input"
-            />
-          </div>
-
+          <!-- Тип ордера -->
           <div class="input-item full-width">
-            <label class="label-priority">Тип ордера</label>
             <div class="order-type-container">
               <button
                 class="order-btn"
@@ -91,27 +107,30 @@
                 Рыночный
               </button>
             </div>
+            <span class="left-field-desc">Тип ордера исполнения</span>
           </div>
 
+          <!-- Объединенная группа актива и стоимости -->
           <div class="input-row trade-group-row">
+            <!-- Выбор пары (50%) -->
             <div class="input-item pair-item-width">
-              <label class="label-priority">Торговая пара</label>
               <div class="select-custom-wrapper">
                 <select id="pair" onchange="handlePairChange()">
                   <option value="BTCUSDT">BTC/USDT</option>
                   <option value="ETHUSDT">ETH/USDT</option>
+                  <option value="TONUSDT">TON/USDT</option>
+                  <!-- ИНТЕГРИРОВАНО: Новая пара -->
                   <option value="MNTUSDT">MNT/USDT</option>
                   <option value="ZECUSDT">ZEC/USDT</option>
                   <option value="XAUTUSDT">XAUT/USDT</option>
                   <option value="SOLUSDT">SOL/USDT</option>
                 </select>
               </div>
+              <span class="left-field-desc">Торговая пара</span>
             </div>
 
+            <!-- Поле Цены входа (50%) -->
             <div class="input-item price-item-width input-group-king">
-              <label class="label-priority king-label" id="entry-label"
-                >Цена входа (USDT)</label
-              >
               <div class="king-input-wrapper">
                 <input
                   type="number"
@@ -121,10 +140,14 @@
                   class="king-input"
                 />
               </div>
+              <span class="left-field-desc" id="entry-label"
+                >Цена входа (USDT)</span
+              >
             </div>
           </div>
         </div>
 
+        <!-- ПРИОРИТЕТ №3: Финальный триггер действия (Лонг/Шорт) -->
         <div class="side-fade-wrapper" id="side-item-wrapper">
           <div class="input-item full-width">
             <div class="toggle-container container-medium" id="side-container">
@@ -142,6 +165,7 @@
           </div>
         </div>
 
+        <!-- Системный подвал -->
         <div class="system-footer-row">
           <button class="reset-link-btn" onclick="resetTerminal()">
             Сбросить настройки
@@ -152,23 +176,10 @@
       <!-- === НАЧАЛО ЧАСТИ 2 === -->
       <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="panel-right">
-        <div class="analytics-header">
-          <div class="analytic-badge b-risk">
-            <span class="badge-label">Риск (2%)</span>
-            <span class="badge-value" id="risk-cash">$2.00</span>
-          </div>
-          <div class="analytic-badge b-volume">
-            <span class="badge-label">Объем сделки</span>
-            <span class="badge-value" id="res-volume-badge">$400.00</span>
-          </div>
-          <div class="analytic-badge b-ratio">
-            <span class="badge-label">P/R Ratio</span>
-            <span class="badge-value" style="color: #ffb11a">1 : 2</span>
-          </div>
-        </div>
-
         <div class="results-display">
+          <!-- СЕКЦИЯ 1: ВСЕ ПАРАМЕТРЫ ПРЕДСТОЯЩЕГО ОРДЕРА -->
           <div class="results-section">
+            <!-- 1. Главный копируемый объем -->
             <div class="display-row val-orange-text">
               <div class="field-info">
                 <span class="field-name">Объем в USDT (Value)</span>
@@ -191,6 +202,7 @@
               </div>
             </div>
 
+            <!-- 2. Количество монет -->
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Количество (Qty в монетах)</span>
@@ -201,6 +213,7 @@
               </div>
             </div>
 
+            <!-- 3. Занятая маржа -->
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Занятая маржа (Cost)</span>
@@ -210,9 +223,34 @@
                 <span class="display-value" id="res-cost">20.00</span>
               </div>
             </div>
+
+            <!-- 4. Рабочее плечо Bybit -->
+            <div class="display-row val-orange-text" id="res-leverage-section">
+              <div class="field-info">
+                <span class="field-name">Рабочее плечо Bybit</span>
+                <span class="field-sub" style="color: rgba(255, 159, 67, 0.85)"
+                  >Выставить в терминале биржи</span
+                >
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-leverage-copy">20</span>
+                <button
+                  class="google-copy-btn btn-orange"
+                  onclick="copyData('res-leverage-copy', this)"
+                >
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
 
+          <!-- СЕКЦИЯ 2: ЦЕЛЕВЫЕ ТАРГЕТЫ ЗАЩИТЫ (TP / SL) -->
           <div class="results-section">
+            <!-- Тейк Профит -->
             <div class="display-row val-green">
               <div class="field-info">
                 <span class="field-name">Тейк Профит</span>
@@ -237,6 +275,8 @@
                 </button>
               </div>
             </div>
+
+            <!-- Стоп Лосс -->
             <div class="display-row val-red">
               <div class="field-info">
                 <span class="field-name">Стоп Лосс</span>
@@ -263,28 +303,8 @@
             </div>
           </div>
 
-          <div class="results-section no-border">
-            <div class="display-row val-orange-text" id="res-leverage-section">
-              <div class="field-info">
-                <span class="field-name">Рабочее плечо Bybit</span>
-                <span class="field-sub" style="color: rgba(255, 159, 67, 0.85)"
-                  >Выставить в терминале биржи</span
-                >
-              </div>
-              <div class="value-action">
-                <span class="display-value" id="res-leverage-copy">20</span>
-                <button
-                  class="google-copy-btn btn-orange"
-                  onclick="copyData('res-leverage-copy', this)"
-                >
-                  <svg class="icon-copy" viewBox="0 0 24 24">
-                    <path
-                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
+          <!-- СЕКЦИЯ 3: ИНФОРМАЦИЯ О РИСКАХ И ЗАПАСАХ НА ДЕПОЗИТ -->
+          <div class="results-section">
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Цена ликвидации (Liq)</span>
@@ -306,6 +326,31 @@
                   >$80.00</span
                 >
               </div>
+            </div>
+          </div>
+
+          <!-- ОБНОВЛЕННАЯ СЕКЦИЯ 4: ИНТЕГРИРОВАННЫЙ СВОД АНАЛИТИКИ (Добавлен Баланс слева) -->
+          <div class="results-section no-border analytics-footer-row">
+            <!-- Добавлено: Дубликат баланса для мгновенного контроля рисков -->
+            <div class="analytic-footer-item">
+              <span class="an-label">Депозит</span>
+              <span class="an-value an-v-blue" id="res-analytics-balance"
+                >$100.00</span
+              >
+            </div>
+            <div class="analytic-footer-item">
+              <span class="an-label">Риск (2%)</span>
+              <span class="an-value an-v-red" id="risk-cash">$2.00</span>
+            </div>
+            <div class="analytic-footer-item">
+              <span class="an-label">Объем сделки</span>
+              <span class="an-value an-v-main" id="res-volume-badge"
+                >$400.00</span
+              >
+            </div>
+            <div class="analytic-footer-item">
+              <span class="an-label">P/R Ratio</span>
+              <span class="an-value an-v-orange">1 : 2</span>
             </div>
           </div>
         </div>

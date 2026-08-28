@@ -5,9 +5,11 @@ let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 
+// ОБНОВЛЕНО: В кошелек coinConfig внедрена глубокая логика для TONUSDT
 const coinConfig = {
   BTCUSDT: { price: 79670, priceDecimals: 0, qtyDecimals: 5, recLeverage: 20 },
   ETHUSDT: { price: 2510, priceDecimals: 0, qtyDecimals: 4, recLeverage: 10 },
+  TONUSDT: { price: 5.345, priceDecimals: 3, qtyDecimals: 2, recLeverage: 3 }, // ИНТЕГРИРОВАНО: 3х плечо, сотые доли монет
   XAUTUSDT: {
     price: 4582.6,
     priceDecimals: 2,
@@ -73,20 +75,6 @@ function saveToStorage() {
   );
 }
 
-function toggleTheme() {
-  const btn = document.getElementById("theme-toggle-btn");
-  if (currentTheme === "dark") {
-    currentTheme = "light";
-    document.documentElement.classList.add("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
-  } else {
-    currentTheme = "dark";
-    document.documentElement.classList.remove("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
-  }
-  saveToStorage();
-}
-
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
   const btn = document.getElementById("theme-toggle-btn");
@@ -102,6 +90,7 @@ function loadFromStorage() {
   if (localStorage.getItem("bybit_pair")) {
     document.getElementById("pair").value = localStorage.getItem("bybit_pair");
   }
+
   if (localStorage.getItem("bybit_balance")) {
     document.getElementById("balance").value =
       localStorage.getItem("bybit_balance");
@@ -150,12 +139,12 @@ function restoreTabsVisualOnly() {
 
   if (currentTab === "futures") {
     sideItemWrapper.classList.remove("fade-out");
-    liqSection.classList.remove("disabled-element");
+    if (liqSection) liqSection.classList.remove("disabled-element");
     if (resLeverageSection)
       resLeverageSection.classList.remove("disabled-element");
   } else {
     sideItemWrapper.classList.add("fade-out");
-    liqSection.classList.add("disabled-element");
+    if (liqSection) liqSection.classList.add("disabled-element");
     if (resLeverageSection)
       resLeverageSection.classList.add("disabled-element");
   }
@@ -222,6 +211,12 @@ function calculate() {
   const selectedPair = document.getElementById("pair").value;
 
   if (balance <= 0 || entryPrice <= 0) return;
+
+  // ДОБАВЛЕНО: Синхронизация дублирующего поля баланса в статус-строке результатов
+  const analyticsBalanceEl = document.getElementById("res-analytics-balance");
+  if (analyticsBalanceEl) {
+    analyticsBalanceEl.innerText = `$${balance.toFixed(2)}`;
+  }
 
   const config = coinConfig[selectedPair] || {
     priceDecimals: 2,
