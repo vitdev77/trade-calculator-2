@@ -4,10 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bybit Премиум Терминал</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <!-- Инъекция мгновенного восстановления до рендера элементов (Защита от фликкера) -->
     <script>
       (function () {
         const savedTab = localStorage.getItem("bybit_tab") || "futures";
@@ -17,6 +16,8 @@
       })();
     </script>
 
+    <button class="info-mini-btn" onclick="toggleModal(true)">?</button>
+
     <div class="glow-sphere sphere-1"></div>
     <div class="glow-sphere sphere-2"></div>
     <div class="glow-sphere sphere-3"></div>
@@ -24,7 +25,6 @@
     <div class="glass-container">
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
-        <!-- Верхние табы режима торговли -->
         <div class="input-item">
           <div class="tabs tabs-large">
             <button
@@ -40,7 +40,6 @@
           </div>
         </div>
 
-        <!-- Адаптивный контейнер направления -->
         <div class="side-fade-wrapper" id="side-item-wrapper">
           <div class="input-item">
             <div class="toggle-container container-small" id="side-container">
@@ -107,15 +106,15 @@
           <div class="input-row">
             <div class="input-item">
               <label id="entry-label">Цена входа</label>
+              <!-- ИСПРАВЛЕНО: Теперь по умолчанию установлена ваша актуальная цена BTC -->
               <input
                 type="number"
                 id="entry-price"
-                value="60000"
+                value="79670"
                 oninput="calculate()"
               />
             </div>
             <div class="input-item" id="leverage-item">
-              <!-- ИСПРАВЛЕНО: Плечо по умолчанию синхронизировано со скриптом динамически -->
               <label>Плечо (<span id="rec-lev-badge">20x</span>)</label>
               <input
                 type="number"
@@ -134,9 +133,8 @@
         </button>
       </div>
 
-      <!-- ПРАВАЯ ПАНЕЛЬ: РАСШИРЕННАЯ ПРОЗРАЧНАЯ АНАЛИТИКА -->
+      <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="panel-right">
-        <!-- Верхняя строка живых метрик -->
         <div class="analytics-header">
           <div class="analytic-badge b-risk">
             <span class="badge-label">Риск (2%)</span>
@@ -153,7 +151,6 @@
         </div>
 
         <div class="results-display">
-          <!-- Секция 1: Данные ордера Bybit -->
           <div class="results-section">
             <div class="display-row">
               <span class="field-name" id="label-cost">Стоимость</span>
@@ -175,7 +172,6 @@
             </div>
           </div>
 
-          <!-- Секция 2: Цели ордера -->
           <div class="results-section">
             <div class="display-row val-green">
               <div class="field-info">
@@ -188,7 +184,7 @@
                 >
               </div>
               <div class="value-action">
-                <span class="display-value" id="res-tp">61200</span>
+                <span class="display-value" id="res-tp">81200</span>
                 <button
                   class="copy-btn btn-green"
                   onclick="copyData('res-tp', this)"
@@ -219,7 +215,6 @@
             </div>
           </div>
 
-          <!-- Секция 3: Запас маржи и Ликвидация -->
           <div class="results-section no-border">
             <div class="display-row">
               <div class="field-info">
@@ -249,6 +244,17 @@
         </div>
       </div>
     </div>
-    <script src="script.js"></script>
+
+    <div class="modal-overlay" id="info-modal" onclick="toggleModal(false)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close-btn" onclick="toggleModal(false)">✕</button>
+        <div class="modal-scroll-area" id="md-render-target"></div>
+        <button class="modal-action-btn" onclick="toggleModal(false)">
+          Понятно, в бой!
+        </button>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
   </body>
 </html>
