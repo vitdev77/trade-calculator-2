@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bybit Премиум Терминал</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+    <div class="glow-sphere sphere-3"></div>
+
+    <div class="glass-container">
+      <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
+      <div class="panel-left">
+        <div class="input-item">
+          <div class="tabs tabs-large">
+            <button
+              class="tab-btn active"
+              id="tab-futures"
+              onclick="switchTab('futures')"
+            >
+              Фьючерсы
+            </button>
+            <button class="tab-btn" id="tab-spot" onclick="switchTab('spot')">
+              Спот
+            </button>
+          </div>
+        </div>
+
+        <div class="side-fade-wrapper" id="side-item-wrapper">
+          <div class="input-item">
+            <div class="toggle-container container-small" id="side-container">
+              <button
+                class="side-btn active"
+                id="side-long"
+                onclick="setSide('Long')"
+              >
+                Лонг
+              </button>
+              <button
+                class="side-btn"
+                id="side-short"
+                onclick="setSide('Short')"
+              >
+                Шорт
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="input-row">
+            <div class="input-item">
+              <label>Баланс (USDT)</label>
+              <input
+                type="number"
+                id="balance"
+                value="100"
+                oninput="calculate()"
+              />
+            </div>
+            <div class="input-item">
+              <label>Торговая пара</label>
+              <select id="pair" onchange="handlePairChange()">
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-item full-width">
+            <label>Тип ордера</label>
+            <div class="order-type-container">
+              <button
+                class="order-btn active"
+                id="order-limit"
+                onclick="setOrderType('limit')"
+              >
+                Лимит
+              </button>
+              <button
+                class="order-btn"
+                id="order-market"
+                onclick="setOrderType('market')"
+              >
+                Рынок
+              </button>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-item">
+              <label id="entry-label">Цена входа</label>
+              <input
+                type="number"
+                id="entry-price"
+                value="60000"
+                oninput="calculate()"
+              />
+            </div>
+            <div class="input-item" id="leverage-item">
+              <label>Плечо (<span id="rec-lev-badge">5x</span>)</label>
+              <input
+                type="number"
+                id="leverage"
+                value="5"
+                min="1"
+                max="100"
+                oninput="calculate()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ПРАВАЯ ПАНЕЛЬ: РАСШИРЕННАЯ ПРОЗРАЧНАЯ АНАЛИТИКА -->
+      <div class="panel-right">
+        <!-- Верхняя строка живых метрик -->
+        <div class="analytics-header">
+          <div class="analytic-badge b-risk">
+            <span class="badge-label">Риск (2%)</span>
+            <span class="badge-value" id="risk-cash">$2.00</span>
+          </div>
+          <div class="analytic-badge b-volume">
+            <span class="badge-label">Объем сделки</span>
+            <span class="badge-value" id="res-volume">$100.00</span>
+          </div>
+          <div class="analytic-badge b-ratio">
+            <span class="badge-label">P/R Ratio</span>
+            <span class="badge-value" style="color: #ffb11a">1 : 2</span>
+          </div>
+        </div>
+
+        <div class="results-display">
+          <!-- Секция 1: Данные ордера Bybit -->
+          <div class="results-section">
+            <div class="display-row">
+              <span class="field-name" id="label-cost">Стоимость</span>
+              <div class="value-action">
+                <span class="display-value" id="res-cost">20.00</span>
+                <button class="copy-btn" onclick="copyData('res-cost', this)">
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="display-row">
+              <span class="field-name">Количество (Qty)</span>
+              <div class="value-action">
+                <span class="display-value" id="res-qty">0.00033</span>
+                <button class="copy-btn" onclick="copyData('res-qty', this)">
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Секция 2: Цели ордера -->
+          <div class="results-section">
+            <div class="display-row val-green">
+              <div class="field-info">
+                <span class="field-name">Тейк-профит (TP)</span>
+                <span class="field-sub" id="pct-tp">+6.67%</span>
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-tp">61200</span>
+                <button
+                  class="copy-btn btn-green"
+                  onclick="copyData('res-tp', this)"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="display-row val-red">
+              <div class="field-info">
+                <span class="field-name">Стоп-лосс (SL)</span>
+                <span class="field-sub" id="pct-sl">-3.33%</span>
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-sl">58800</span>
+                <button
+                  class="copy-btn btn-red"
+                  onclick="copyData('res-sl', this)"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Секция 3: Запас маржи и Ликвидация -->
+          <div class="results-section no-border">
+            <div class="display-row">
+              <div class="field-info">
+                <span class="field-name">Запас маржи (Остаток)</span>
+                <span class="field-sub" id="margin-trades"
+                  >Запас на 4 сделки</span
+                >
+              </div>
+              <span class="display-value small-val" id="res-margin-free"
+                >$80.00</span
+              >
+            </div>
+            <div class="display-row val-orange" id="liq-section">
+              <span class="field-name">Цена ликвидации (Liq)</span>
+              <div class="value-action">
+                <span class="display-value" id="res-liq">—</span>
+                <button
+                  class="copy-btn btn-orange"
+                  id="copy-btn-liq"
+                  onclick="copyData('res-liq', this)"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
