@@ -4,6 +4,7 @@ let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 
+// Спецификации монет и актуальные рыночные цены Bybit
 const coinConfig = {
   BTCUSDT: { price: 79670, priceDecimals: 0, qtyDecimals: 5, recLeverage: 20 },
   ETHUSDT: { price: 2510, priceDecimals: 0, qtyDecimals: 4, recLeverage: 10 },
@@ -40,11 +41,9 @@ function saveToStorage() {
   );
 }
 
-// ИСПРАВЛЕНО: Жёсткий и правильный порядок чтения памяти без перезаписи плеча
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
 
-  // 1. Сначала просто восстанавливаем текстовые значения в полях
   if (localStorage.getItem("bybit_balance")) {
     document.getElementById("balance").value =
       localStorage.getItem("bybit_balance");
@@ -52,23 +51,29 @@ function loadFromStorage() {
   if (localStorage.getItem("bybit_pair")) {
     document.getElementById("pair").value = localStorage.getItem("bybit_pair");
   }
+
+  // ИСПРАВЛЕНО: Сначала восстанавливаем только физическое положение табов, без перезаписи логики
+  restoreTabsVisualOnly();
+
   if (localStorage.getItem("bybit_leverage")) {
     document.getElementById("leverage").value =
       localStorage.getItem("bybit_leverage");
   }
+
+  // ИСПРАВЛЕНО: Инициализируем тип ордера со всеми сопутствующими текстовыми метками Bybit
+  setOrderType(currentOrderType);
+
   if (localStorage.getItem("bybit_entry")) {
     document.getElementById("entry-price").value =
       localStorage.getItem("bybit_entry");
   }
 
-  // 2. Затем активируем табы БЕЗ вызова функций автоподстановки цен/плеч
-  restoreTabsVisual();
   updateLeverageBadge();
   calculate();
 }
 
-// Новая изолированная функция для включения табов при старте, чтобы не затирать плечи
-function restoreTabsVisual() {
+// Вывод корректных классов подсветки кнопок при первичной загрузке страницы
+function restoreTabsVisualOnly() {
   document.getElementById("tab-spot").classList.remove("active");
   document.getElementById("tab-futures").classList.remove("active");
   document.getElementById(`tab-${currentTab}`).classList.add("active");
@@ -80,10 +85,6 @@ function restoreTabsVisual() {
   } else {
     document.getElementById("side-short").classList.add("active");
   }
-
-  document.getElementById("order-limit").classList.remove("active");
-  document.getElementById("order-market").classList.remove("active");
-  document.getElementById(`order-${currentOrderType}`).classList.add("active");
 
   const sideItemWrapper = document.getElementById("side-item-wrapper");
   const leverageItem = document.getElementById("leverage-item");
@@ -176,7 +177,11 @@ function setOrderType(type) {
     costLabel.innerText = "Стоимость";
   }
 
-  entryInput.value = coinConfig[selectedPair].price;
+  // Предотвращаем перезапись цены, если она уже корректно подгрузилась из хранилища
+  if (!localStorage.getItem("bybit_entry") || entryInput.value == 0) {
+    entryInput.value = coinConfig[selectedPair].price;
+  }
+
   saveToStorage();
   calculate();
 }
@@ -259,14 +264,16 @@ function calculate() {
         ? netRiskForPriceMove * 2 + totalFee
         : riskAmount * 2;
   } else {
+    // Расчет спот-рынка с гарантированным выравниванием знаков процентов
     const spotPriceStep = (riskAmount * entryPrice) / cost;
 
     sl = entryPrice - spotPriceStep;
     tp = entryPrice + spotPriceStep * 2;
     liq = "—";
 
-    pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
-    pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
+    // На споте лонг всегда линеен: падение — минус, рост — плюс
+    pctChangeSL = -Math.abs(((sl - entryPrice) / entryPrice) * 100);
+    pctChangeTP = Math.abs(((tp - entryPrice) / entryPrice) * 100);
 
     cashLoss = riskAmount;
     cashProfit = riskAmount * 2;
@@ -310,7 +317,6 @@ function calculate() {
   }
 }
 
-// ИСПРАВЛЕНО: Рекомендованное плечо подставляется СТРОГО при ручном выборе пары пользователем
 function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
   const entryInput = document.getElementById("entry-price");
@@ -356,7 +362,8 @@ function resetTerminal() {
     coinConfig[defaultPair].recLeverage;
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
 
-  restoreTabsVisual();
+  restoreTabsVisualOnly();
+  setOrderType(currentOrderType);
   updateLeverageBadge();
   calculate();
 }
