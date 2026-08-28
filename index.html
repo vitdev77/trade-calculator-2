@@ -1,3 +1,4 @@
+<!-- === НАЧАЛО ЧАСТИ 1 === -->
 <!doctype html>
 <html lang="ru">
   <head>
@@ -16,6 +17,7 @@
       })();
     </script>
 
+    <!-- Микро-кнопка помощи зафиксирована вне контейнеров -->
     <button class="info-mini-btn" onclick="toggleModal(true)">?</button>
 
     <div class="glow-sphere sphere-1"></div>
@@ -25,7 +27,8 @@
     <div class="glass-container">
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
-        <div class="input-item">
+        <!-- Выбор глобального рынка -->
+        <div class="input-item full-width">
           <div class="tabs tabs-large">
             <button
               class="tab-btn"
@@ -40,9 +43,10 @@
           </div>
         </div>
 
+        <!-- Выбор направления (Лонг / Шорт) -->
         <div class="side-fade-wrapper" id="side-item-wrapper">
-          <div class="input-item">
-            <div class="toggle-container container-small" id="side-container">
+          <div class="input-item full-width">
+            <div class="toggle-container container-medium" id="side-container">
               <button class="side-btn" id="side-long" onclick="setSide('Long')">
                 Лонг
               </button>
@@ -57,34 +61,11 @@
           </div>
         </div>
 
-        <div class="fields-grid">
-          <div class="input-row">
-            <div class="input-item">
-              <label>Баланс (USDT)</label>
-              <input
-                type="number"
-                id="balance"
-                value="100"
-                oninput="calculate()"
-              />
-            </div>
-            <div class="input-item">
-              <label>Торговая пара</label>
-              <div class="select-custom-wrapper">
-                <select id="pair" onchange="handlePairChange()">
-                  <option value="BTCUSDT">BTC/USDT</option>
-                  <option value="ETHUSDT">ETH/USDT</option>
-                  <option value="MNTUSDT">MNT/USDT</option>
-                  <option value="ZECUSDT">ZEC/USDT</option>
-                  <option value="XAUTUSDT">XAUT/USDT</option>
-                  <option value="SOLUSDT">SOL/USDT</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
+        <!-- Сетка параметров ввода с иерархией приоритетов -->
+        <div class="fields-grid-priority">
+          <!-- Тип ордера -->
           <div class="input-item full-width">
-            <label>Тип ордера</label>
+            <label class="label-priority">Тип ордера</label>
             <div class="order-type-container">
               <button
                 class="order-btn"
@@ -103,36 +84,61 @@
             </div>
           </div>
 
-          <div class="input-row">
-            <div class="input-item">
-              <label id="entry-label">Цена входа</label>
-              <!-- ИСПРАВЛЕНО: Теперь по умолчанию установлена ваша актуальная цена BTC -->
+          <!-- ГЛАВНЫЙ АКЦЕНТ: Цена входа -->
+          <div class="input-item full-width input-group-king">
+            <label class="label-priority king-label" id="entry-label"
+              >Цена входа (USDT)</label
+            >
+            <div class="king-input-wrapper">
               <input
                 type="number"
                 id="entry-price"
                 value="79670"
                 oninput="calculate()"
+                class="king-input"
               />
             </div>
-            <div class="input-item" id="leverage-item">
-              <label>Плечо (<span id="rec-lev-badge">20x</span>)</label>
+          </div>
+
+          <!-- ВТОРОСТЕПЕННЫЙ РЯД: Кошелек и Монета -->
+          <div class="input-row compact-row">
+            <div class="input-item">
+              <label class="label-priority">Баланс (USDT)</label>
               <input
                 type="number"
-                id="leverage"
-                value="20"
-                min="1"
-                max="125"
+                id="balance"
+                value="100"
                 oninput="calculate()"
+                class="compact-input"
               />
+            </div>
+            <div class="input-item">
+              <label class="label-priority">Торговая пара</label>
+              <div class="select-custom-wrapper">
+                <select
+                  id="pair"
+                  onchange="handlePairChange()"
+                  class="compact-select"
+                >
+                  <option value="BTCUSDT">BTC/USDT</option>
+                  <option value="ETHUSDT">ETH/USDT</option>
+                  <option value="MNTUSDT">MNT/USDT</option>
+                  <option value="ZECUSDT">ZEC/USDT</option>
+                  <option value="XAUTUSDT">XAUT/USDT</option>
+                  <option value="SOLUSDT">SOL/USDT</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Системный сброс -->
         <button class="reset-link-btn" onclick="resetTerminal()">
           Сбросить настройки
         </button>
       </div>
-
+      <!-- === КОНЕЦ ЧАСТИ 1 === -->
+      <!-- === НАЧАЛО ЧАСТИ 2 === -->
       <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="panel-right">
         <div class="analytics-header">
@@ -142,7 +148,7 @@
           </div>
           <div class="analytic-badge b-volume">
             <span class="badge-label">Объем сделки</span>
-            <span class="badge-value" id="res-volume">$100.00</span>
+            <span class="badge-value" id="res-volume-badge">$400.00</span>
           </div>
           <div class="analytic-badge b-ratio">
             <span class="badge-label">P/R Ratio</span>
@@ -151,93 +157,155 @@
         </div>
 
         <div class="results-display">
+          <!-- СЕКЦИЯ 1: ВСЕ ПАРАМЕТРЫ ПОЗИЦИИ И ПЛЕЧО ОБЪЕДИНЕНЫ ВМЕСТЕ -->
           <div class="results-section">
-            <div class="display-row">
-              <span class="field-name" id="label-cost">Стоимость</span>
+            <!-- 1. Главный копируемый объем -->
+            <div class="display-row val-orange-text">
+              <div class="field-info">
+                <span class="field-name">Объем в USDT (Value)</span>
+                <span class="field-sub" style="color: rgba(255, 159, 67, 0.85)"
+                  >1. Копировать в «Стоимость» на Bybit</span
+                >
+              </div>
               <div class="value-action">
-                <span class="display-value" id="res-cost">20.00</span>
-                <button class="copy-btn" onclick="copyData('res-cost', this)">
-                  Copy
+                <span class="display-value" id="res-volume-copy">400.00</span>
+                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
+                <button
+                  class="google-copy-btn btn-orange"
+                  onclick="copyData('res-volume-copy', this)"
+                >
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
-            <div class="display-row">
-              <span class="field-name">Количество (Qty)</span>
+
+            <!-- 2. Количество монет -->
+            <div class="display-row low-accent-row">
+              <div class="field-info">
+                <span class="field-name">Количество (Qty в монетах)</span>
+                <span class="field-sub">Размер позиции в базовом активе</span>
+              </div>
               <div class="value-action">
-                <span class="display-value" id="res-qty">0.00033</span>
-                <button class="copy-btn" onclick="copyData('res-qty', this)">
-                  Copy
+                <span class="display-value" id="res-qty">0.00514</span>
+              </div>
+            </div>
+
+            <!-- 3. Занятая маржа -->
+            <div class="display-row low-accent-row">
+              <div class="field-info">
+                <span class="field-name">Занятая маржа (Cost)</span>
+                <span class="field-sub">Личные деньги под залог сделки</span>
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-cost">20.00</span>
+              </div>
+            </div>
+
+            <!-- 4. Рабочее плечо -->
+            <div class="display-row val-orange-text" id="res-leverage-section">
+              <div class="field-info">
+                <span class="field-name">Рабочее плечо Bybit</span>
+                <span class="field-sub" style="color: rgba(255, 159, 67, 0.85)"
+                  >Выставить в терминале биржи</span
+                >
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-leverage-copy">20</span>
+                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
+                <button
+                  class="google-copy-btn btn-orange"
+                  onclick="copyData('res-leverage-copy', this)"
+                >
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
           </div>
 
+          <!-- СЕКЦИЯ 2: ЦЕЛЕВЫЕ ТАРГЕТЫ ЗАЩИТЫ (TP / SL) -->
           <div class="results-section">
             <div class="display-row val-green">
               <div class="field-info">
                 <span class="field-name">Тейк Профит</span>
-                <span class="field-sub"
-                  ><span id="pct-tp">+6.67%</span>
+                <span class="field-sub">
+                  <span id="pct-tp">+0.78%</span>
                   <span id="cash-tp" style="opacity: 0.8; margin-left: 4px"
                     >(+$4.00)</span
-                  ></span
-                >
+                  >
+                </span>
               </div>
               <div class="value-action">
-                <span class="display-value" id="res-tp">81200</span>
+                <span class="display-value" id="res-tp">78367</span>
+                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
                 <button
-                  class="copy-btn btn-green"
+                  class="google-copy-btn btn-green"
                   onclick="copyData('res-tp', this)"
                 >
-                  Copy
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
             <div class="display-row val-red">
               <div class="field-info">
                 <span class="field-name">Стоп Лосс</span>
-                <span class="field-sub"
-                  ><span id="pct-sl">-3.33%</span>
+                <span class="field-sub">
+                  <span id="pct-sl">-0.39%</span>
                   <span id="cash-sl" style="opacity: 0.8; margin-left: 4px"
                     >(-$2.00)</span
-                  ></span
-                >
+                  >
+                </span>
               </div>
               <div class="value-action">
-                <span class="display-value" id="res-sl">58800</span>
+                <span class="display-value" id="res-sl">77457</span>
+                <!-- Оптимизировано: Кнопка-иконка в стиле Google -->
                 <button
-                  class="copy-btn btn-red"
+                  class="google-copy-btn btn-red"
                   onclick="copyData('res-sl', this)"
                 >
-                  Copy
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
           </div>
 
+          <!-- СЕКЦИЯ 3: ИНФОРМАЦИЯ О РИСКАХ И ЗАПАСАХ -->
           <div class="results-section no-border">
-            <div class="display-row">
+            <div class="display-row low-accent-row">
+              <div class="field-info">
+                <span class="field-name">Цена ликвидации (Liq)</span>
+                <span class="field-sub">Уровень принудительного закрытия</span>
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-liq">—</span>
+              </div>
+            </div>
+            <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Запас маржи (Остаток)</span>
                 <span class="field-sub" id="margin-trades"
                   >Запас на 4 сделки</span
                 >
               </div>
-              <span class="display-value small-val" id="res-margin-free"
-                >$80.00</span
-              >
-            </div>
-            <div class="display-row val-orange" id="liq-section">
-              <span class="field-name">Цена ликвидации (Liq)</span>
               <div class="value-action">
-                <span class="display-value" id="res-liq">—</span>
-                <button
-                  class="copy-btn btn-orange"
-                  id="copy-btn-liq"
-                  onclick="copyData('res-liq', this)"
+                <span class="display-value small-val" id="res-margin-free"
+                  >$80.00</span
                 >
-                  Copy
-                </button>
               </div>
             </div>
           </div>
@@ -258,3 +326,4 @@
     <script src="./script.js"></script>
   </body>
 </html>
+<!-- === КОНЕЦ ЧАСТИ 2 === -->

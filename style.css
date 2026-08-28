@@ -1,4 +1,4 @@
-/* НАЧАЛО ЧАСТИ 1 */
+/* === НАЧАЛО ЧАСТИ 1 === */
 
 * {
   margin: 0;
@@ -60,9 +60,12 @@ body {
   border-radius: 38px;
   padding: 30px;
   width: 860px;
-  height: 440px;
+  /* ИСПРАВЛЕНО: Убрана жесткая высота, добавлена адаптивная минимальная высота и авто-выравнивание */
+  min-height: 480px;
+  height: auto;
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
+  align-items: stretch;
   gap: 40px;
   box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.6),
@@ -92,8 +95,8 @@ body {
   height: 34px !important;
 }
 
-/* КОНЕЦ ЧАСТИ 1 */
-/* НАЧАЛО ЧАСТИ 2 */
+/* === КОНЕЦ ЧАСТИ 1 === */
+/* === НАЧАЛО ЧАСТИ 2 === */
 
 .side-fade-wrapper {
   transition:
@@ -101,7 +104,7 @@ body {
     max-height 0.25s ease,
     margin 0.25s ease,
     transform 0.25s ease;
-  max-height: 48px;
+  max-height: 54px;
   opacity: 1;
   transform: translateY(0);
   overflow: hidden;
@@ -116,7 +119,7 @@ html.init-spot-mode .side-fade-wrapper {
   pointer-events: none;
   transition: none !important;
 }
-html.init-spot-mode #leverage-item,
+
 html.init-spot-mode #liq-section {
   opacity: 0.15 !important;
   pointer-events: none !important;
@@ -132,10 +135,11 @@ html.init-spot-mode #liq-section {
   pointer-events: none;
 }
 
-.fields-grid {
+/* Сетка левой панели */
+.fields-grid-priority {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   flex-grow: 1;
   justify-content: center;
 }
@@ -143,6 +147,7 @@ html.init-spot-mode #liq-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
 }
 .input-item {
   display: flex;
@@ -154,67 +159,7 @@ html.init-spot-mode #liq-section {
   width: 100%;
 }
 
-.tabs,
-.toggle-container,
-.order-type-container {
-  display: flex;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  padding: 4px;
-  gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  width: 100%;
-  align-items: center;
-}
-.order-type-container {
-  height: 38px;
-}
-
-.tab-btn,
-.side-btn,
-.order-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #a0aab8;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 13px;
-  height: 100%;
-  border-radius: 4px;
-  transition: all 0.25s ease;
-}
-.order-btn {
-  font-size: 12px;
-}
-
-.tab-btn.active {
-  background: #ffb11a;
-  color: #000000;
-  box-shadow: 0 0 12px rgba(255, 177, 26, 0.4);
-}
-.side-btn.active {
-  background: #03c27e;
-  color: #ffffff;
-  box-shadow: 0 0 12px rgba(3, 194, 126, 0.4);
-}
-#side-short.side-btn.active {
-  background: #f46166;
-  color: #ffffff;
-  box-shadow: 0 0 12px rgba(244, 97, 102, 0.4);
-}
-.order-btn.active {
-  background: #ffb11a;
-  color: #0d0e12;
-  box-shadow: 0 0 14px rgba(255, 177, 26, 0.45);
-}
-
-label {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.45);
-  font-weight: 500;
-}
-
+/* Глобальные базовые стили элементов ввода (Обеспечивают единство стиля) */
 input,
 select {
   background: rgba(0, 0, 0, 0.5);
@@ -229,54 +174,163 @@ select {
   width: 100%;
   transition: all 0.2s ease;
 }
-input:hover {
+input:hover,
+select:hover {
   border-color: rgba(255, 255, 255, 0.3);
 }
-input:focus {
+input:focus,
+select:focus {
   border-color: #ffb11a;
   box-shadow: 0 0 15px rgba(255, 177, 26, 0.3);
   background: rgba(0, 0, 0, 0.6);
 }
 
+/* Стилизация КУПНОГО поля цены (Уровень 1) с сохранением базовых свойств */
+.input-group-king {
+  margin: 2px 0;
+}
+.king-label {
+  color: #ffb11a !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(255, 177, 26, 0.1);
+}
+.king-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+.king-input {
+  height: 48px !important; /* Увеличенная высота */
+  font-size: 18px !important; /* Увеличенный шрифт */
+  font-weight: 800 !important;
+  border: 1px solid rgba(255, 177, 26, 0.3) !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  box-shadow:
+    inset 0 0 12px rgba(255, 177, 26, 0.03),
+    0 0 12px rgba(255, 177, 26, 0.04) !important;
+}
+.king-input:focus {
+  border-color: #ffb11a !important;
+  box-shadow:
+    0 0 20px rgba(255, 177, 26, 0.2),
+    inset 0 0 8px rgba(255, 177, 26, 0.1) !important;
+}
+
+/* Стилизация МЕЛКОГО нижнего ряда (Уровень 4) с сохранением базовых свойств */
+.compact-row {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+.compact-row:hover {
+  opacity: 1;
+}
+.compact-input,
+.compact-select {
+  height: 34px !important; /* Уменьшенная высота */
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Контейнеры переключателей */
+.tabs,
+.toggle-container,
+.order-type-container {
+  display: flex;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+  align-items: center;
+}
+.container-medium {
+  height: 44px !important;
+}
+.order-type-container {
+  height: 38px;
+}
+
+/* Кнопки внутри контейнеров */
+.tab-btn,
+.side-btn,
+.order-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #a0aab8;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  height: 100%;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+}
+.side-btn {
+  font-size: 14px;
+}
+.order-btn {
+  font-size: 12px;
+}
+
+/* Состояния активных кнопок */
+.tab-btn.active {
+  background: #ffb11a;
+  color: #000000;
+  box-shadow: 0 0 12px rgba(255, 177, 26, 0.4);
+}
+.side-btn.active {
+  color: #ffffff;
+}
+#side-long.side-btn.active {
+  background: linear-gradient(135deg, #03c27e 0%, #028a59 100%);
+  box-shadow: 0 0 16px rgba(3, 194, 126, 0.4);
+}
+#side-short.side-btn.active {
+  background: linear-gradient(135deg, #f46166 0%, #c43b40 100%);
+  box-shadow: 0 0 16px rgba(244, 97, 102, 0.4);
+}
+.order-btn.active {
+  background: #ffb11a;
+  color: #0d0e12;
+  box-shadow: 0 0 14px rgba(255, 177, 26, 0.45);
+}
+
+.label-priority {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Оформление кастомного стрелочки выпадающего списка */
 .select-custom-wrapper {
   position: relative;
   width: 100%;
 }
 .select-custom-wrapper::after {
   content: "▼";
-  font-size: 9px;
-  color: rgba(255, 255, 255, 0.4);
-  right: 14px;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   position: absolute;
   pointer-events: none;
-  transition: color 0.2s ease;
-}
-.select-custom-wrapper:hover::after {
-  color: #ffb11a;
 }
 select {
-  padding-right: 30px;
+  padding-right: 26px;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
 }
-select:hover {
-  border-color: rgba(255, 177, 26, 0.3);
-  background: rgba(0, 0, 0, 0.55);
-}
-select:focus {
-  border-color: #ffb11a;
-  box-shadow: 0 0 15px rgba(255, 177, 26, 0.3);
-  background: rgba(14, 16, 22, 0.95);
-}
 select option {
   background: #0f1115;
   color: #ffffff;
   font-weight: 600;
-  padding: 10px;
 }
 
 input::-webkit-outer-spin-button,
@@ -284,7 +338,6 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
@@ -293,7 +346,7 @@ input[type="number"] {
 .reset-link-btn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.12);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -303,12 +356,10 @@ input[type="number"] {
   transition: all 0.2s ease;
 }
 .reset-link-btn:hover {
-  color: rgba(255, 177, 26, 0.6);
-}
-.reset-link-btn:active {
-  transform: scale(0.98);
+  color: rgba(255, 177, 26, 0.5);
 }
 
+/* Кнопка помощи жестко зафиксирована в углу экрана */
 .info-mini-btn {
   position: fixed;
   top: 24px;
@@ -327,7 +378,7 @@ input[type="number"] {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  z-index: 90;
+  z-index: 200; /* Самый верхний слой */
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .info-mini-btn:hover {
@@ -337,9 +388,8 @@ input[type="number"] {
   box-shadow: 0 0 15px rgba(255, 177, 26, 0.15);
 }
 
-/* КОНЕЦ ЧАСТИ 2 */
-/* НАЧАЛО ЧАСТИ 3 */
-
+/* === КОНЕЦ ЧАСТИ 2 === */
+/* === НАЧАЛО ЧАСТИ 3 === */
 .panel-right {
   justify-content: flex-start;
   gap: 14px;
@@ -366,6 +416,7 @@ input[type="number"] {
   color: rgba(255, 255, 255, 0.4);
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .badge-value {
   font-size: 13px;
@@ -406,6 +457,24 @@ input[type="number"] {
   justify-content: space-between;
   align-items: center;
 }
+
+/* Стилизация приглушенных информационных строк */
+.low-accent-row {
+  opacity: 0.35;
+  transition: opacity 0.25s ease;
+}
+.low-accent-row:hover {
+  opacity: 0.85;
+}
+.low-accent-row .display-value {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.low-accent-row .field-sub {
+  color: rgba(255, 255, 255, 0.35);
+}
+
 .field-info {
   display: flex;
   flex-direction: column;
@@ -420,6 +489,10 @@ input[type="number"] {
 }
 .val-red .field-sub {
   color: rgba(244, 97, 102, 0.8);
+}
+.val-orange-text .display-value {
+  color: #ff9f43;
+  text-shadow: 0 0 10px rgba(255, 159, 67, 0.2);
 }
 #margin-trades {
   color: rgba(255, 255, 255, 0.3);
@@ -441,8 +514,7 @@ input[type="number"] {
   text-align: right;
 }
 .small-val {
-  font-size: 18px;
-  color: #ffffff;
+  font-size: 22px !important;
 }
 .val-green .display-value {
   color: #00ff9d;
@@ -457,45 +529,61 @@ input[type="number"] {
   text-shadow: 0 0 10px rgba(255, 159, 67, 0.2);
 }
 
-.copy-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.6);
-  padding: 4px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 4px;
+/* ОПТИМИЗИРОВАНО: Абсолютно чистая кнопка без обводки и фонов */
+.google-copy-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%; /* Для аккуратного свечения при клике */
   cursor: pointer;
-  min-width: 82px;
-  text-align: center;
-  text-transform: uppercase;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  flex-shrink: 0;
 }
-.copy-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+.google-copy-btn .icon-copy {
+  width: 18px;
+  height: 18px;
+  fill: rgba(255, 255, 255, 0.25); /* Максимально ненавязчивая в покое */
+  transition:
+    fill 0.2s ease,
+    transform 0.2s ease,
+    filter 0.2s ease;
 }
-.btn-green:hover {
-  border-color: #03c27e;
-  color: #03c27e;
-  background: rgba(3, 194, 126, 0.08);
+
+/* Эффекты мягкого подсвечивания иконки при наведении */
+.btn-orange:hover .icon-copy {
+  fill: #ff9f43;
+  filter: drop-shadow(0 0 4px rgba(255, 159, 67, 0.4));
 }
-.btn-red:hover {
-  border-color: #f46166;
-  color: #f46166;
-  background: rgba(244, 97, 102, 0.08);
+.btn-green:hover .icon-copy {
+  fill: #00ff9d;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 157, 0.4));
 }
-.btn-orange:hover {
-  border-color: #ff9f43;
-  color: #ff9f43;
-  background: rgba(255, 159, 67, 0.08);
+.btn-red:hover .icon-copy {
+  fill: #ff5b60;
+  filter: drop-shadow(0 0 4px rgba(255, 91, 96, 0.4));
 }
-.copy-btn.copied {
-  background: #03c27e !important;
-  border-color: #00ff9d !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 10px rgba(3, 194, 126, 0.4);
+
+/* Состояние «Успешно скопировано» — неоновая вспышка вокруг самой иконки */
+.google-copy-btn.copied .icon-copy {
+  transform: scale(1.1);
+}
+.google-copy-btn.btn-orange.copied .icon-copy {
+  fill: #ff9f43 !important;
+  filter: drop-shadow(0 0 8px #ff9f43) !important;
+}
+.google-copy-btn.btn-green.copied .icon-copy {
+  fill: #00ff9d !important;
+  filter: drop-shadow(0 0 8px #00ff9d) !important;
+}
+.google-copy-btn.btn-red.copied .icon-copy {
+  fill: #ff5b60 !important;
+  filter: drop-shadow(0 0 8px #ff5b60) !important;
 }
 
 .disabled-element {
@@ -507,10 +595,6 @@ input[type="number"] {
 input:disabled {
   background: rgba(0, 0, 0, 0.3);
   color: #64748b;
-}
-#rec-lev-badge {
-  font-weight: 800;
-  color: #ffb11a;
 }
 
 .modal-overlay {
@@ -688,15 +772,22 @@ input:disabled {
     padding: 14px 0;
     gap: 16px;
   }
+  .display-row {
+    align-items: flex-start;
+  }
   .display-value {
     font-size: 19px;
   }
   .small-val {
-    font-size: 16px;
+    font-size: 19px !important;
   }
-  .copy-btn {
-    min-width: 74px;
-    padding: 6px 8px;
+  .google-copy-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .google-copy-btn .icon-copy {
+    width: 16px;
+    height: 16px;
   }
   .reset-link-btn {
     align-self: center;
@@ -715,5 +806,4 @@ input:disabled {
     gap: 16px;
   }
 }
-
-/* КОНЕЦ ЧАСТИ 3 */
+/* === КОНЕЦ ЧАСТИ 3 === */

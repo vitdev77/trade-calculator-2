@@ -1,4 +1,4 @@
-/* НАЧАЛО ЧАСТИ 1 */
+// === НАЧАЛО ЧАСТИ 1 ===
 
 let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
@@ -66,37 +66,23 @@ function saveToStorage() {
   );
   localStorage.setItem("bybit_pair", document.getElementById("pair").value);
   localStorage.setItem(
-    "bybit_leverage",
-    document.getElementById("leverage").value,
-  );
-  localStorage.setItem(
     "bybit_entry",
     document.getElementById("entry-price").value,
   );
 }
 
-// ИСПРАВЛЕНО: Жёсткий линейный порядок загрузки памяти без накладывания функций друг на друга
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
 
-  // 1. Сначала восстанавливаем выбранную торговую пару
   if (localStorage.getItem("bybit_pair")) {
     document.getElementById("pair").value = localStorage.getItem("bybit_pair");
   }
 
-  // 2. Восстанавливаем баланс
   if (localStorage.getItem("bybit_balance")) {
     document.getElementById("balance").value =
       localStorage.getItem("bybit_balance");
   }
 
-  // 3. Восстанавливаем плечо сделки
-  if (localStorage.getItem("bybit_leverage")) {
-    document.getElementById("leverage").value =
-      localStorage.getItem("bybit_leverage");
-  }
-
-  // 4. Восстанавливаем цену входа (из памяти или дефолт для ТЕКУЩЕЙ пары)
   const selectedPair = document.getElementById("pair").value;
   if (localStorage.getItem("bybit_entry")) {
     document.getElementById("entry-price").value =
@@ -106,11 +92,7 @@ function loadFromStorage() {
       coinConfig[selectedPair].price;
   }
 
-  // 5. Визуально подсвечиваем табы и типы ордеров
   restoreTabsVisualOnly();
-  updateLeverageBadge();
-
-  // 6. Запускаем финальный пересчёт математики
   calculate();
 }
 
@@ -130,37 +112,27 @@ function restoreTabsVisualOnly() {
   document.getElementById(`order-${currentOrderType}`).classList.add("active");
 
   const entryLabel = document.getElementById("entry-label");
-  const costLabel = document.getElementById("label-cost");
   if (currentOrderType === "market") {
     entryLabel.innerText = "Текущая цена Bybit (USDT)";
-    costLabel.innerText = currentTab === "spot" ? "Всего" : "Стоимость";
   } else {
     entryLabel.innerText = "Цена входа (USDT)";
-    costLabel.innerText = "Стоимость";
   }
 
   const sideItemWrapper = document.getElementById("side-item-wrapper");
-  const leverageItem = document.getElementById("leverage-item");
   const liqSection = document.getElementById("liq-section");
+  const resLeverageSection = document.getElementById("res-leverage-section");
+
   if (currentTab === "futures") {
     sideItemWrapper.classList.remove("fade-out");
-    leverageItem.classList.remove("disabled-element");
-    document.getElementById("leverage").disabled = false;
     liqSection.classList.remove("disabled-element");
+    if (resLeverageSection)
+      resLeverageSection.classList.remove("disabled-element");
   } else {
     sideItemWrapper.classList.add("fade-out");
-    leverageItem.classList.add("disabled-element");
-    document.getElementById("leverage").disabled = true;
     liqSection.classList.add("disabled-element");
+    if (resLeverageSection)
+      resLeverageSection.classList.add("disabled-element");
   }
-}
-
-function updateLeverageBadge() {
-  const selectedPair = document.getElementById("pair").value;
-  const config = coinConfig[selectedPair];
-  if (config)
-    document.getElementById("rec-lev-badge").innerText =
-      `${config.recLeverage}x`;
 }
 
 function switchTab(tab) {
@@ -183,8 +155,8 @@ function setSide(side) {
   calculate();
 }
 
-/* КОНЕЦ ЧАСТИ 1 */
-/* НАЧАЛО ЧАСТИ 2 */
+// === КОНЕЦ ЧАСТИ 1 ===
+// === НАЧАЛО ЧАСТИ 2 ===
 
 function setOrderType(type) {
   currentOrderType = type;
@@ -193,16 +165,13 @@ function setOrderType(type) {
   document.getElementById(`order-${type}`).classList.add("active");
   const entryInput = document.getElementById("entry-price");
   const entryLabel = document.getElementById("entry-label");
-  const costLabel = document.getElementById("label-cost");
   const selectedPair = document.getElementById("pair").value;
 
   if (type === "market") {
     entryLabel.innerText = "Текущая цена Bybit (USDT)";
-    costLabel.innerText = currentTab === "spot" ? "Всего" : "Стоимость";
     entryInput.value = coinConfig[selectedPair].price;
   } else {
     entryLabel.innerText = "Цена входа (USDT)";
-    costLabel.innerText = "Стоимость";
     entryInput.value = coinConfig[selectedPair].price;
   }
 
@@ -220,27 +189,31 @@ function calculate() {
   const balance = parseFloat(document.getElementById("balance").value) || 0;
   const entryPrice =
     parseFloat(document.getElementById("entry-price").value) || 0;
-  const leverage =
-    currentTab === "futures"
-      ? parseFloat(document.getElementById("leverage").value) || 1
-      : 1;
   const selectedPair = document.getElementById("pair").value;
+
   if (balance <= 0 || entryPrice <= 0) return;
+
   const config = coinConfig[selectedPair] || {
     priceDecimals: 2,
     qtyDecimals: 2,
+    recLeverage: 1,
   };
+
+  const leverage = currentTab === "futures" ? config.recLeverage : 1;
   const cost = balance / 5;
   const qty = (cost * leverage) / entryPrice;
   const totalVolume = cost * leverage;
   const freeMargin = balance - cost;
   const remainingTrades = Math.floor(freeMargin / cost);
+
   document.getElementById("res-margin-free").innerText =
     `$${freeMargin.toFixed(2)}`;
   document.getElementById("margin-trades").innerText =
     `Запас на ${remainingTrades} сделки`;
+
   const riskAmount = balance * 0.02;
   document.getElementById("risk-cash").innerText = `$${riskAmount.toFixed(2)}`;
+
   let sl = 0,
     tp = 0,
     liq = "—",
@@ -287,8 +260,18 @@ function calculate() {
 
   if (sl < 0) sl = 0;
   if (liq !== "—" && liq < 0) liq = 0;
-  document.getElementById("res-volume").innerText =
+
+  document.getElementById("res-volume-badge").innerText =
     `$${totalVolume.toFixed(2)}`;
+  document.getElementById("res-volume-copy").innerText = totalVolume.toFixed(2);
+
+  if (currentTab === "futures") {
+    document.getElementById("res-leverage-copy").innerText =
+      Math.round(leverage).toString();
+  } else {
+    document.getElementById("res-leverage-copy").innerText = "—";
+  }
+
   document.getElementById("pct-tp").innerText =
     `${pctChangeTP > 0 ? "+" : ""}${pctChangeTP.toFixed(2)}%`;
   document.getElementById("pct-sl").innerText =
@@ -318,23 +301,32 @@ function calculate() {
 function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
   const entryInput = document.getElementById("entry-price");
-  const leverageInput = document.getElementById("leverage");
   entryInput.value = coinConfig[selectedPair].price;
-  if (currentTab === "futures")
-    leverageInput.value = coinConfig[selectedPair].recLeverage;
-  updateLeverageBadge();
   saveToStorage();
   calculate();
 }
 
+// ОПТИМИЗИРОВАНО: Google-поведение кнопок с динамической подменой SVG
 function copyData(elementId, btnElement) {
   const valueText = document.getElementById(elementId).innerText;
   if (valueText === "—" || btnElement.closest(".disabled-element")) return;
-  navigator.clipboard.writeText(valueText);
-  btnElement.innerText = "Copied";
+
+  let textToCopy = valueText;
+  if (textToCopy.startsWith("$")) {
+    textToCopy = textToCopy.substring(1);
+  }
+
+  navigator.clipboard.writeText(textToCopy);
+
+  // Сохраняем исходную иконку копирования
+  const oldSvg = btnElement.innerHTML;
+
+  // Вставляем иконку галочки (Google Done)
+  btnElement.innerHTML = `<svg class="icon-copy" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
   btnElement.classList.add("copied");
+
   setTimeout(() => {
-    btnElement.innerText = "Copy";
+    btnElement.innerHTML = oldSvg;
     btnElement.classList.remove("copied");
   }, 1200);
 }
@@ -347,17 +339,13 @@ function resetTerminal() {
   const defaultPair = "BTCUSDT";
   document.getElementById("balance").value = "100";
   document.getElementById("pair").value = defaultPair;
-  document.getElementById("leverage").value =
-    coinConfig[defaultPair].recLeverage;
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
   restoreTabsVisualOnly();
-  updateLeverageBadge();
   calculate();
 }
 
 document.getElementById("balance").addEventListener("input", saveToStorage);
-document.getElementById("leverage").addEventListener("input", saveToStorage);
 document.getElementById("entry-price").addEventListener("input", saveToStorage);
 window.onload = () => loadFromStorage();
 
-/* КОНЕЦ ЧАСТИ 2 */
+// === КОНЕЦ ЧАСТИ 2 ===
