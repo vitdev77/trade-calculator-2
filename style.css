@@ -57,7 +57,7 @@ body {
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
+  border-radius: 38px;
   padding: 30px;
   width: 860px;
   height: 440px;
@@ -159,7 +159,7 @@ html.init-spot-mode #liq-section {
 .order-type-container {
   display: flex;
   background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 4px;
   gap: 6px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -181,7 +181,7 @@ html.init-spot-mode #liq-section {
   font-weight: 700;
   font-size: 13px;
   height: 100%;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: all 0.25s ease;
 }
 .order-btn {
@@ -385,7 +385,7 @@ input[type="number"] {
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.01);
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.04);
   padding: 4px 16px;
   flex-grow: 1;
