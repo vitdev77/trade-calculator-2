@@ -804,6 +804,178 @@ html:not(.light-theme) input:disabled {
   background: rgba(0, 0, 0, 0.3);
 }
 
+/* === КОНЕЦ ЧАСТИ 5 === */
+/* === НАЧАЛО ЧАСТИ 6 === */
+
+/* СТИЛИ КУСТОМНОЙ НИЖНЕЙ ПАНЕЛИ ЖУРНАЛА */
+.table-log-container {
+  grid-column: span 2;
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 1;
+  transform: scaleY(1);
+  transform-origin: top;
+  max-height: 260px;
+  overflow: hidden;
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease,
+    transform 0.3s ease,
+    padding 0.3s ease,
+    margin 0.3s ease;
+}
+
+/* ОБНОВЛЕНО: Полное схлопывание блока журнала и обнуление зазоров сетки, убирающее пустое место */
+.table-log-container.collapsed {
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  opacity: 0 !important;
+  transform: scaleY(0);
+  pointer-events: none;
+  border-color: transparent !important;
+}
+
+/* Жесткое скрытие журнала ДО загрузки DOM-структуры (Flicker-защита) */
+html.init-log-hidden #global-table-log-block {
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  opacity: 0 !important;
+  transform: scaleY(0);
+  pointer-events: none;
+  border-color: transparent !important;
+  transition: none !important;
+}
+
+/* Стилизация активного состояния кнопки Журнала в верхней капсуле */
+#log-global-toggle-btn.active-log-btn {
+  background: var(--c-orange-glow) !important;
+  border: 1px solid var(--c-king) !important;
+  color: var(--c-king) !important;
+}
+
+.table-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+}
+html.light-theme .table-log-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+.table-log-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.table-log-counter {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+html.light-theme .table-log-counter {
+  background: rgba(0, 0, 0, 0.05);
+}
+.table-log-actions {
+  display: flex;
+  gap: 14px;
+}
+.log-action-btn-link {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.log-action-btn-link:hover {
+  color: var(--c-king);
+}
+.btn-clear-danger:hover {
+  color: var(--c-red) !important;
+}
+.table-log-scroll-area {
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.table-log-scroll-area::-webkit-scrollbar {
+  width: 4px;
+}
+.table-log-scroll-area::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 4px;
+}
+.premium-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 11px;
+}
+.premium-log-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 9px;
+}
+html.light-theme .premium-log-table th {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+.premium-log-table td {
+  padding: 8px 10px;
+  color: var(--text-main);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+html.light-theme .premium-log-table td {
+  border-bottom-color: rgba(0, 0, 0, 0.02);
+}
+.premium-log-table tbody tr {
+  transition: background 0.2s ease;
+}
+.premium-log-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+html.light-theme .premium-log-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.row-side-long {
+  border-left: 3px solid var(--c-green);
+}
+.row-side-short {
+  border-left: 3px solid var(--c-red);
+}
+.log-badge-long {
+  color: var(--c-green) !important;
+}
+.log-badge-short {
+  color: var(--c-red) !important;
+}
+
+/* СТИЛИ МОДАЛЬНОГО ОКНА СПРАВКИ */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1014,6 +1186,15 @@ html:not(.light-theme) .modal-action-btn {
     align-self: center;
     margin-top: 10px;
   }
+  .table-log-container {
+    grid-column: span 1;
+    padding: 12px;
+  }
+  .premium-log-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
   .modal-overlay {
     align-items: flex-start;
     overflow-y: auto;
@@ -1028,4 +1209,4 @@ html:not(.light-theme) .modal-action-btn {
   }
 }
 
-/* === КОНЕЦ ЧАСТИ 5 === */
+/* === КОНЕЦ ЧАСТИ 6 === */

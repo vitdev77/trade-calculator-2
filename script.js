@@ -96,10 +96,12 @@ function loadFromStorage() {
 
   if (currentTheme === "light") {
     document.documentElement.classList.add("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
+    if (btn)
+      btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
   } else {
     document.documentElement.classList.remove("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+    if (btn)
+      btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
   }
 
   if (localStorage.getItem("bybit_pair")) {
@@ -219,6 +221,9 @@ function formatSmartValue(value, decimals) {
   return value.toFixed(decimals);
 }
 
+// Глобальный массив для хранения записей журнала
+let tradingLog = JSON.parse(localStorage.getItem("bybit_trading_log")) || [];
+
 function calculate() {
   const balance = parseFloat(document.getElementById("balance").value) || 0;
   const entryPrice =
@@ -283,13 +288,9 @@ function calculate() {
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
     }
   } else {
-    // ОБНОВЛЕННАЯ МАТЕМАТИКА СПОТА: Базовая комиссия спота Bybit = 0.1% (0.001) на вход и выход
     const spotFee = 0.001;
-
-    // Буфер на рыночное проскальзывание спотового стакана (активен только в режиме Market)
     const spotSlippage = currentOrderType === "market" ? 0.0005 : 0;
 
-    // В Лонге (на споте только Лонг) комиссии уменьшают шаг цены до стопа
     sl = entryPrice * (1 - riskAmount / cost - spotFee * 2 - spotSlippage);
     tp = entryPrice * (1 + (riskAmount * 2) / cost + spotFee * 2);
     liq = "—";
@@ -340,6 +341,164 @@ function calculate() {
   } else {
     document.getElementById("res-liq").innerText = "—";
   }
+
+  renderLogTable();
+}
+
+/* === КОНЕЦ ЧАСТИ 2 === */
+/* === НАЧАЛО ЧАСТИ 3 === */
+
+// Функция генерации и добавления записи в массив журнала расчетов
+function pushToLog() {
+  const selectedPair = document.getElementById("pair").value;
+  const pairText =
+    document.getElementById("pair").options[
+      document.getElementById("pair").selectedIndex
+    ].text;
+  const entryPrice = document.getElementById("entry-price").value;
+  const tp = document.getElementById("res-tp").innerText;
+  const sl = document.getElementById("res-sl").innerText;
+  const volume = document.getElementById("res-volume-copy").innerText;
+  const qty = document.getElementById("res-qty").innerText;
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
+  const logItem = {
+    time: timeStr,
+    market: currentTab === "futures" ? `Фьюч ${currentSide}` : "Спот Лонг",
+    sideClass:
+      currentTab === "futures"
+        ? `row-side-${currentSide.toLowerCase()}`
+        : "row-side-long",
+    badgeClass:
+      currentTab === "futures"
+        ? `log-badge-${currentSide.toLowerCase()}`
+        : "log-badge-long",
+    pair: pairText,
+    type: currentOrderType === "limit" ? "Лимит" : "Рынок",
+    entry: entryPrice,
+    tp: tp,
+    sl: sl,
+    details: `$${volume} / ${qty}`,
+  };
+
+  // Проверка на дубликаты, чтобы исключить спам при множественных кликах на копирование
+  if (tradingLog.length > 0) {
+    const last = tradingLog[0];
+    if (
+      last.pair === logItem.pair &&
+      last.market === logItem.market &&
+      last.entry === logItem.entry &&
+      last.sl === logItem.sl
+    ) {
+      return;
+    }
+  }
+
+  tradingLog.unshift(logItem);
+  if (tradingLog.length > 50) tradingLog.pop();
+
+  localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+  renderLogTable();
+}
+
+// Рендеринг строк динамической таблицы журнала
+function renderLogTable() {
+  const tbody = document.getElementById("log-table-body");
+  const counter = document.getElementById("log-counter");
+  if (!tbody || !counter) return;
+
+  counter.innerText = `${tradingLog.length} записей`;
+  tbody.innerHTML = "";
+
+  tradingLog.forEach((item) => {
+    const tr = document.createElement("tr");
+    tr.className = item.sideClass;
+    tr.innerHTML = `
+      <td style="color:var(--text-muted);">${item.time}</td>
+      <td class="${item.badgeClass}">${item.market}</td>
+      <td>${item.pair}</td>
+      <td>${item.type}</td>
+      <td>${item.entry}</td>
+      <td style="color:var(--c-green);">${item.tp}</td>
+      <td style="color:var(--c-red);">${item.sl}</td>
+      <td style="color:var(--c-orange); font-size:10px;">${item.details}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* === КОНЕЦ ЧАСТИ 3 === */
+/* === НАЧАЛО ЧАСТИ 4 === */
+
+// ОБНОВЛЕНО: Скрытие журнала с полной Flicker-защитой и компенсацией пустых зон
+function toggleLogVisibility() {
+  // Мгновенно убираем пре-лонч класс flicker-защиты, если он есть
+  document.documentElement.classList.remove("init-log-hidden");
+
+  const logBlock = document.getElementById("global-table-log-block");
+  const toggleBtn = document.getElementById("log-global-toggle-btn");
+  if (!logBlock || !toggleBtn) return;
+
+  const isCollapsed = logBlock.classList.toggle("collapsed");
+
+  if (isCollapsed) {
+    toggleBtn.classList.remove("active-log-btn");
+    localStorage.setItem("bybit_log_visible", "hidden");
+  } else {
+    toggleBtn.classList.add("active-log-btn");
+    localStorage.setItem("bybit_log_visible", "visible");
+  }
+}
+
+function clearLog() {
+  if (confirm("Очистить всю историю журнала расчетов?")) {
+    tradingLog = [];
+    localStorage.removeItem("bybit_trading_log");
+    renderLogTable();
+  }
+}
+
+// Экспорт журнала расчетов в структурированный .CSV файл для Excel (с BOM для кириллицы)
+function exportLogToCSV() {
+  if (tradingLog.length === 0) {
+    alert("Журнал пуст. Нечего экспортировать.");
+    return;
+  }
+
+  let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+  csvContent +=
+    "Время;Рынок;Пара;Тип Ордера;Цена Входа;Тейк Профит;Стоп Лосс;Объем и Монеты\r\n";
+
+  tradingLog.forEach((row) => {
+    const line = [
+      row.time,
+      row.market,
+      row.pair,
+      row.type,
+      row.entry,
+      row.tp,
+      row.sl,
+      row.details,
+    ].join(";");
+    csvContent += line + "\r\n";
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute(
+    "download",
+    `Bybit_Risk_Log_${new Date().toISOString().slice(0, 10)}.csv`,
+  );
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 function handlePairChange() {
@@ -365,6 +524,8 @@ function copyData(elementId, btnElement) {
   btnElement.innerHTML = `<svg class="icon-copy" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
   btnElement.classList.add("copied");
 
+  pushToLog();
+
   setTimeout(() => {
     btnElement.innerHTML = oldSvg;
     btnElement.classList.remove("copied");
@@ -377,6 +538,7 @@ function resetTerminal() {
   currentSide = "Long";
   currentOrderType = "limit";
   currentTheme = "dark";
+  tradingLog = [];
   const defaultPair = "BTCUSDT";
 
   document.getElementById("balance").value = "100";
@@ -384,9 +546,18 @@ function resetTerminal() {
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
 
   document.documentElement.classList.remove("light-theme");
+  document.documentElement.classList.remove("init-log-hidden");
+
   const themeBtn = document.getElementById("theme-toggle-btn");
   if (themeBtn) {
     themeBtn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+  }
+
+  const logBlock = document.getElementById("global-table-log-block");
+  const toggleBtn = document.getElementById("log-global-toggle-btn");
+  if (logBlock && toggleBtn) {
+    logBlock.classList.remove("collapsed");
+    toggleBtn.classList.add("active-log-btn");
   }
 
   restoreTabsVisualOnly();
@@ -395,6 +566,21 @@ function resetTerminal() {
 
 document.getElementById("balance").addEventListener("input", saveToStorage);
 document.getElementById("entry-price").addEventListener("input", saveToStorage);
-window.onload = () => loadFromStorage();
 
-/* === КОНЕЦ ЧАСТИ 2 === */
+window.onload = () => {
+  loadFromStorage();
+  const savedLogState = localStorage.getItem("bybit_log_visible");
+  const logBlock = document.getElementById("global-table-log-block");
+  const toggleBtn = document.getElementById("log-global-toggle-btn");
+
+  if (savedLogState === "hidden" && logBlock && toggleBtn) {
+    logBlock.classList.add("collapsed");
+    toggleBtn.classList.remove("active-log-btn");
+  } else if (toggleBtn) {
+    // Если в системе нет флага скрытия, убираем пре-лонч класс, чтобы лог отображался корректно
+    document.documentElement.classList.remove("init-log-hidden");
+    toggleBtn.classList.add("active-log-btn");
+  }
+};
+
+/* === КОНЕЦ ЧАСТИ 4 === */

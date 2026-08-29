@@ -7,7 +7,7 @@
     <title>Bybit Премиум Терминал</title>
     <link rel="stylesheet" href="./style.css" />
     <script>
-      // ЖЕСТКАЯ FLICKER-ЗАЩИТА: Проверяем сохраненную тему ДО рендеринга страницы
+      // ЖЕСТКАЯ FLICKER-ЗАЩИТА: Проверяем все состояния DO рендеринга страницы
       (function () {
         const savedTab = localStorage.getItem("bybit_tab") || "futures";
         if (savedTab === "spot") {
@@ -16,6 +16,11 @@
         const savedTheme = localStorage.getItem("bybit_theme") || "dark";
         if (savedTheme === "light") {
           document.documentElement.classList.add("light-theme");
+        }
+        // НОВОЕ: Скрываем журнал до отрисовки интерфейса, чтобы избежать скачков
+        const savedLogState = localStorage.getItem("bybit_log_visible");
+        if (savedLogState === "hidden") {
+          document.documentElement.classList.add("init-log-hidden");
         }
       })();
     </script>
@@ -38,6 +43,21 @@
 
       <!-- СЕРВИСНЫЕ КНОПКИ GOOGLE -->
       <div class="google-utility-capsule">
+        <!-- Кнопка быстрого управления видимостью всего журнала -->
+        <button
+          class="google-action-icon-btn"
+          id="log-global-toggle-btn"
+          onclick="toggleLogVisibility()"
+          title="Показать/Скрыть журнал ордеров"
+          style="
+            font-size: 11px;
+            width: auto;
+            padding: 0 10px;
+            border-radius: 20px;
+          "
+        >
+          Журнал
+        </button>
         <button
           class="google-action-icon-btn"
           id="theme-toggle-btn"
@@ -119,7 +139,6 @@
                   <option value="BTCUSDT">BTC/USDT</option>
                   <option value="ETHUSDT">ETH/USDT</option>
                   <option value="TONUSDT">TON/USDT</option>
-                  <!-- ИНТЕГРИРОВАНО: Новая пара -->
                   <option value="MNTUSDT">MNT/USDT</option>
                   <option value="ZECUSDT">ZEC/USDT</option>
                   <option value="XAUTUSDT">XAUT/USDT</option>
@@ -305,7 +324,7 @@
 
           <!-- СЕКЦИЯ 3: ИНФОРМАЦИЯ О РИСКАХ И ЗАПАСАХ НА ДЕПОЗИТ -->
           <div class="results-section">
-            <div class="display-row low-accent-row">
+            <div class="display-row low-accent-row" id="liq-section">
               <div class="field-info">
                 <span class="field-name">Цена ликвидации (Liq)</span>
                 <span class="field-sub">Уровень принудительного закрытия</span>
@@ -329,9 +348,8 @@
             </div>
           </div>
 
-          <!-- ОБНОВЛЕННАЯ СЕКЦИЯ 4: ИНТЕГРИРОВАННЫЙ СВОД АНАЛИТИКИ (Добавлен Баланс слева) -->
+          <!-- ОБНОВЛЕННАЯ СЕКЦИЯ 4: ИНТЕГРИРОВАННЫЙ СВОД АНАЛИТИКИ -->
           <div class="results-section no-border analytics-footer-row">
-            <!-- Добавлено: Дубликат баланса для мгновенного контроля рисков -->
             <div class="analytic-footer-item">
               <span class="an-label">Депозит</span>
               <span class="an-value an-v-blue" id="res-analytics-balance"
@@ -355,7 +373,48 @@
           </div>
         </div>
       </div>
+
+      <!-- Журнал ордеров внутри главного контейнера -->
+      <div class="table-log-container" id="global-table-log-block">
+        <div class="table-log-header">
+          <div class="table-log-title">
+            <span>🗒 Журнал ордеров</span>
+            <span class="table-log-counter" id="log-counter">0 записей</span>
+          </div>
+          <div class="table-log-actions">
+            <button class="log-action-btn-link" onclick="exportLogToCSV()">
+              Экспорт CSV
+            </button>
+            <button
+              class="log-action-btn-link btn-clear-danger"
+              onclick="clearLog()"
+            >
+              Очистить лог
+            </button>
+          </div>
+        </div>
+        <div class="table-log-scroll-area">
+          <table class="premium-log-table">
+            <thead>
+              <tr>
+                <th>Время</th>
+                <th>Рынок</th>
+                <th>Пара</th>
+                <th>Тип</th>
+                <th>Вход (USDT)</th>
+                <th>Тейк Профит</th>
+                <th>Стоп Лосс</th>
+                <th>Объем / Монеты</th>
+              </tr>
+            </thead>
+            <tbody id="log-table-body">
+              <!-- Строки генерируются динамически через JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+    <!-- Закрывающий тег главного .glass-container -->
 
     <div class="modal-overlay" id="info-modal" onclick="toggleModal(false)">
       <div class="modal-content" onclick="event.stopPropagation()">
