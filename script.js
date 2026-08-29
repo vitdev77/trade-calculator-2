@@ -323,6 +323,10 @@ function pushToLogManual() {
   const volume = document.getElementById("res-volume-copy").innerText;
   const qty = document.getElementById("res-qty").innerText;
 
+  // Считываем баланс (депозит) с экрана для базы данных
+  const inputBalance =
+    parseFloat(document.getElementById("balance").value) || 0;
+
   if (tp === "—" || sl === "—" || !entryPrice) return;
 
   const now = new Date();
@@ -361,9 +365,11 @@ function pushToLogManual() {
     entry: entryPrice,
     tp: tp,
     sl: sl,
+    dep: `$${inputBalance.toFixed(2)}`, // Жестко фиксируем сумму с сотыми
     details: `$${volume} / ${qty}`,
   };
 
+  // Проверка дубликатов: не даем занести одну и ту же неизмененную сделку дважды
   if (tradingLog.length > 0) {
     const last = tradingLog;
     if (
@@ -383,6 +389,7 @@ function pushToLogManual() {
   localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
   renderLogTable();
 
+  // Визуальный премиальный фидбэк на кнопке
   const addBtn = document.getElementById("add-to-log-btn");
   const btnText = document.getElementById("add-to-log-text");
   const btnSvg = document.getElementById("add-to-log-svg");
@@ -410,6 +417,7 @@ function pushToLogManual() {
   }
 }
 
+// Переключение тумблера приглушения (тусклости) для строки ордера по её ID
 function toggleMuteLogRow(id) {
   tradingLog = tradingLog.map((item) => {
     if (item.id === id) {
@@ -421,13 +429,12 @@ function toggleMuteLogRow(id) {
   renderLogTable();
 }
 
-// ОБНОВЛЕНО: Из баджа вырезано слово «записей», теперь выводится строго чистая цифра
+// ОБНОВЛЕНО: Сгенерирована выделенная ячейка для Депозита, а вывод деталей очищен
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
   if (!tbody || !counter) return;
 
-  // Изменено: Передаем только цифру длины лога
   counter.innerText = tradingLog.length;
   tbody.innerHTML = "";
 
@@ -442,6 +449,8 @@ function renderLogTable() {
       leverageMarkup = `${item.leverage}<span style="opacity: 0.5; font-size: 9px; margin-left: 1px; font-weight: 700; text-transform: lowercase;">x</span>`;
     }
 
+    const displayDep = item.dep || "—";
+
     tr.innerHTML = `
       <td>
         <div style="display: flex; flex-direction: column; line-height: 1.3; font-size: 11px;">
@@ -449,6 +458,8 @@ function renderLogTable() {
           <span style="color: var(--text-muted); font-size: 9px; font-weight: 500;">${item.time}</span>
         </div>
       </td>
+      <!-- ОБНОВЛЕНО: Новая независимая контрастная ячейка депозита в строке -->
+      <td style="color: var(--text-main); font-weight: 700;">${displayDep}</td>
       <td>${item.pair}</td>
       <td style="color: var(--text-main); font-weight: 700;">${leverageMarkup}</td>
       <td class="${item.badgeClass}">${item.market}</td>
@@ -456,6 +467,7 @@ function renderLogTable() {
       <td>${item.entry}</td>
       <td style="color:var(--c-green);">${item.tp}</td>
       <td style="color:var(--c-red);">${item.sl}</td>
+      <!-- ОБНОВЛЕНО: Колонка деталей очищена от дублирования надписи Dep -->
       <td style="color:var(--c-orange); font-size:10px;">${item.details}</td>
       <td style="text-align: center;">
         <button class="log-row-mute-btn" onclick="toggleMuteLogRow(${item.id})" title="Приглушить/Активировать строку ордера">
@@ -499,7 +511,7 @@ function clearLog() {
   }
 }
 
-// ОБНОВЛЕНО: Экспорт CSV теперь выгружает независимую ячейку плеча в общей структуре таблицы Excel
+// ОБНОВЛЕНО: Структура выгрузки CSV выровнена с новой очередностью колонок (Деп сразу после Времени)
 function exportLogToCSV() {
   if (tradingLog.length === 0) {
     alert("Журнал пуст. Нечего экспортировать.");
@@ -508,15 +520,17 @@ function exportLogToCSV() {
 
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent +=
-    "Дата и Время;Пара;Плечо;Рынок;Тип Ордера;Цена Входа;TP;SL;Объем и Монеты\r\n";
+    "Дата и Время;Деп;Пара;Плечо;Рынок;Тип Ордера;Цена Входа;TP;SL;Объем и Монеты\r\n";
 
   tradingLog.forEach((row) => {
     const fullDateTime = `${row.date || "—"} ${row.time}`;
-    const csvLeverage = row.leverage || "—";
+    const csvLeverage = row.leverage || "";
+    const csvDep = row.dep || "—";
 
-    // Вшиваем csvLeverage строго между парой и рынком
+    // Склеиваем поля в новом точном порядке колонок таблицы
     const line = [
       fullDateTime,
+      csvDep,
       row.pair,
       csvLeverage,
       row.market,
