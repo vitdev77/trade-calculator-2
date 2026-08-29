@@ -70,13 +70,6 @@
             />
           </svg>
         </button>
-        <button
-          class="google-action-icon-btn help-btn-text"
-          onclick="toggleModal(true)"
-          title="Справка"
-        >
-          ?
-        </button>
       </div>
     </div>
 
@@ -375,8 +368,8 @@
             </div>
           </div>
 
-          <!-- Кнопка фиксации расчета в торговый дневник с интегрированной SVG-иконкой -->
-          <div style="width: 100%; padding-top: 14px">
+          <!-- Кнопка фиксации расчета в торговый дневник -->
+          <div style="width: 100%; padding-top: 14px; margin-bottom: 12px">
             <button
               class="modal-action-btn"
               onclick="pushToLogManual()"
@@ -443,14 +436,14 @@
             <thead>
               <tr>
                 <th>Время</th>
-                <th>Рынок</th>
                 <th>Пара</th>
+                <th>Плечо</th>
+                <th>Рынок</th>
                 <th>Тип</th>
                 <th>Вход (USDT)</th>
-                <th>Тейк Профит</th>
-                <th>Стоп Лосс</th>
+                <th>TP</th>
+                <th>SL</th>
                 <th>Объем / Монеты</th>
-                <!-- ОБНОВЛЕНО: Новая колонка для тумблера приглушения строки -->
                 <th style="text-align: center; width: 50px">Действие</th>
               </tr>
             </thead>
@@ -459,17 +452,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-    <!-- Закрывающий тег главного .glass-container -->
-
-    <div class="modal-overlay" id="info-modal" onclick="toggleModal(false)">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="modal-close-btn" onclick="toggleModal(false)">✕</button>
-        <div class="modal-scroll-area" id="md-render-target"></div>
-        <button class="modal-action-btn" onclick="toggleModal(false)">
-          Понятно
-        </button>
       </div>
     </div>
 

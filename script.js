@@ -5,11 +5,11 @@ let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 
-// ОБНОВЛЕНО: В кошелек coinConfig внедрена глубокая логика для TONUSDT
+// Кошелек coinConfig с торговыми параметрами Bybit
 const coinConfig = {
   BTCUSDT: { price: 79670, priceDecimals: 0, qtyDecimals: 5, recLeverage: 20 },
   ETHUSDT: { price: 2510, priceDecimals: 0, qtyDecimals: 4, recLeverage: 10 },
-  TONUSDT: { price: 5.345, priceDecimals: 3, qtyDecimals: 2, recLeverage: 3 }, // ИНТЕГРИРОВАНО: 3х плечо, сотые доли монет
+  TONUSDT: { price: 5.345, priceDecimals: 3, qtyDecimals: 2, recLeverage: 3 },
   XAUTUSDT: {
     price: 4582.6,
     priceDecimals: 2,
@@ -23,41 +23,6 @@ const coinConfig = {
 
 const TAKER_FEE = 0.00055;
 const MMR = 0.004;
-
-function renderMarkdown(md) {
-  return md
-    .replace(/## (.*?)\n/g, "<h2>$1</h2>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\* (.*?)\n/g, "<li>$1</li>")
-    .replace(/### (.*?)\n/g, "<h3>$1</h3>")
-    .replace(/<\/li>\n<li>/g, "</li><li>")
-    .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
-    .replace(/\n\n/g, "<br>");
-}
-
-function toggleModal(show) {
-  const modal = document.getElementById("info-modal");
-  if (show) {
-    fetch("instruction.md")
-      .then((response) => {
-        if (!response.ok) throw new Error("Файл инструкции не найден");
-        return response.text();
-      })
-      .then((text) => {
-        document.getElementById("md-render-target").innerHTML =
-          renderMarkdown(text);
-        modal.classList.add("active");
-      })
-      .catch((err) => {
-        document.getElementById("md-render-target").innerHTML =
-          `<h2>Ошибка</h2><p>${err.message}. Убедитесь, что файл instruction.md лежит в той же папке.</p>`;
-        modal.classList.add("active");
-      });
-  } else {
-    modal.classList.remove("active");
-  }
-}
 
 function saveToStorage() {
   localStorage.setItem("bybit_tab", currentTab);
@@ -75,7 +40,7 @@ function saveToStorage() {
   );
 }
 
-// ДОБАВЛЕНО: Полноценная функция живого переключения тем оформления терминала
+// Управление темами оформления терминала
 function toggleTheme() {
   const btn = document.getElementById("theme-toggle-btn");
   if (currentTheme === "dark") {
@@ -107,7 +72,6 @@ function loadFromStorage() {
   if (localStorage.getItem("bybit_pair")) {
     document.getElementById("pair").value = localStorage.getItem("bybit_pair");
   }
-
   if (localStorage.getItem("bybit_balance")) {
     document.getElementById("balance").value =
       localStorage.getItem("bybit_balance");
@@ -178,7 +142,6 @@ function switchTab(tab) {
 function setSide(side) {
   if (currentTab === "spot" && side === "Short") return;
   currentSide = side;
-
   document.getElementById("side-long").classList.remove("active");
   document.getElementById("side-short").classList.remove("active");
   if (side === "Long") {
@@ -186,7 +149,6 @@ function setSide(side) {
   } else {
     document.getElementById("side-short").classList.add("active");
   }
-
   saveToStorage();
   calculate();
 }
@@ -348,7 +310,7 @@ function calculate() {
 /* === КОНЕЦ ЧАСТИ 2 === */
 /* === НАЧАЛО ЧАСТИ 3 === */
 
-// Функция генерации и добавления записи в массив журнала расчетов
+// Осознанная фиксация расчета в дневник по кнопке с премиальной SVG-анимацией фидбэка
 function pushToLogManual() {
   const selectedPair = document.getElementById("pair").value;
   const pairText =
@@ -364,28 +326,28 @@ function pushToLogManual() {
   if (tp === "—" || sl === "—" || !entryPrice) return;
 
   const now = new Date();
-
-  // ДОБАВЛЕНО: Форматирование даты в компактный формат ДД.ММ.ГГГГ (например, 29.08.2026)
   const dateStr = now.toLocaleDateString([], {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
-
-  // Время сессии в формате ЧЧ:ММ:СС
   const timeStr = now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
   });
 
-  // Создаем объект строки. Интегрированы дата и время раздельно
+  const currentLeverage = coinConfig[selectedPair]
+    ? coinConfig[selectedPair].recLeverage
+    : 1;
+
   const logItem = {
     id: Date.now(),
     isMuted: false,
     date: dateStr,
     time: timeStr,
-    market: currentTab === "futures" ? `Фьюч ${currentSide}` : "Спот Лонг",
+    leverage: currentTab === "futures" ? currentLeverage : "",
+    market: currentTab === "futures" ? "Фьючерсы" : "Спот",
     sideClass:
       currentTab === "futures"
         ? `row-side-${currentSide.toLowerCase()}`
@@ -448,7 +410,6 @@ function pushToLogManual() {
   }
 }
 
-// Переключение тумблера приглушения (тусклости) для строки ордера по её ID
 function toggleMuteLogRow(id) {
   tradingLog = tradingLog.map((item) => {
     if (item.id === id) {
@@ -460,23 +421,27 @@ function toggleMuteLogRow(id) {
   renderLogTable();
 }
 
-// ОБНОВЛЕНО: Двухстрочный рендеринг колонки даты/времени с микро-стилизацией
+// ОБНОВЛЕНО: Из баджа вырезано слово «записей», теперь выводится строго чистая цифра
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
   if (!tbody || !counter) return;
 
-  counter.innerText = `${tradingLog.length} записей`;
+  // Изменено: Передаем только цифру длины лога
+  counter.innerText = tradingLog.length;
   tbody.innerHTML = "";
 
   tradingLog.forEach((item) => {
     const tr = document.createElement("tr");
     tr.className = item.sideClass + (item.isMuted ? " muted-row" : "");
 
-    // Получаем значение даты. Если в старых логах даты не было — подставим прочерк, для новых записей — дата запишется штатно.
     const displayDate = item.date || "—";
 
-    // Формируем контент. Колонку времени превращаем в двухстрочный блок: дата сверху, время ниже и бледнее
+    let leverageMarkup = "";
+    if (item.leverage) {
+      leverageMarkup = `${item.leverage}<span style="opacity: 0.5; font-size: 9px; margin-left: 1px; font-weight: 700; text-transform: lowercase;">x</span>`;
+    }
+
     tr.innerHTML = `
       <td>
         <div style="display: flex; flex-direction: column; line-height: 1.3; font-size: 11px;">
@@ -484,8 +449,9 @@ function renderLogTable() {
           <span style="color: var(--text-muted); font-size: 9px; font-weight: 500;">${item.time}</span>
         </div>
       </td>
-      <td class="${item.badgeClass}">${item.market}</td>
       <td>${item.pair}</td>
+      <td style="color: var(--text-main); font-weight: 700;">${leverageMarkup}</td>
+      <td class="${item.badgeClass}">${item.market}</td>
       <td>${item.type}</td>
       <td>${item.entry}</td>
       <td style="color:var(--c-green);">${item.tp}</td>
@@ -533,7 +499,7 @@ function clearLog() {
   }
 }
 
-// ОБНОВЛЕНО: Экспорт журнала с автоматическим объединением даты и времени для Excel
+// ОБНОВЛЕНО: Экспорт CSV теперь выгружает независимую ячейку плеча в общей структуре таблицы Excel
 function exportLogToCSV() {
   if (tradingLog.length === 0) {
     alert("Журнал пуст. Нечего экспортировать.");
@@ -542,15 +508,18 @@ function exportLogToCSV() {
 
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent +=
-    "Дата и Время;Рынок;Пара;Тип Ордера;Цена Входа;Тейк Профит;Стоп Лосс;Объем и Монеты\r\n";
+    "Дата и Время;Пара;Плечо;Рынок;Тип Ордера;Цена Входа;TP;SL;Объем и Монеты\r\n";
 
   tradingLog.forEach((row) => {
-    // Безопасно склеиваем дату и время для одной ячейки Excel
     const fullDateTime = `${row.date || "—"} ${row.time}`;
+    const csvLeverage = row.leverage || "—";
+
+    // Вшиваем csvLeverage строго между парой и рынком
     const line = [
       fullDateTime,
-      row.market,
       row.pair,
+      csvLeverage,
+      row.market,
       row.type,
       row.entry,
       row.tp,
@@ -601,33 +570,23 @@ function copyData(elementId, btnElement) {
   }, 1200);
 }
 
+// Сброс настроек больше НЕ уничтожает массив логов и ключ журнала из памяти
 function resetTerminal() {
-  localStorage.clear();
+  localStorage.removeItem("bybit_tab");
+  localStorage.removeItem("bybit_side");
+  localStorage.removeItem("bybit_order_type");
+  localStorage.removeItem("bybit_balance");
+  localStorage.removeItem("bybit_pair");
+  localStorage.removeItem("bybit_entry");
+
   currentTab = "futures";
   currentSide = "Long";
   currentOrderType = "limit";
-  currentTheme = "dark";
-  tradingLog = [];
   const defaultPair = "BTCUSDT";
 
   document.getElementById("balance").value = "100";
   document.getElementById("pair").value = defaultPair;
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
-
-  document.documentElement.classList.remove("light-theme");
-  document.documentElement.classList.remove("init-log-hidden");
-
-  const themeBtn = document.getElementById("theme-toggle-btn");
-  if (themeBtn) {
-    themeBtn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
-  }
-
-  const logBlock = document.getElementById("global-table-log-block");
-  const toggleBtn = document.getElementById("log-global-toggle-btn");
-  if (logBlock && toggleBtn) {
-    logBlock.classList.remove("collapsed");
-    toggleBtn.classList.add("active-log-btn");
-  }
 
   restoreTabsVisualOnly();
   calculate();
