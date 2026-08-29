@@ -102,6 +102,9 @@ body {
   opacity: var(--sphere-3-opacity);
 }
 
+/* === КОНЕЦ ЧАСТИ 1 === */
+/* === НАЧАЛО ЧАСТИ 2 === */
+
 .glass-container {
   background: var(--glass-bg);
   backdrop-filter: blur(35px);
@@ -160,9 +163,6 @@ html.light-theme .glass-container {
   height: 34px !important;
 }
 
-/* === КОНЕЦ ЧАСТИ 1 === */
-/* === НАЧАЛО ЧАСТИ 2 === */
-
 .side-fade-wrapper {
   transition:
     opacity 0.25s ease,
@@ -198,6 +198,9 @@ html.init-spot-mode #liq-section {
   pointer-events: none;
 }
 
+/* === КОНЕЦ ЧАСТИ 2 === */
+/* === НАЧАЛО ЧАСТИ 3 === */
+
 .fields-grid-priority {
   display: flex;
   flex-direction: column;
@@ -214,7 +217,7 @@ html.init-spot-mode #liq-section {
 
 .trade-group-row {
   grid-template-columns: 1fr 1fr !important;
-  align-items: flex-start; /* Изменено на верхнее выравнивание из-за нижних подписей */
+  align-items: flex-start;
 }
 
 .input-item {
@@ -267,7 +270,6 @@ html.light-theme .market-king-btn:hover {
   text-shadow: 0 0 8px var(--c-orange-glow);
 }
 
-/* Базовые стили элементов ввода */
 input,
 select {
   background: var(--input-bg);
@@ -318,22 +320,16 @@ html:not(.light-theme) .king-input {
   background: var(--input-bg) !important;
 }
 
-/* НОВЫЙ СТИЛЬ: Матовые нижние описания полей (Точная копия .field-sub из результатов) */
 .left-field-desc {
   font-size: 10px !important;
   font-weight: 400 !important;
-  color: rgba(
-    255,
-    255,
-    255,
-    0.25
-  ) !important; /* Легкий матовый тон в темноте */
+  color: rgba(255, 255, 255, 0.25) !important;
   letter-spacing: 0.2px;
   line-height: 1.2;
   padding-left: 2px;
 }
 html.light-theme .left-field-desc {
-  color: rgba(15, 23, 42, 0.4) !important; /* Легкий матовый тон на свету */
+  color: rgba(15, 23, 42, 0.4) !important;
 }
 
 .toggle-container,
@@ -354,6 +350,9 @@ html.light-theme .left-field-desc {
 .order-type-container {
   height: 38px;
 }
+
+/* === КОНЕЦ ЧАСТИ 3 === */
+/* === НАЧАЛО ЧАСТИ 4 === */
 
 .tab-btn,
 .side-btn,
@@ -398,7 +397,6 @@ html.light-theme .order-btn.active {
   box-shadow: 0 0 16px rgba(244, 97, 102, 0.4) !important;
 }
 
-/* Крупные лейблы убраны, заменены на аккуратные .left-field-desc под инпутами */
 .label-priority {
   display: none !important;
 }
@@ -444,12 +442,6 @@ input[type="number"] {
   appearance: textfield !important;
 }
 
-.system-footer-row {
-  display: flex;
-  justify-content: center !important;
-  align-items: center;
-  width: 100%;
-}
 .reset-link-btn {
   background: transparent;
   border: none;
@@ -466,7 +458,6 @@ input[type="number"] {
   color: var(--c-king);
 }
 
-/* ПАНЕЛЬ УПРАВЛЕНИЯ В ШАКПЕ */
 .terminal-top-bar {
   position: fixed;
   top: 20px;
@@ -587,8 +578,8 @@ html.light-theme .google-action-icon-btn:hover {
   display: none !important;
 }
 
-/* === КОНЕЦ ЧАСТИ 2 === */
-/* === НАЧАЛО ЧАСТИ 3 === */
+/* === КОНЕЦ ЧАСТИ 4 === */
+/* === НАЧАЛО ЧАСТИ 5 === */
 
 .panel-right {
   justify-content: flex-start;
@@ -629,7 +620,6 @@ html.light-theme .results-section {
   align-items: center;
 }
 
-/* Информационные приглушенные строки */
 .low-accent-row {
   opacity: 0.45;
   transition: opacity 0.25s ease;
@@ -644,7 +634,6 @@ html.light-theme .results-section {
   padding-right: 44px;
 }
 
-/* Базовый матовый стиль описаний */
 .field-sub {
   font-size: 10px;
   font-weight: 400;
@@ -656,7 +645,6 @@ html.light-theme .field-sub {
   color: rgba(15, 23, 42, 0.35);
 }
 
-/* Фиксация контрастных подписей SL/TP */
 .val-green .field-sub {
   color: var(--c-green) !important;
   font-weight: 700 !important;
@@ -713,7 +701,6 @@ html.light-theme .field-sub {
   text-shadow: 0 0 10px var(--c-orange-glow);
 }
 
-/* ПРЕМИАЛЬНЫЙ АНАЛИТИЧЕСКИЙ ПОДВАЛ (АККУРАТНАЯ СТАТУС-СТРОКА ИЗ 4-Х КОЛОНОК) */
 .analytics-footer-row {
   display: flex !important;
   flex-direction: row !important;
@@ -740,11 +727,10 @@ html.light-theme .field-sub {
   font-weight: 800;
   letter-spacing: 0.2px;
 }
-/* Индикация значений статус-строки */
 .an-v-blue {
   color: var(--text-main);
   opacity: 0.9;
-} /* Депозит: спокойный цвет темы */
+}
 .an-v-red {
   color: var(--c-red);
 }
@@ -755,7 +741,6 @@ html.light-theme .field-sub {
   color: var(--c-king);
 }
 
-/* Чистые Google Copy кнопки */
 .google-copy-btn {
   background: transparent !important;
   border: none !important;
@@ -1042,4 +1027,5 @@ html:not(.light-theme) .modal-action-btn {
     gap: 16px;
   }
 }
-/* === КОНЕЦ ЧАСТИ 3 === */
+
+/* === КОНЕЦ ЧАСТИ 5 === */

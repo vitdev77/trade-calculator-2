@@ -1,4 +1,4 @@
-// === НАЧАЛО ЧАСТИ 1 ===
+/* === НАЧАЛО ЧАСТИ 1 === */
 
 let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
@@ -75,16 +75,31 @@ function saveToStorage() {
   );
 }
 
+// ДОБАВЛЕНО: Полноценная функция живого переключения тем оформления терминала
+function toggleTheme() {
+  const btn = document.getElementById("theme-toggle-btn");
+  if (currentTheme === "dark") {
+    currentTheme = "light";
+    document.documentElement.classList.add("light-theme");
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
+  } else {
+    currentTheme = "dark";
+    document.documentElement.classList.remove("light-theme");
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+  }
+  saveToStorage();
+}
+
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
   const btn = document.getElementById("theme-toggle-btn");
 
   if (currentTheme === "light") {
     document.documentElement.classList.add("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
   } else {
     document.documentElement.classList.remove("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
   }
 
   if (localStorage.getItem("bybit_pair")) {
@@ -174,8 +189,8 @@ function setSide(side) {
   calculate();
 }
 
-// === КОНЕЦ ЧАСТИ 1 ===
-// === НАЧАЛО ЧАСТИ 2 ===
+/* === КОНЕЦ ЧАСТИ 1 === */
+/* === НАЧАЛО ЧАСТИ 2 === */
 
 function setOrderType(type) {
   currentOrderType = type;
@@ -212,7 +227,6 @@ function calculate() {
 
   if (balance <= 0 || entryPrice <= 0) return;
 
-  // ДОБАВЛЕНО: Синхронизация дублирующего поля баланса в статус-строке результатов
   const analyticsBalanceEl = document.getElementById("res-analytics-balance");
   if (analyticsBalanceEl) {
     analyticsBalanceEl.innerText = `$${balance.toFixed(2)}`;
@@ -244,47 +258,48 @@ function calculate() {
     liq = "—",
     pctChangeSL = 0,
     pctChangeTP = 0,
-    cashLoss = 0,
-    cashProfit = 0;
+    cashLoss = riskAmount,
+    cashProfit = riskAmount * 2;
 
   if (currentTab === "futures") {
-    const totalFee = totalVolume * TAKER_FEE * 2;
-    const netRiskForPriceMove = riskAmount - totalFee;
-    const allowedPriceChange =
-      netRiskForPriceMove > 0
-        ? (netRiskForPriceMove * entryPrice) / totalVolume
-        : (riskAmount * 0.05 * entryPrice) / totalVolume;
+    const rPct = 0.02;
+    const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
+    const exitFeeSL = 0.00055;
+    const exitFeeTP = 0.00055;
 
     if (currentSide === "Long") {
-      sl = entryPrice - allowedPriceChange;
-      tp = entryPrice + allowedPriceChange * 2;
+      sl = entryPrice * ((1 - rPct / 5 - entryFee) / (1 + exitFeeSL));
+      tp = entryPrice * ((1 + (2 * rPct) / 5 + entryFee) / (1 - exitFeeTP));
       liq = entryPrice * (1 - 1 / leverage + MMR);
+
       pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
       pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
     } else {
-      sl = entryPrice + allowedPriceChange;
-      tp = entryPrice - allowedPriceChange * 2;
+      sl = entryPrice * ((1 + rPct / 5 + entryFee) / (1 - exitFeeSL));
+      tp = entryPrice * ((1 - (2 * rPct) / 5 - entryFee) / (1 + exitFeeTP));
       liq = entryPrice * (1 + 1 / leverage - MMR);
+
       pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
     }
-    cashLoss = riskAmount;
-    cashProfit =
-      netRiskForPriceMove > 0
-        ? netRiskForPriceMove * 2 + totalFee
-        : riskAmount * 2;
   } else {
-    const spotPriceStep = (riskAmount * entryPrice) / cost;
-    sl = entryPrice - spotPriceStep;
-    tp = entryPrice + spotPriceStep * 2;
+    // ОБНОВЛЕННАЯ МАТЕМАТИКА СПОТА: Базовая комиссия спота Bybit = 0.1% (0.001) на вход и выход
+    const spotFee = 0.001;
+
+    // Буфер на рыночное проскальзывание спотового стакана (активен только в режиме Market)
+    const spotSlippage = currentOrderType === "market" ? 0.0005 : 0;
+
+    // В Лонге (на споте только Лонг) комиссии уменьшают шаг цены до стопа
+    sl = entryPrice * (1 - riskAmount / cost - spotFee * 2 - spotSlippage);
+    tp = entryPrice * (1 + (riskAmount * 2) / cost + spotFee * 2);
     liq = "—";
-    pctChangeSL = -Math.abs(((sl - entryPrice) / entryPrice) * 100);
-    pctChangeTP = Math.abs(((tp - entryPrice) / entryPrice) * 100);
-    cashLoss = riskAmount;
-    cashProfit = riskAmount * 2;
+
+    pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
+    pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
   }
 
   if (sl < 0) sl = 0;
+  if (tp < 0) tp = 0;
   if (liq !== "—" && liq < 0) liq = 0;
 
   document.getElementById("res-volume-badge").innerText =
@@ -301,7 +316,7 @@ function calculate() {
   document.getElementById("pct-tp").innerText =
     `${pctChangeTP > 0 ? "+" : ""}${pctChangeTP.toFixed(2)}%`;
   document.getElementById("pct-sl").innerText =
-    `${pctChangeSL > 0 ? "+" : ""}${pctChangeSL.toFixed(2)}%`;
+    `${pctChangeSL > 0 ? "-" : ""}${Math.abs(pctChangeSL).toFixed(2)}%`;
   document.getElementById("cash-tp").innerText = `(+$${cashProfit.toFixed(2)})`;
   document.getElementById("cash-sl").innerText = `(-$${cashLoss.toFixed(2)})`;
   document.getElementById("res-cost").innerText = cost.toFixed(2);
@@ -382,4 +397,4 @@ document.getElementById("balance").addEventListener("input", saveToStorage);
 document.getElementById("entry-price").addEventListener("input", saveToStorage);
 window.onload = () => loadFromStorage();
 
-// === КОНЕЦ ЧАСТИ 2 ===
+/* === КОНЕЦ ЧАСТИ 2 === */
