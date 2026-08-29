@@ -349,7 +349,7 @@ function calculate() {
 /* === НАЧАЛО ЧАСТИ 3 === */
 
 // Функция генерации и добавления записи в массив журнала расчетов
-function pushToLog() {
+function pushToLogManual() {
   const selectedPair = document.getElementById("pair").value;
   const pairText =
     document.getElementById("pair").options[
@@ -361,14 +361,29 @@ function pushToLog() {
   const volume = document.getElementById("res-volume-copy").innerText;
   const qty = document.getElementById("res-qty").innerText;
 
+  if (tp === "—" || sl === "—" || !entryPrice) return;
+
   const now = new Date();
+
+  // ДОБАВЛЕНО: Форматирование даты в компактный формат ДД.ММ.ГГГГ (например, 29.08.2026)
+  const dateStr = now.toLocaleDateString([], {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  // Время сессии в формате ЧЧ:ММ:СС
   const timeStr = now.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
   });
 
+  // Создаем объект строки. Интегрированы дата и время раздельно
   const logItem = {
+    id: Date.now(),
+    isMuted: false,
+    date: dateStr,
     time: timeStr,
     market: currentTab === "futures" ? `Фьюч ${currentSide}` : "Спот Лонг",
     sideClass:
@@ -387,15 +402,15 @@ function pushToLog() {
     details: `$${volume} / ${qty}`,
   };
 
-  // Проверка на дубликаты, чтобы исключить спам при множественных кликах на копирование
   if (tradingLog.length > 0) {
-    const last = tradingLog[0];
+    const last = tradingLog;
     if (
       last.pair === logItem.pair &&
       last.market === logItem.market &&
       last.entry === logItem.entry &&
       last.sl === logItem.sl
     ) {
+      alert("Этот расчет уже зафиксирован в журнале!");
       return;
     }
   }
@@ -405,9 +420,47 @@ function pushToLog() {
 
   localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
   renderLogTable();
+
+  const addBtn = document.getElementById("add-to-log-btn");
+  const btnText = document.getElementById("add-to-log-text");
+  const btnSvg = document.getElementById("add-to-log-svg");
+
+  if (addBtn && btnText && btnSvg) {
+    const oldText = btnText.innerText;
+    const oldSvgPath = btnSvg.innerHTML;
+
+    btnText.innerText = "Расчет зафиксирован в дневник!";
+    btnSvg.innerHTML = `<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>`;
+
+    addBtn.style.background = "rgba(3, 194, 126, 0.15)";
+    addBtn.style.borderColor = "var(--c-green)";
+    addBtn.style.color = "var(--c-green)";
+    btnSvg.style.fill = "var(--c-green)";
+
+    setTimeout(() => {
+      btnText.innerText = oldText;
+      btnSvg.innerHTML = oldSvgPath;
+      addBtn.style.background = "rgba(255, 177, 26, 0.15)";
+      addBtn.style.borderColor = "var(--c-king)";
+      addBtn.style.color = "var(--c-king)";
+      btnSvg.style.fill = "var(--c-king)";
+    }, 1200);
+  }
 }
 
-// Рендеринг строк динамической таблицы журнала
+// Переключение тумблера приглушения (тусклости) для строки ордера по её ID
+function toggleMuteLogRow(id) {
+  tradingLog = tradingLog.map((item) => {
+    if (item.id === id) {
+      item.isMuted = !item.isMuted;
+    }
+    return item;
+  });
+  localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+  renderLogTable();
+}
+
+// ОБНОВЛЕНО: Двухстрочный рендеринг колонки даты/времени с микро-стилизацией
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
@@ -418,9 +471,19 @@ function renderLogTable() {
 
   tradingLog.forEach((item) => {
     const tr = document.createElement("tr");
-    tr.className = item.sideClass;
+    tr.className = item.sideClass + (item.isMuted ? " muted-row" : "");
+
+    // Получаем значение даты. Если в старых логах даты не было — подставим прочерк, для новых записей — дата запишется штатно.
+    const displayDate = item.date || "—";
+
+    // Формируем контент. Колонку времени превращаем в двухстрочный блок: дата сверху, время ниже и бледнее
     tr.innerHTML = `
-      <td style="color:var(--text-muted);">${item.time}</td>
+      <td>
+        <div style="display: flex; flex-direction: column; line-height: 1.3; font-size: 11px;">
+          <span style="color: var(--text-main); font-weight: 700;">${displayDate}</span>
+          <span style="color: var(--text-muted); font-size: 9px; font-weight: 500;">${item.time}</span>
+        </div>
+      </td>
       <td class="${item.badgeClass}">${item.market}</td>
       <td>${item.pair}</td>
       <td>${item.type}</td>
@@ -428,6 +491,13 @@ function renderLogTable() {
       <td style="color:var(--c-green);">${item.tp}</td>
       <td style="color:var(--c-red);">${item.sl}</td>
       <td style="color:var(--c-orange); font-size:10px;">${item.details}</td>
+      <td style="text-align: center;">
+        <button class="log-row-mute-btn" onclick="toggleMuteLogRow(${item.id})" title="Приглушить/Активировать строку ордера">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        </button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -436,9 +506,8 @@ function renderLogTable() {
 /* === КОНЕЦ ЧАСТИ 3 === */
 /* === НАЧАЛО ЧАСТИ 4 === */
 
-// ОБНОВЛЕНО: Скрытие журнала с полной Flicker-защитой и компенсацией пустых зон
+// Скрытие журнала с полной Flicker-защитой и компенсацией пустых зон
 function toggleLogVisibility() {
-  // Мгновенно убираем пре-лонч класс flicker-защиты, если он есть
   document.documentElement.classList.remove("init-log-hidden");
 
   const logBlock = document.getElementById("global-table-log-block");
@@ -464,7 +533,7 @@ function clearLog() {
   }
 }
 
-// Экспорт журнала расчетов в структурированный .CSV файл для Excel (с BOM для кириллицы)
+// ОБНОВЛЕНО: Экспорт журнала с автоматическим объединением даты и времени для Excel
 function exportLogToCSV() {
   if (tradingLog.length === 0) {
     alert("Журнал пуст. Нечего экспортировать.");
@@ -473,11 +542,13 @@ function exportLogToCSV() {
 
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent +=
-    "Время;Рынок;Пара;Тип Ордера;Цена Входа;Тейк Профит;Стоп Лосс;Объем и Монеты\r\n";
+    "Дата и Время;Рынок;Пара;Тип Ордера;Цена Входа;Тейк Профит;Стоп Лосс;Объем и Монеты\r\n";
 
   tradingLog.forEach((row) => {
+    // Безопасно склеиваем дату и время для одной ячейки Excel
+    const fullDateTime = `${row.date || "—"} ${row.time}`;
     const line = [
-      row.time,
+      fullDateTime,
       row.market,
       row.pair,
       row.type,
@@ -523,8 +594,6 @@ function copyData(elementId, btnElement) {
   const oldSvg = btnElement.innerHTML;
   btnElement.innerHTML = `<svg class="icon-copy" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
   btnElement.classList.add("copied");
-
-  pushToLog();
 
   setTimeout(() => {
     btnElement.innerHTML = oldSvg;
@@ -577,7 +646,6 @@ window.onload = () => {
     logBlock.classList.add("collapsed");
     toggleBtn.classList.remove("active-log-btn");
   } else if (toggleBtn) {
-    // Если в системе нет флага скрытия, убираем пре-лонч класс, чтобы лог отображался корректно
     document.documentElement.classList.remove("init-log-hidden");
     toggleBtn.classList.add("active-log-btn");
   }

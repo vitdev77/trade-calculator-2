@@ -17,7 +17,7 @@
         if (savedTheme === "light") {
           document.documentElement.classList.add("light-theme");
         }
-        // НОВОЕ: Скрываем журнал до отрисовки интерфейса, чтобы избежать скачков
+        // Скрываем журнал до отрисовки интерфейса, чтобы избежать скачков
         const savedLogState = localStorage.getItem("bybit_log_visible");
         if (savedLogState === "hidden") {
           document.documentElement.classList.add("init-log-hidden");
@@ -349,7 +349,10 @@
           </div>
 
           <!-- ОБНОВЛЕННАЯ СЕКЦИЯ 4: ИНТЕГРИРОВАННЫЙ СВОД АНАЛИТИКИ -->
-          <div class="results-section no-border analytics-footer-row">
+          <div
+            class="results-section no-border analytics-footer-row"
+            style="padding-bottom: 0 !important; border-bottom: none !important"
+          >
             <div class="analytic-footer-item">
               <span class="an-label">Депозит</span>
               <span class="an-value an-v-blue" id="res-analytics-balance"
@@ -370,6 +373,48 @@
               <span class="an-label">P/R Ratio</span>
               <span class="an-value an-v-orange">1 : 2</span>
             </div>
+          </div>
+
+          <!-- Кнопка фиксации расчета в торговый дневник с интегрированной SVG-иконкой -->
+          <div style="width: 100%; padding-top: 14px">
+            <button
+              class="modal-action-btn"
+              onclick="pushToLogManual()"
+              id="add-to-log-btn"
+              title="Сохранить текущие параметры расчета в личный журнал ордеров"
+              style="
+                height: 38px;
+                font-size: 12px;
+                background: rgba(255, 177, 26, 0.15);
+                border: 1px solid var(--c-king);
+                color: var(--c-king);
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(255, 177, 26, 0.05);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                cursor: pointer;
+                transition: all 0.25s ease;
+              "
+            >
+              <svg
+                id="add-to-log-svg"
+                viewBox="0 0 24 24"
+                style="
+                  width: 16px;
+                  height: 16px;
+                  fill: var(--c-king);
+                  transition: fill 0.25s ease;
+                "
+              >
+                <path
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+                />
+              </svg>
+              <span id="add-to-log-text">Зафиксировать расчет в журнал</span>
+            </button>
           </div>
         </div>
       </div>
@@ -405,6 +450,8 @@
                 <th>Тейк Профит</th>
                 <th>Стоп Лосс</th>
                 <th>Объем / Монеты</th>
+                <!-- ОБНОВЛЕНО: Новая колонка для тумблера приглушения строки -->
+                <th style="text-align: center; width: 50px">Действие</th>
               </tr>
             </thead>
             <tbody id="log-table-body">
