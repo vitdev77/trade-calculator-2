@@ -1,5 +1,4 @@
 /* === НАЧАЛО ЧАСТИ 1 === */
-
 let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
@@ -40,13 +39,11 @@ function saveToStorage() {
   );
 }
 
-// Управление темами оформления терминала
 function toggleTheme() {
   const btn = document.getElementById("theme-toggle-btn");
   if (currentTheme === "dark") {
     currentTheme = "light";
     document.documentElement.classList.add("light-theme");
-    // ИСПРАВЛЕНИЕ: Утвержденное геометрическое солнце Google Translate (r=5, stroke-width=2, воздушный зазор)
     btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text-muted);stroke-width:2;stroke-linecap:round;"><circle cx="12" cy="12" r="5" fill="var(--text-muted)" stroke="none"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.93" y1="4.93" x2="6.03" y2="6.03"/><line x1="17.97" y1="17.97" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.03" y2="17.97"/><line x1="17.97" y1="6.03" x2="19.07" y2="4.93"/></svg>`;
   } else {
     currentTheme = "dark";
@@ -57,7 +54,6 @@ function toggleTheme() {
 }
 /* === КОНЕЦ ЧАСТИ 1 === */
 /* === НАЧАЛО ЧАСТИ 2 === */
-
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
   const btn = document.getElementById("theme-toggle-btn");
@@ -65,7 +61,6 @@ function loadFromStorage() {
   if (currentTheme === "light") {
     document.documentElement.classList.add("light-theme");
     if (btn)
-      // ИСПРАВЛЕНИЕ: Утвержденное геометрическое солнце Google Translate при стартовой инициализации темы
       btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text-muted);stroke-width:2;stroke-linecap:round;"><circle cx="12" cy="12" r="5" fill="var(--text-muted)" stroke="none"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.93" y1="4.93" x2="6.03" y2="6.03"/><line x1="17.97" y1="17.97" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.03" y2="17.97"/><line x1="17.97" y1="6.03" x2="19.07" y2="4.93"/></svg>`;
   } else {
     document.documentElement.classList.remove("light-theme");
@@ -123,18 +118,19 @@ function restoreTabsVisualOnly() {
   const resLeverageSection = document.getElementById("res-leverage-section");
 
   if (currentTab === "futures") {
-    sideItemWrapper.classList.remove("fade-out");
+    if (sideItemWrapper) sideItemWrapper.classList.remove("fade-out");
     if (liqSection) liqSection.classList.remove("disabled-element");
     if (resLeverageSection)
       resLeverageSection.classList.remove("disabled-element");
   } else {
-    sideItemWrapper.classList.add("fade-out");
+    if (sideItemWrapper) sideItemWrapper.classList.add("fade-out");
     if (liqSection) liqSection.classList.add("disabled-element");
     if (resLeverageSection)
       resLeverageSection.classList.add("disabled-element");
   }
 }
 
+// Заглушка-ссылка под интерфейсный коннект
 function switchTab(tab) {
   currentTab = tab;
   restoreTabsVisualOnly();
@@ -169,25 +165,22 @@ function setOrderType(type) {
 
   if (type === "market") {
     entryLabel.innerText = "Текущая цена Bybit (USDT)";
-    entryInput.value = coinConfig[selectedPair].price;
   } else {
     entryLabel.innerText = "Цена входа (USDT)";
-    entryInput.value = coinConfig[selectedPair].price;
   }
+  entryInput.value = coinConfig[selectedPair].price;
 
   saveToStorage();
   calculate();
 }
 /* === КОНЕЦ ЧАСТИ 2 === */
 /* === НАЧАЛО ЧАСТИ 3 === */
-
 function formatSmartValue(value, decimals) {
   if (value === "—" || value === undefined) return "—";
   if (decimals === 0) return Math.round(value).toString();
   return value.toFixed(decimals);
 }
 
-// Глобальный массив для хранения записей журнала
 let tradingLog = JSON.parse(localStorage.getItem("bybit_trading_log")) || [];
 
 function calculate() {
@@ -208,7 +201,6 @@ function calculate() {
     qtyDecimals: 2,
     recLeverage: 1,
   };
-
   const leverage = currentTab === "futures" ? config.recLeverage : 1;
   const cost = balance / 5;
   const qty = (cost * leverage) / entryPrice;
@@ -242,25 +234,21 @@ function calculate() {
       sl = entryPrice * ((1 - rPct / 5 - entryFee) / (1 + exitFeeSL));
       tp = entryPrice * ((1 + (2 * rPct) / 5 + entryFee) / (1 - exitFeeTP));
       liq = entryPrice * (1 - 1 / leverage + MMR);
-
       pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
       pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
     } else {
       sl = entryPrice * ((1 + rPct / 5 + entryFee) / (1 - exitFeeSL));
       tp = entryPrice * ((1 - (2 * rPct) / 5 - entryFee) / (1 + exitFeeTP));
       liq = entryPrice * (1 + 1 / leverage - MMR);
-
       pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
     }
   } else {
     const spotFee = 0.001;
     const spotSlippage = currentOrderType === "market" ? 0.0005 : 0;
-
     sl = entryPrice * (1 - riskAmount / cost - spotFee * 2 - spotSlippage);
     tp = entryPrice * (1 + (riskAmount * 2) / cost + spotFee * 2);
     liq = "—";
-
     pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
     pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
   }
@@ -273,13 +261,10 @@ function calculate() {
     `$${totalVolume.toFixed(2)}`;
   document.getElementById("res-volume-copy").innerText = totalVolume.toFixed(2);
 
-  if (currentTab === "futures") {
-    const levCopyEl = document.getElementById("res-leverage-copy");
-    if (levCopyEl) levCopyEl.innerText = Math.round(leverage).toString();
-  } else {
-    const levCopyEl = document.getElementById("res-leverage-copy");
-    if (levCopyEl) levCopyEl.innerText = "—";
-  }
+  const levCopyEl = document.getElementById("res-leverage-copy");
+  if (levCopyEl)
+    levCopyEl.innerText =
+      currentTab === "futures" ? Math.round(leverage).toString() : "—";
 
   document.getElementById("pct-tp").innerText =
     `${pctChangeTP > 0 ? "+" : ""}${pctChangeTP.toFixed(2)}%`;
@@ -299,21 +284,15 @@ function calculate() {
     sl,
     config.priceDecimals,
   );
-
-  if (currentTab === "futures" && liq !== "—") {
-    document.getElementById("res-liq").innerText = formatSmartValue(
-      liq,
-      config.priceDecimals,
-    );
-  } else {
-    document.getElementById("res-liq").innerText = "—";
-  }
+  document.getElementById("res-liq").innerText =
+    currentTab === "futures" && liq !== "—"
+      ? formatSmartValue(liq, config.priceDecimals)
+      : "—";
 
   renderLogTable();
 }
 /* === КОНЕЦ ЧАСТИ 3 === */
 /* === НАЧАЛО ЧАСТИ 4 === */
-
 function pushToLogManual() {
   const selectedPair = document.getElementById("pair").value;
   const pairText =
@@ -467,7 +446,6 @@ function renderLogTable() {
 }
 /* === КОНЕЦ ЧАСТИ 4 === */
 /* === НАЧАЛО ЧАСТИ 5 === */
-
 function toggleLogVisibility() {
   document.documentElement.classList.remove("init-log-hidden");
   const logBlock = document.getElementById("global-table-log-block");
@@ -493,10 +471,8 @@ function clearLog() {
 }
 
 function exportLogToCSV() {
-  if (tradingLog.length === 0) {
-    alert("Журнал пуст. Нечего экспортировать.");
-    return;
-  }
+  if (tradingLog.length === 0)
+    return alert("Журнал пуст. Нечего экспортировать.");
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent +=
     "Дата и Время;Деп;Пара;Плечо;Рынок;Тип Ордера;Цена Входа;TP;SL;Объем и Монеты\r\n";
@@ -577,8 +553,8 @@ function resetTerminal() {
   calculate();
   initWebSocketInformer();
 }
-
-// АРХИТЕКТУРА ИНФОРМЕРА BYBIT WEBSOCKET V5 БЕЗ СЕНТИМЕНТ-БАРА
+/* === КОНЕЦ ЧАСТИ 5 === */
+/* === НАЧАЛО ЧАСТИ 6 === */
 let informerWs = null;
 let informerPingInterval = null;
 let informerCountdownInterval = null;
@@ -586,6 +562,16 @@ let informerFlatTimeout = null;
 let infNextFundingTimestamp = 0;
 let informerLastPrice = 0;
 const INF_CRITICAL_LIMIT = 0.05;
+
+let localCachedBid = 0;
+let localCachedAsk = 0;
+
+const SVG_TREND_UP = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M12 6l-8 12h16z"/></svg>`;
+const SVG_TREND_DOWN = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M12 18L4 6h16z"/></svg>`;
+const SVG_TREND_FLAT = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M19 13H5v-2h14v2z"/></svg>`;
+
+const SVG_BOOK_ASK = `<svg viewBox="0 0 24 24" style="width:8px; height:8px; fill:var(--c-red);"><path d="M24 22H0L12 2z"/></svg>`;
+const SVG_BOOK_BID = `<svg viewBox="0 0 24 24" style="width:8px; height:8px; fill:var(--c-green);"><path d="M0 2h24L12 22z"/></svg>`;
 
 function initWebSocketInformer() {
   if (informerWs) {
@@ -595,17 +581,50 @@ function initWebSocketInformer() {
     informerWs.close();
   }
 
-  const livePriceEl = document.getElementById("live-price");
-  const arrowEl = document.getElementById("live-arrow");
-  const askEl = document.getElementById("live-ask");
-  const bidEl = document.getElementById("live-bid");
+  localCachedBid = 0;
+  localCachedAsk = 0;
+  informerLastPrice = 0;
+
+  const informerContainer = document.querySelector(".bybit-live-informer");
+  const priceBlock = document.querySelector(".live-price-block");
+  const bookBlock = document.querySelector(".live-book-block");
   const spreadEl = document.getElementById("live-spread");
   const fundingBox = document.getElementById("live-funding-box");
   const fundingRateEl = document.getElementById("live-funding-rate");
   const fundingTimeEl = document.getElementById("live-funding-time");
 
   const selectedPair = document.getElementById("pair").value;
-  fundingBox.style.display = currentTab === "futures" ? "flex" : "none";
+  if (fundingBox)
+    fundingBox.style.display = currentTab === "futures" ? "flex" : "none";
+
+  if (priceBlock) {
+    priceBlock.innerHTML = `
+      <span class="informer-title-meta">Bybit Live</span>
+      <span id="live-arrow" class="live-arrow flat">${SVG_TREND_FLAT}</span>
+      <span id="live-price" class="live-price-val">0.00</span>
+    `;
+  }
+
+  // Модернизация стакана: гармонично внедрили невзрачный текст Ask/Bid перед иконками ордеров
+  if (bookBlock) {
+    bookBlock.innerHTML = `
+      <div class="book-row-meta">
+        <span class="book-text-label">Ask</span>
+        <span class="book-icon-wrap">${SVG_BOOK_ASK}</span>
+        <span id="live-ask" class="book-tick ask">0.00</span>
+      </div>
+      <div class="book-row-meta">
+        <span class="book-text-label">Bid</span>
+        <span class="book-icon-wrap">${SVG_BOOK_BID}</span>
+        <span id="live-bid" class="book-tick bid">0.00</span>
+      </div>
+    `;
+  }
+
+  const livePriceEl = document.getElementById("live-price");
+  const arrowEl = document.getElementById("live-arrow");
+  const askEl = document.getElementById("live-ask");
+  const bidEl = document.getElementById("live-bid");
 
   const baseParts = [
     "wss",
@@ -623,21 +642,17 @@ function initWebSocketInformer() {
   informerWs = new WebSocket(wsUrl);
 
   informerWs.onopen = () => {
-    if (informerWs.readyState === WebSocket.OPEN) {
+    if (informerWs.readyState !== WebSocket.OPEN) return;
+    informerWs.send(
+      JSON.stringify({
+        op: "subscribe",
+        args: [`orderbook.1.${selectedPair}`],
+      }),
+    );
+    if (currentTab === "futures") {
       informerWs.send(
-        JSON.stringify({
-          op: "subscribe",
-          args: [`orderbook.1.${selectedPair}`],
-        }),
+        JSON.stringify({ op: "subscribe", args: [`tickers.${selectedPair}`] }),
       );
-      if (currentTab === "futures") {
-        informerWs.send(
-          JSON.stringify({
-            op: "subscribe",
-            args: [`tickers.${selectedPair}`],
-          }),
-        );
-      }
     }
 
     informerPingInterval = setInterval(() => {
@@ -650,14 +665,14 @@ function initWebSocketInformer() {
       informerCountdownInterval = setInterval(() => {
         if (infNextFundingTimestamp <= 0) return;
         const dist = infNextFundingTimestamp - Date.now();
-        if (dist <= 0) {
-          fundingTimeEl.innerText = "00:00:00";
-          return;
-        }
+        if (dist <= 0)
+          return fundingTimeEl ? (fundingTimeEl.innerText = "00:00:00") : null;
         const h = Math.floor((dist % 86400000) / 3600000);
         const m = Math.floor((dist % 3600000) / 60000);
         const s = Math.floor((dist % 60000) / 1000);
-        fundingTimeEl.innerText = `через ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+        if (fundingTimeEl) {
+          fundingTimeEl.innerText = `через ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+        }
       }, 1000);
     }
   };
@@ -668,57 +683,73 @@ function initWebSocketInformer() {
 
     if (res.topic === `orderbook.1.${selectedPair}` && res.data) {
       const ob = res.data;
-      let up = false;
-      let curBid =
-        parseFloat(bidEl.innerText.replace(/[A-Za-z: ,$]/g, "")) || 0;
-      let curAsk =
-        parseFloat(askEl.innerText.replace(/[A-Za-z: ,$]/g, "")) || 0;
+      let hasUpdate = false;
 
       if (ob.b && ob.b.length > 0) {
-        curBid = parseFloat(ob.b);
-        up = true;
+        localCachedBid = parseFloat(ob.b) || localCachedBid;
+        hasUpdate = true;
       }
       if (ob.a && ob.a.length > 0) {
-        curAsk = parseFloat(ob.a);
-        up = true;
+        localCachedAsk = parseFloat(ob.a) || localCachedAsk;
+        hasUpdate = true;
       }
 
-      if (curBid > 0 && curAsk > 0 && up) {
-        const mid = (curAsk + curBid) / 2;
+      if (localCachedBid > 0 && localCachedAsk > 0 && hasUpdate) {
+        const mid = (localCachedAsk + localCachedBid) / 2;
+        const decimals = coinConfig[selectedPair]
+          ? coinConfig[selectedPair].priceDecimals
+          : 2;
 
-        askEl.innerText = `${formatSmartValue(curAsk, coinConfig[selectedPair].priceDecimals)}`;
-        bidEl.innerText = `${formatSmartValue(curBid, coinConfig[selectedPair].priceDecimals)}`;
-        livePriceEl.innerText = formatSmartValue(
-          mid,
-          coinConfig[selectedPair].priceDecimals,
-        );
+        if (askEl) askEl.innerText = formatSmartValue(localCachedAsk, decimals);
+        if (bidEl) bidEl.innerText = formatSmartValue(localCachedBid, decimals);
+        if (livePriceEl)
+          livePriceEl.innerText = formatSmartValue(mid, decimals);
 
         clearTimeout(informerFlatTimeout);
         if (informerLastPrice > 0) {
           if (mid > informerLastPrice) {
-            livePriceEl.className = "live-price-val up";
-            arrowEl.className = "live-arrow up";
-            arrowEl.innerText = "▲";
+            if (livePriceEl) livePriceEl.className = "live-price-val up";
+            if (arrowEl) {
+              arrowEl.className = "live-arrow up";
+              arrowEl.innerHTML = SVG_TREND_UP;
+            }
+            if (informerContainer) {
+              informerContainer.classList.remove("trend-down");
+              informerContainer.classList.add("trend-up");
+            }
           } else if (mid < informerLastPrice) {
-            livePriceEl.className = "live-price-val down";
-            arrowEl.className = "live-arrow down";
-            arrowEl.innerText = "▼";
+            if (livePriceEl) livePriceEl.className = "live-price-val down";
+            if (arrowEl) {
+              arrowEl.className = "live-arrow down";
+              arrowEl.innerHTML = SVG_TREND_DOWN;
+            }
+            if (informerContainer) {
+              informerContainer.classList.remove("trend-up");
+              informerContainer.classList.add("trend-down");
+            }
           }
         } else {
-          arrowEl.className = "live-arrow flat";
-          arrowEl.innerText = "▬";
+          if (arrowEl) {
+            arrowEl.className = "live-arrow flat";
+            arrowEl.innerHTML = SVG_TREND_FLAT;
+          }
         }
         informerLastPrice = mid;
 
         informerFlatTimeout = setTimeout(() => {
-          arrowEl.className = "live-arrow flat";
-          arrowEl.innerText = "▬";
-          livePriceEl.className = "live-price-val";
+          if (arrowEl) {
+            arrowEl.className = "live-arrow flat";
+            arrowEl.innerHTML = SVG_TREND_FLAT;
+          }
+          if (livePriceEl) livePriceEl.className = "live-price-val";
+          if (informerContainer)
+            informerContainer.classList.remove("trend-up", "trend-down");
         }, 1500);
 
-        const sprAbs = curAsk - curBid;
-        const sprPct = (sprAbs / curBid) * 100;
-        spreadEl.innerText = `${sprAbs.toFixed(coinConfig[selectedPair].priceDecimals)} (${sprPct.toFixed(3)}%)`;
+        const sprAbs = localCachedAsk - localCachedBid;
+        const sprPct = (sprAbs / localCachedBid) * 100;
+        if (spreadEl)
+          spreadEl.innerText = `${sprAbs.toFixed(decimals)} (${sprPct.toFixed(3)}%)`;
       }
     }
 
@@ -727,19 +758,21 @@ function initWebSocketInformer() {
       res.topic === `tickers.${selectedPair}` &&
       res.data
     ) {
-      const t = Array.isArray(res.data) ? res.data : res.data;
-      if (t && t.fundingRate !== undefined) {
+      const t = res.data;
+      if (t.fundingRate !== undefined) {
         const rate = parseFloat(t.fundingRate) * 100;
-        fundingRateEl.innerText = `Fnd: ${rate > 0 ? "+" : ""}${rate.toFixed(4)}%`;
-        fundingRateEl.style.color = rate >= 0 ? "#0ecb81" : "#f6465d";
-
-        if (Math.abs(rate) >= INF_CRITICAL_LIMIT) {
-          fundingBox.classList.add("critical-alert");
-        } else {
-          fundingBox.classList.remove("critical-alert");
+        if (fundingRateEl) {
+          fundingRateEl.innerText = `Fnd: ${rate > 0 ? "+" : ""}${rate.toFixed(4)}%`;
+          fundingRateEl.style.color =
+            rate >= 0 ? "var(--c-green)" : "var(--c-red)";
+        }
+        if (fundingBox) {
+          if (Math.abs(rate) >= INF_CRITICAL_LIMIT)
+            fundingBox.classList.add("critical-alert");
+          else fundingBox.classList.remove("critical-alert");
         }
       }
-      if (t && t.nextFundingTime !== undefined)
+      if (t.nextFundingTime !== undefined)
         infNextFundingTimestamp = parseInt(t.nextFundingTime);
     }
   };
@@ -764,4 +797,4 @@ window.onload = () => {
     toggleBtn.classList.add("active-log-btn");
   }
 };
-/* === КОНЕЦ ЧАСТИ 5 === */
+/* === КОНЕЦ ЧАСТИ 6 === */

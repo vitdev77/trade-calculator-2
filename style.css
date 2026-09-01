@@ -554,57 +554,139 @@ html.light-theme .glass-container {
     inset 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 
-/* ИНФОРМЕР В ВИДЕ ВНУТРЕННЕЙ ШАПКИ КАРТОЧКИ (С ХАРД-ВЫРАВНИВАНИЕМ) */
+/* ИНФОРМЕР С ПРЕМИАЛЬНЫМ ВИЗУАЛОМ И НЕОНОВЫМ ТРЕНДОМ */
 .bybit-live-informer {
   grid-column: span 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    145deg,
+    rgba(16, 20, 30, 0.5) 0%,
+    rgba(10, 12, 18, 0.3) 100%
+  );
   border: 1px solid var(--input-border);
-  padding: 12px 20px;
-  border-radius: 16px;
+  padding: 10px 18px;
+  border-radius: 18px;
   font-size: 12px;
   font-weight: 700;
   width: 100%;
   margin-bottom: -10px;
-
-  /* ЖЕСТКОЕ ЗАПРЕЩЕНИЕ ПРЫЖКОВ ШРИФТА ДЛЯ ВСЕХ ВНУТРЕННИХ ЦИФР */
   font-variant-numeric: tabular-nums !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.03);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 html.light-theme .bybit-live-informer {
-  background: rgba(255, 255, 255, 0.4);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(241, 245, 249, 0.4) 100%
+  );
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    0 4px 12px rgba(15, 23, 42, 0.02);
+}
+
+.bybit-live-informer.trend-up {
+  border-color: rgba(0, 255, 157, 0.2);
+}
+.bybit-live-informer.trend-down {
+  border-color: rgba(255, 91, 96, 0.2);
+}
+
+.informer-title-meta {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  user-select: none;
+  border-right: 1px solid var(--input-border);
+  padding-right: 12px;
+  margin-right: 4px;
+}
+
+.live-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  transition: color 0.1s ease;
+}
+.live-arrow.up {
+  color: var(--c-green) !important;
+}
+.live-arrow.down {
+  color: var(--c-red) !important;
+}
+.live-arrow.flat {
+  color: var(--text-muted) !important;
 }
 
 .live-price-block {
   display: flex;
   align-items: center;
-  gap: 4px;
-  min-width: 110px; /* Фиксированная ширина предотвращает сдвиг соседних блоков */
-}
-.live-arrow {
-  font-size: 14px;
-  width: 12px;
-  display: inline-block;
-  text-align: center;
-  transition: color 0.1s ease;
-}
-.live-arrow.flat {
-  color: var(--text-muted) !important;
+  gap: 8px;
+  min-width: 250px;
 }
 .live-price-val {
   font-variant-numeric: tabular-nums !important;
-  font-size: 14px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
+.live-price-val.up {
+  color: var(--c-green);
+  text-shadow: 0 0 8px var(--c-green-glow);
+}
+.live-price-val.down {
+  color: var(--c-red);
+  text-shadow: 0 0 8px var(--c-red-glow);
+}
+
 .live-book-block {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   font-size: 11px;
-  min-width: 105px; /* Фиксированная полка для цен Ask/Bid */
+  min-width: 125px; /* Немного расширили полку стакана под невзрачный текст */
+  border-left: 1px dashed var(--input-border);
+  padding-left: 14px;
+}
+.book-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+/* СВЕРХНЕВЗРАЧНЫЙ СТИЛЬ ДЛЯ ТЕКСТОВЫХ ПОДПИСЕЙ ASK/BID */
+.book-text-label {
+  font-size: 8px;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--text-main);
+  opacity: 0.22; /* Легкая дымчатая прозрачность */
+  min-width: 18px;
+  user-select: none;
+}
+
+.book-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
 }
 .book-tick {
   font-variant-numeric: tabular-nums !important;
+  font-weight: 700;
 }
 .book-tick.ask {
   color: var(--c-red);
@@ -617,18 +699,34 @@ html.light-theme .bybit-live-informer {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  text-align: left;
-  min-width: 185px; /* Запас ширины под абсолютный, процентный спред и сентимент */
+  min-width: 155px;
+  border-left: 1px dashed var(--input-border);
+  padding-left: 14px;
 }
 .spread-label {
   font-size: 9px;
   color: var(--text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.spread-capsule {
+  background: rgba(255, 177, 26, 0.06);
+  border: 1px solid rgba(255, 177, 26, 0.15);
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  width: fit-content;
+}
+html.light-theme .spread-capsule {
+  background: rgba(217, 119, 6, 0.04);
+  border-color: rgba(217, 119, 6, 0.12);
 }
 .spread-val {
   color: var(--c-king);
   font-variant-numeric: tabular-nums !important;
+  font-weight: 700;
 }
+
 .live-funding-block {
   display: none;
   flex-direction: column;
@@ -636,10 +734,11 @@ html.light-theme .bybit-live-informer {
   border-left: 1px dashed var(--input-border);
   padding-left: 14px;
   transition: all 0.3s ease;
-  min-width: 110px; /* Фиксированная зона под таймер и ставку фандинга */
+  min-width: 110px;
 }
 .funding-rate-val {
   font-variant-numeric: tabular-nums !important;
+  font-weight: 700;
 }
 .funding-time-val {
   color: var(--text-muted);
@@ -648,16 +747,19 @@ html.light-theme .bybit-live-informer {
 }
 .live-funding-block.critical-alert {
   animation: pulse-top-alert 2s infinite alternate;
-  border-radius: 10px;
-  padding: 2px 10px;
-  background: var(--alert-bg);
+  border-radius: 8px;
+  padding: 2px 8px;
+  background: rgba(255, 91, 96, 0.08);
+  border: 1px solid rgba(255, 91, 96, 0.2);
 }
 @keyframes pulse-top-alert {
   0% {
-    box-shadow: 0 0 4px rgba(246, 70, 53, 0.2);
+    box-shadow: 0 0 4px rgba(246, 70, 53, 0.1);
+    border-color: rgba(255, 91, 96, 0.2);
   }
   100% {
-    box-shadow: 0 0 12px rgba(246, 70, 53, 0.4);
+    box-shadow: 0 0 12px rgba(246, 70, 53, 0.3);
+    border-color: rgba(255, 91, 96, 0.4);
   }
 }
 
