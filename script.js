@@ -686,8 +686,8 @@ function initWebSocketInformer() {
       if (curBid > 0 && curAsk > 0 && up) {
         const mid = (curAsk + curBid) / 2;
 
-        askEl.innerText = `Ask: ${formatSmartValue(curAsk, coinConfig[selectedPair].priceDecimals)}`;
-        bidEl.innerText = `Bid: ${formatSmartValue(curBid, coinConfig[selectedPair].priceDecimals)}`;
+        askEl.innerText = `${formatSmartValue(curAsk, coinConfig[selectedPair].priceDecimals)}`;
+        bidEl.innerText = `${formatSmartValue(curBid, coinConfig[selectedPair].priceDecimals)}`;
         livePriceEl.innerText = formatSmartValue(
           mid,
           coinConfig[selectedPair].priceDecimals,
