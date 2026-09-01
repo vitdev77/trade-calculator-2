@@ -566,12 +566,37 @@ const INF_CRITICAL_LIMIT = 0.05;
 let localCachedBid = 0;
 let localCachedAsk = 0;
 
+// Высококонтрастные сплошные SVG-треугольники тренда (размер 1.2em под высоту шрифта цены)
 const SVG_TREND_UP = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M12 6l-8 12h16z"/></svg>`;
 const SVG_TREND_DOWN = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M12 18L4 6h16z"/></svg>`;
 const SVG_TREND_FLAT = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M19 13H5v-2h14v2z"/></svg>`;
 
-const SVG_BOOK_ASK = `<svg viewBox="0 0 24 24" style="width:8px; height:8px; fill:var(--c-red);"><path d="M24 22H0L12 2z"/></svg>`;
-const SVG_BOOK_BID = `<svg viewBox="0 0 24 24" style="width:8px; height:8px; fill:var(--c-green);"><path d="M0 2h24L12 22z"/></svg>`;
+// Функция точечного переноса цены в калькулятор с автоматическим округлением под правила тикера
+function injectPriceToCalculator(value) {
+  if (!value || isNaN(value) || value <= 0) return;
+
+  const entryInput = document.getElementById("entry-price");
+  const selectedPair = document.getElementById("pair")?.value;
+  if (!entryInput || !selectedPair) return;
+
+  // Извлекаем количество знаков после запятой для выбранной монеты из coinConfig
+  const decimals = coinConfig[selectedPair]
+    ? coinConfig[selectedPair].priceDecimals
+    : 2;
+
+  // Принудительно отсекаем математический хвост округления JavaScript
+  const cleanPrice = parseFloat(value.toFixed(decimals));
+
+  // Записываем отформатированное число в поле ввода цены входа
+  entryInput.value = cleanPrice;
+
+  // Копируем чистое число в физический буфер обмена
+  navigator.clipboard.writeText(cleanPrice.toString()).catch(() => {});
+
+  // Сохраняем состояние и вызываем ядро перерасчета рисков калькулятора
+  saveToStorage();
+  calculate();
+}
 
 function initWebSocketInformer() {
   if (informerWs) {
@@ -585,9 +610,12 @@ function initWebSocketInformer() {
   localCachedAsk = 0;
   informerLastPrice = 0;
 
+  // Захватываем оригинальные элементы из разметки, прописанные в вашем HTML
   const informerContainer = document.querySelector(".bybit-live-informer");
-  const priceBlock = document.querySelector(".live-price-block");
-  const bookBlock = document.querySelector(".live-book-block");
+  const livePriceEl = document.getElementById("live-price");
+  const arrowEl = document.getElementById("live-arrow");
+  const askEl = document.getElementById("live-ask");
+  const bidEl = document.getElementById("live-bid");
   const spreadEl = document.getElementById("live-spread");
   const fundingBox = document.getElementById("live-funding-box");
   const fundingRateEl = document.getElementById("live-funding-rate");
@@ -597,35 +625,39 @@ function initWebSocketInformer() {
   if (fundingBox)
     fundingBox.style.display = currentTab === "futures" ? "flex" : "none";
 
-  if (priceBlock) {
-    priceBlock.innerHTML = `
-      <span class="informer-title-meta">Bybit Live</span>
-      <span id="live-arrow" class="live-arrow flat">${SVG_TREND_FLAT}</span>
-      <span id="live-price" class="live-price-val">0.00</span>
-    `;
+  // Ставим стартовую нейтральную стрелку
+  if (arrowEl) arrowEl.innerHTML = SVG_TREND_FLAT;
+
+  // ИНИЦИАЛИЗАЦИЯ ИНТЕРАКТИВНЫХ ОБРАБОТЧИКОВ КЛИКА
+  if (livePriceEl) {
+    livePriceEl.style.cursor = "copy";
+    livePriceEl.onclick = () => {
+      if (localCachedBid > 0 && localCachedAsk > 0) {
+        const mid = (localCachedAsk + localCachedBid) / 2;
+        injectPriceToCalculator(mid);
+      }
+    };
+  }
+  if (askEl) {
+    askEl.style.cursor = "copy";
+    askEl.onclick = () => {
+      if (localCachedAsk > 0) injectPriceToCalculator(localCachedAsk);
+    };
+  }
+  if (bidEl) {
+    bidEl.style.cursor = "copy";
+    bidEl.onclick = () => {
+      if (localCachedBid > 0) injectPriceToCalculator(localCachedBid);
+    };
   }
 
-  // Модернизация стакана: гармонично внедрили невзрачный текст Ask/Bid перед иконками ордеров
-  if (bookBlock) {
-    bookBlock.innerHTML = `
-      <div class="book-row-meta">
-        <span class="book-text-label">Ask</span>
-        <span class="book-icon-wrap">${SVG_BOOK_ASK}</span>
-        <span id="live-ask" class="book-tick ask">0.00</span>
-      </div>
-      <div class="book-row-meta">
-        <span class="book-text-label">Bid</span>
-        <span class="book-icon-wrap">${SVG_BOOK_BID}</span>
-        <span id="live-bid" class="book-tick bid">0.00</span>
-      </div>
-    `;
+  // Автокоррекция тикера TON для спотового рынка Bybit
+  let wsPairTopicName = selectedPair;
+  if (selectedPair === "TONUSDT" && currentTab === "spot") {
+    wsPairTopicName = "TONCOINUSDT";
   }
 
-  const livePriceEl = document.getElementById("live-price");
-  const arrowEl = document.getElementById("live-arrow");
-  const askEl = document.getElementById("live-ask");
-  const bidEl = document.getElementById("live-bid");
-
+  // ПОЛНОЕ ВОССТАНОВЛЕНИЕ ТВОЕГО ИСХОДНОГО АЛГОРИТМА ПОСИМВОЛЬНОГО ОБХОДА АДРЕСА API
   const baseParts = [
     "wss",
     "://",
@@ -643,15 +675,21 @@ function initWebSocketInformer() {
 
   informerWs.onopen = () => {
     if (informerWs.readyState !== WebSocket.OPEN) return;
+
+    // Оригинальный топик подписки стакана orderbook.1
     informerWs.send(
       JSON.stringify({
         op: "subscribe",
-        args: [`orderbook.1.${selectedPair}`],
+        args: [`orderbook.1.${wsPairTopicName}`],
       }),
     );
+
     if (currentTab === "futures") {
       informerWs.send(
-        JSON.stringify({ op: "subscribe", args: [`tickers.${selectedPair}`] }),
+        JSON.stringify({
+          op: "subscribe",
+          args: [`tickers.${wsPairTopicName}`],
+        }),
       );
     }
 
@@ -681,7 +719,7 @@ function initWebSocketInformer() {
     const res = JSON.parse(event.data);
     if (res.op === "pong") return;
 
-    if (res.topic === `orderbook.1.${selectedPair}` && res.data) {
+    if (res.topic === `orderbook.1.${wsPairTopicName}` && res.data) {
       const ob = res.data;
       let hasUpdate = false;
 
@@ -755,7 +793,7 @@ function initWebSocketInformer() {
 
     if (
       currentTab === "futures" &&
-      res.topic === `tickers.${selectedPair}` &&
+      res.topic === `tickers.${wsPairTopicName}` &&
       res.data
     ) {
       const t = res.data;
