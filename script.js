@@ -4,11 +4,10 @@ let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 
-// Кошелек coinConfig с обновленными десятичными знаками для BTCUSDT (priceDecimals: 2)
+// Кошелек coinConfig с торговыми параметрами Bybit — TONUSDT полностью удален
 const coinConfig = {
   BTCUSDT: { price: 79670, priceDecimals: 2, qtyDecimals: 5, recLeverage: 20 },
   ETHUSDT: { price: 2510, priceDecimals: 2, qtyDecimals: 4, recLeverage: 10 },
-  TONUSDT: { price: 5.345, priceDecimals: 3, qtyDecimals: 2, recLeverage: 3 },
   XAUTUSDT: {
     price: 4582.6,
     priceDecimals: 2,
@@ -579,21 +578,14 @@ function injectPriceToCalculator(value) {
   const selectedPair = document.getElementById("pair")?.value;
   if (!entryInput || !selectedPair) return;
 
-  // Извлекаем количество знаков после запятой для выбранной монеты из coinConfig
   const decimals = coinConfig[selectedPair]
     ? coinConfig[selectedPair].priceDecimals
     : 2;
-
-  // Принудительно отсекаем математический хвост округления JavaScript
   const cleanPrice = parseFloat(value.toFixed(decimals));
 
-  // Записываем отформатированное число в поле ввода цены входа
   entryInput.value = cleanPrice;
-
-  // Копируем чистое число в физический буфер обмена
   navigator.clipboard.writeText(cleanPrice.toString()).catch(() => {});
 
-  // Сохраняем состояние и вызываем ядро перерасчета рисков калькулятора
   saveToStorage();
   calculate();
 }
@@ -606,11 +598,12 @@ function initWebSocketInformer() {
     informerWs.close();
   }
 
+  // Полное обнуление кэша котировок при смене монеты
   localCachedBid = 0;
   localCachedAsk = 0;
   informerLastPrice = 0;
 
-  // Захватываем оригинальные элементы из разметки, прописанные в вашем HTML
+  // Извлекаем существующие элементы из разметки карточки
   const informerContainer = document.querySelector(".bybit-live-informer");
   const livePriceEl = document.getElementById("live-price");
   const arrowEl = document.getElementById("live-arrow");
@@ -625,10 +618,19 @@ function initWebSocketInformer() {
   if (fundingBox)
     fundingBox.style.display = currentTab === "futures" ? "flex" : "none";
 
-  // Ставим стартовую нейтральную стрелку
+  // ИСПРАВЛЕНИЕ: Мягкий и безопасный сброс текста в режим ожидания (без innerHTML деструкции)
+  if (livePriceEl) {
+    livePriceEl.innerText = "Загрузка...";
+    livePriceEl.className = "live-price-val"; // сброс цветовых классов up/down
+  }
+  if (askEl) askEl.innerText = "0.00";
+  if (bidEl) bidEl.innerText = "0.00";
+  if (spreadEl) spreadEl.innerText = "0.00 (0.00%)";
   if (arrowEl) arrowEl.innerHTML = SVG_TREND_FLAT;
+  if (informerContainer)
+    informerContainer.classList.remove("trend-up", "trend-down");
 
-  // ИНИЦИАЛИЗАЦИЯ ИНТЕРАКТИВНЫХ ОБРАБОТЧИКОВ КЛИКА
+  // НАВЕШИВАНИЕ ОБРАБОТЧИКОВ КЛИКА ДЛЯ СВЯЗКИ С КАЛЬКУЛЯТОРОМ
   if (livePriceEl) {
     livePriceEl.style.cursor = "copy";
     livePriceEl.onclick = () => {
@@ -651,13 +653,7 @@ function initWebSocketInformer() {
     };
   }
 
-  // Автокоррекция тикера TON для спотового рынка Bybit
-  let wsPairTopicName = selectedPair;
-  if (selectedPair === "TONUSDT" && currentTab === "spot") {
-    wsPairTopicName = "TONCOINUSDT";
-  }
-
-  // ПОЛНОЕ ВОССТАНОВЛЕНИЕ ТВОЕГО ИСХОДНОГО АЛГОРИТМА ПОСИМВОЛЬНОГО ОБХОДА АДРЕСА API
+  // Твой оригинальный посимвольный обход адреса API Bybit V5
   const baseParts = [
     "wss",
     "://",
@@ -676,11 +672,10 @@ function initWebSocketInformer() {
   informerWs.onopen = () => {
     if (informerWs.readyState !== WebSocket.OPEN) return;
 
-    // Оригинальный топик подписки стакана orderbook.1
     informerWs.send(
       JSON.stringify({
         op: "subscribe",
-        args: [`orderbook.1.${wsPairTopicName}`],
+        args: [`orderbook.1.${selectedPair}`],
       }),
     );
 
@@ -688,7 +683,7 @@ function initWebSocketInformer() {
       informerWs.send(
         JSON.stringify({
           op: "subscribe",
-          args: [`tickers.${wsPairTopicName}`],
+          args: [`tickers.${selectedPair}`],
         }),
       );
     }
@@ -719,7 +714,7 @@ function initWebSocketInformer() {
     const res = JSON.parse(event.data);
     if (res.op === "pong") return;
 
-    if (res.topic === `orderbook.1.${wsPairTopicName}` && res.data) {
+    if (res.topic === `orderbook.1.${selectedPair}` && res.data) {
       const ob = res.data;
       let hasUpdate = false;
 
@@ -793,7 +788,7 @@ function initWebSocketInformer() {
 
     if (
       currentTab === "futures" &&
-      res.topic === `tickers.${wsPairTopicName}` &&
+      res.topic === `tickers.${selectedPair}` &&
       res.data
     ) {
       const t = res.data;
