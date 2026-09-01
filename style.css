@@ -21,6 +21,7 @@
   --c-red: #ff5b60;
   --c-red-glow: rgba(255, 91, 96, 0.2);
   --c-king: #ffb11a;
+  --inf-bg: rgba(19, 23, 34, 0.6);
 }
 
 /* ВЫСОКОКОНТРАСТНАЯ СВЕТЛАЯ ТЕМА (Apple Glass Style) */
@@ -44,6 +45,7 @@ html.light-theme {
   --c-red: #dc2626;
   --c-red-glow: rgba(220, 38, 38, 0.08);
   --c-king: #d97706;
+  --inf-bg: rgba(255, 255, 255, 0.8);
 }
 
 * {
@@ -51,13 +53,11 @@ html.light-theme {
   padding: 0;
   box-sizing: border-box;
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
 }
-
 /* === КОНЕЦ ЧАСТИ 1 === */
 /* === НАЧАЛО ЧАСТИ 2 === */
-
 body {
   height: 100vh;
   display: flex;
@@ -136,28 +136,26 @@ html.light-theme .glass-container {
     0 30px 60px rgba(15, 23, 42, 0.08),
     inset 0 1px 1px rgba(255, 255, 255, 0.6);
 }
-
 /* === КОНЕЦ ЧАСТИ 2 === */
 /* === НАЧАЛО ЧАСТИ 3 === */
-
 .panel-left,
 .panel-right {
   width: 100%;
-  height: auto; /* ОБНОВЛЕНО: Убрано жесткое 100%, теперь панели облегают контент и сжимаются */
+  height: auto;
   display: flex;
   flex-direction: column;
 }
 .panel-left {
   position: relative;
-  justify-content: flex-start; /* ОБНОВЛЕНО: Естественное распределение полей сверху вниз */
-  gap: 16px; /* Оптимальный зазор между инпутами для компенсации высоты */
+  justify-content: flex-start;
+  gap: 16px;
 }
 .system-footer-row {
   display: flex;
   justify-content: center !important;
   align-items: center;
   width: 100%;
-  margin-top: 8px; /* Небольшой фиксированный отступ для ссылки сброса */
+  margin-top: 8px;
 }
 .tabs-large {
   height: 44px !important;
@@ -202,9 +200,6 @@ html.init-spot-mode #liq-section {
   pointer-events: none;
 }
 
-/* === КОНЕЦ ЧАСТИ 3 === */
-/* === НАЧАЛО ЧАСТИ 4 === */
-
 .fields-grid-priority {
   display: flex;
   flex-direction: column;
@@ -218,12 +213,12 @@ html.init-spot-mode #liq-section {
   gap: 16px;
   width: 100%;
 }
-
 .trade-group-row {
   grid-template-columns: 1fr 1fr !important;
   align-items: flex-start;
 }
-
+/* === КОНЕЦ ЧАСТИ 3 === */
+/* === НАЧАЛО ЧАСТИ 4 === */
 .input-item {
   display: flex;
   flex-direction: column;
@@ -355,9 +350,6 @@ html.light-theme .left-field-desc {
   height: 38px;
 }
 
-/* === КОНЕЦ ЧАСТИ 4 === */
-/* === НАЧАЛО ЧАСТИ 5 === */
-
 .tab-btn,
 .side-btn,
 .order-btn {
@@ -461,7 +453,8 @@ input[type="number"] {
 .reset-link-btn:hover {
   color: var(--c-king);
 }
-
+/* === КОНЕЦ ЧАСТИ 4 === */
+/* === НАЧАЛО ЧАСТИ 5 === */
 .terminal-top-bar {
   position: fixed;
   top: 20px;
@@ -485,6 +478,7 @@ input[type="number"] {
   transition:
     background 0.3s ease,
     border 0.3s ease;
+  flex-shrink: 0;
 }
 html.light-theme .clean-balance-widget {
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.02);
@@ -525,6 +519,148 @@ html.light-theme .clean-balance-widget {
   user-select: none;
   letter-spacing: 0.5px;
 }
+
+/* ОБНОВЛЕННАЯ МОНОЛИТНАЯ GRID-СЕТКА СТЕКЛЯННОГО КОРПУСА */
+.glass-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  border: 1px solid var(--glass-border);
+  border-radius: 38px;
+  padding: 30px;
+  width: 860px;
+  min-height: 480px;
+  height: auto;
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  grid-template-rows: auto auto auto;
+  align-items: stretch;
+  gap: 30px 40px;
+  z-index: 1;
+  transition:
+    background 0.3s ease,
+    border 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+html:not(.light-theme) .glass-container {
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+html.light-theme .glass-container {
+  box-shadow:
+    0 30px 60px rgba(15, 23, 42, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* ИНФОРМЕР В ВИДЕ ВНУТРЕННЕЙ ШАПКИ КАРТОЧКИ (С ХАРД-ВЫРАВНИВАНИЕМ) */
+.bybit-live-informer {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--input-border);
+  padding: 12px 20px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  width: 100%;
+  margin-bottom: -10px;
+
+  /* ЖЕСТКОЕ ЗАПРЕЩЕНИЕ ПРЫЖКОВ ШРИФТА ДЛЯ ВСЕХ ВНУТРЕННИХ ЦИФР */
+  font-variant-numeric: tabular-nums !important;
+}
+html.light-theme .bybit-live-informer {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.live-price-block {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 110px; /* Фиксированная ширина предотвращает сдвиг соседних блоков */
+}
+.live-arrow {
+  font-size: 14px;
+  width: 12px;
+  display: inline-block;
+  text-align: center;
+  transition: color 0.1s ease;
+}
+.live-arrow.flat {
+  color: var(--text-muted) !important;
+}
+.live-price-val {
+  font-variant-numeric: tabular-nums !important;
+  font-size: 14px;
+}
+.live-book-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  min-width: 105px; /* Фиксированная полка для цен Ask/Bid */
+}
+.book-tick {
+  font-variant-numeric: tabular-nums !important;
+}
+.book-tick.ask {
+  color: var(--c-red);
+}
+.book-tick.bid {
+  color: var(--c-green);
+}
+
+.live-spread-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  min-width: 185px; /* Запас ширины под абсолютный, процентный спред и сентимент */
+}
+.spread-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.spread-val {
+  color: var(--c-king);
+  font-variant-numeric: tabular-nums !important;
+}
+.live-funding-block {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px dashed var(--input-border);
+  padding-left: 14px;
+  transition: all 0.3s ease;
+  min-width: 110px; /* Фиксированная зона под таймер и ставку фандинга */
+}
+.funding-rate-val {
+  font-variant-numeric: tabular-nums !important;
+}
+.funding-time-val {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums !important;
+}
+.live-funding-block.critical-alert {
+  animation: pulse-top-alert 2s infinite alternate;
+  border-radius: 10px;
+  padding: 2px 10px;
+  background: var(--alert-bg);
+}
+@keyframes pulse-top-alert {
+  0% {
+    box-shadow: 0 0 4px rgba(246, 70, 53, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 12px rgba(246, 70, 53, 0.4);
+  }
+}
+
 .google-utility-capsule {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -536,6 +672,7 @@ html.light-theme .clean-balance-widget {
   align-items: center;
   gap: 4px;
   height: 42px;
+  flex-shrink: 0;
 }
 html.light-theme .google-utility-capsule {
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.02);
@@ -573,18 +710,8 @@ html.light-theme .google-action-icon-btn:hover {
 .google-action-icon-btn:hover svg {
   fill: var(--text-main);
 }
-.help-btn-text {
-  font-family: inherit;
-  user-select: none;
-}
-.info-mini-btn,
-.theme-mini-btn {
-  display: none !important;
-}
-
 /* === КОНЕЦ ЧАСТИ 5 === */
 /* === НАЧАЛО ЧАСТИ 6 === */
-
 .panel-right {
   justify-content: flex-start;
   gap: 0;
@@ -811,7 +938,6 @@ html:not(.light-theme) input:disabled {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* СТИЛИ МОДАЛЬНОГО ОКНА СПРАВКИ И ШИРОКОФОРМАТНОГО СПЛИТ-ЭКРАНА */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -845,9 +971,9 @@ html.light-theme .modal-overlay {
   border: 1px solid var(--glass-border);
   border-radius: 28px;
   width: 100%;
-  max-width: 1140px; /* ОБНОВЛЕНО: Сверхширокий панорамный формат для абсолютной свободы текста */
+  max-width: 1140px;
   max-height: 85vh;
-  padding: 30px 40px; /* Увеличены боковые отступы */
+  padding: 30px 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -909,23 +1035,22 @@ html.light-theme .modal-content {
   margin-bottom: 6px;
 }
 
-/* ПРОСТОРНАЯ ДВУХКОЛОНОЧНАЯ СЕТКА СПЛИТ-ЭКРАНА */
 .modal-split-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px; /* ОБНОВЛЕНО: Широкий воздушный зазор между колонками */
+  gap: 40px;
   width: 100%;
 }
 .modal-grid-column {
   display: flex;
   flex-direction: column;
-  gap: 18px; /* Увеличено вертикальное расстояние между карточками */
+  gap: 18px;
 }
 .modal-info-card {
   background: rgba(255, 255, 255, 0.01);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 18px 20px; /* Расширена внутренняя посадка контента */
+  padding: 18px 20px;
 }
 html.light-theme .modal-info-card {
   background: rgba(0, 0, 0, 0.01);
@@ -933,7 +1058,7 @@ html.light-theme .modal-info-card {
 }
 .modal-card-title {
   font-weight: 700;
-  font-size: 14px; /* Чуть крупнее заголовок карточки */
+  font-size: 14px;
   color: var(--c-king);
   margin-bottom: 12px;
   display: flex;
@@ -945,17 +1070,14 @@ html.light-theme .modal-info-card {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Увеличен зазор между строками, убирающий сжатость */
+  gap: 8px;
 }
 .modal-card-list li {
-  font-size: 13px; /* Оптимальный читаемый размер */
+  font-size: 13px;
   line-height: 1.5;
 }
-
 /* === КОНЕЦ ЧАСТИ 6 === */
 /* === НАЧАЛО ЧАСТИ 7 === */
-
-/* СТИЛИ КУСТОМНОЙ НИЖНЕЙ ПАНЕЛИ ЖУРНАЛА */
 .table-log-container {
   grid-column: span 2;
   background: var(--glass-bg);
@@ -981,7 +1103,6 @@ html.light-theme .modal-info-card {
     margin 0.3s ease;
 }
 
-/* Схлопывание блока журнала ордеров целиком в ноль */
 .table-log-container.collapsed {
   max-height: 0 !important;
   padding-top: 0 !important;
@@ -993,7 +1114,6 @@ html.light-theme .modal-info-card {
   border-color: transparent !important;
 }
 
-/* Жесткое скрытие журнала ДО загрузки DOM-структуры (Flicker-защита) */
 html.init-log-hidden #global-table-log-block {
   max-height: 0 !important;
   padding-top: 0 !important;
@@ -1006,7 +1126,6 @@ html.init-log-hidden #global-table-log-block {
   transition: none !important;
 }
 
-/* Стилизация активного состояния кнопки Журнала в верхней капсуле */
 #log-global-toggle-btn.active-log-btn {
   background: var(--c-orange-glow) !important;
   border: 1px solid var(--c-king) !important;
@@ -1032,13 +1151,12 @@ html.light-theme .table-log-header {
   color: var(--text-main);
 }
 
-/* ОБНОВЛЕНО: Выразительный крупный индикатор на основном шрифте сайта */
 .table-log-counter {
-  font-size: 11px; /* ОБНОВЛЕНО: Размер цифры увеличен */
-  font-family: inherit; /* ОБНОВЛЕНО: Возвращен чистый основной шрифт сайта вместо моно */
-  font-weight: 800; /* Контрастное жирное начертание */
-  background: var(--c-king); /* Плотный янтарно-золотой фон */
-  color: #0f1115; /* Темный текст для максимальной читаемости */
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 800;
+  background: var(--c-king);
+  color: #0f1115;
   padding: 1px 7px;
   border-radius: 5px;
   box-shadow:
@@ -1059,7 +1177,6 @@ html.light-theme .table-log-header {
   transform: scale(1.08);
   box-shadow: 0 0 16px rgba(255, 177, 26, 0.6);
 }
-/* Адаптация крупного индикатора под светлую тему */
 html.light-theme .table-log-counter {
   background: var(--c-king);
   color: #ffffff;
@@ -1086,7 +1203,6 @@ html.light-theme .table-log-counter {
   color: var(--c-red) !important;
 }
 
-/* Контейнер прокрутки журнала */
 .table-log-scroll-area {
   max-height: 180px;
   overflow-y: auto;
@@ -1108,7 +1224,6 @@ html.light-theme .table-log-counter {
   font-size: 11px;
 }
 
-/* Бесшовный стиль замороженной шапки (Без черной плашки) */
 .premium-log-table th {
   position: sticky;
   top: 0;
@@ -1161,7 +1276,6 @@ html.light-theme .premium-log-table tbody tr:hover {
   color: var(--c-red) !important;
 }
 
-/* Матовое затухание для приглушенных (выключенных) строк ордеров */
 .premium-log-table tbody tr.muted-row {
   opacity: 0.22 !important;
   filter: grayscale(0.85) contrast(0.9);
@@ -1173,7 +1287,6 @@ html.light-theme .premium-log-table tbody tr.muted-row {
   filter: grayscale(1);
 }
 
-/* Кнопка-тумблер приглушения в строке таблицы */
 .log-row-mute-btn {
   background: transparent !important;
   border: none !important;
@@ -1227,37 +1340,11 @@ html.light-theme .premium-log-table tbody tr.muted-row {
     padding-bottom: 24px;
     border-bottom: 1px solid var(--input-border);
   }
-  .google-top-actions {
-    top: 12px;
-    right: 12px;
-    position: absolute;
-  }
-  .analytics-header {
-    grid-template-columns: 1fr 1.2fr 1fr;
-    gap: 6px;
-    height: auto;
-    margin-bottom: 4px;
-  }
   .analytics-footer-row {
     padding: 16px 0 0 0 !important;
     display: grid !important;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-  }
-  .analytic-badge {
-    padding: 6px 4px;
-    align-items: center;
-    text-align: center;
-  }
-  .badge-label {
-    font-size: 8px;
-  }
-  .badge-value {
-    font-size: 11px;
-  }
-  .results-section {
-    padding: 14px 0;
-    gap: 16px;
   }
   .display-row {
     align-items: flex-start;
@@ -1272,18 +1359,6 @@ html.light-theme .premium-log-table tbody tr.muted-row {
   .small-val {
     font-size: 14px !important;
   }
-  .google-copy-btn {
-    width: 28px;
-    height: 28px;
-  }
-  .google-copy-btn .icon-copy {
-    width: 16px;
-    height: 16px;
-  }
-  .reset-link-btn {
-    align-self: center;
-    margin-top: 10px;
-  }
   .table-log-container {
     grid-column: span 1;
     padding: 12px;
@@ -1294,5 +1369,4 @@ html.light-theme .premium-log-table tbody tr.muted-row {
     white-space: nowrap;
   }
 }
-
 /* === КОНЕЦ ЧАСТИ 7 === */

@@ -54,6 +54,8 @@ function toggleTheme() {
   }
   saveToStorage();
 }
+/* === КОНЕЦ ЧАСТИ 1 === */
+/* === НАЧАЛО ЧАСТИ 2 === */
 
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
@@ -62,7 +64,7 @@ function loadFromStorage() {
   if (currentTheme === "light") {
     document.documentElement.classList.add("light-theme");
     if (btn)
-      btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
+      btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0c-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41z"/></svg>`;
   } else {
     document.documentElement.classList.remove("light-theme");
     if (btn)
@@ -137,6 +139,7 @@ function switchTab(tab) {
   if (tab === "spot") setSide("Long");
   saveToStorage();
   calculate();
+  initWebSocketInformer();
 }
 
 function setSide(side) {
@@ -152,9 +155,6 @@ function setSide(side) {
   saveToStorage();
   calculate();
 }
-
-/* === КОНЕЦ ЧАСТИ 1 === */
-/* === НАЧАЛО ЧАСТИ 2 === */
 
 function setOrderType(type) {
   currentOrderType = type;
@@ -176,9 +176,11 @@ function setOrderType(type) {
   saveToStorage();
   calculate();
 }
+/* === КОНЕЦ ЧАСТИ 2 === */
+/* === НАЧАЛО ЧАСТИ 3 === */
 
 function formatSmartValue(value, decimals) {
-  if (value === "—") return "—";
+  if (value === "—" || value === undefined) return "—";
   if (decimals === 0) return Math.round(value).toString();
   return value.toFixed(decimals);
 }
@@ -270,10 +272,11 @@ function calculate() {
   document.getElementById("res-volume-copy").innerText = totalVolume.toFixed(2);
 
   if (currentTab === "futures") {
-    document.getElementById("res-leverage-copy").innerText =
-      Math.round(leverage).toString();
+    const levCopyEl = document.getElementById("res-leverage-copy");
+    if (levCopyEl) levCopyEl.innerText = Math.round(leverage).toString();
   } else {
-    document.getElementById("res-leverage-copy").innerText = "—";
+    const levCopyEl = document.getElementById("res-leverage-copy");
+    if (levCopyEl) levCopyEl.innerText = "—";
   }
 
   document.getElementById("pct-tp").innerText =
@@ -306,11 +309,9 @@ function calculate() {
 
   renderLogTable();
 }
+/* === КОНЕЦ ЧАСТИ 3 === */
+/* === НАЧАЛО ЧАСТИ 4 === */
 
-/* === КОНЕЦ ЧАСТИ 2 === */
-/* === НАЧАЛО ЧАСТИ 3 === */
-
-// Осознанная фиксация расчета в дневник по кнопке с премиальной SVG-анимацией фидбэка
 function pushToLogManual() {
   const selectedPair = document.getElementById("pair").value;
   const pairText =
@@ -322,8 +323,6 @@ function pushToLogManual() {
   const sl = document.getElementById("res-sl").innerText;
   const volume = document.getElementById("res-volume-copy").innerText;
   const qty = document.getElementById("res-qty").innerText;
-
-  // Считываем баланс (депозит) с экрана для базы данных
   const inputBalance =
     parseFloat(document.getElementById("balance").value) || 0;
 
@@ -340,7 +339,6 @@ function pushToLogManual() {
     minute: "2-digit",
     second: "2-digit",
   });
-
   const currentLeverage = coinConfig[selectedPair]
     ? coinConfig[selectedPair].recLeverage
     : 1;
@@ -365,13 +363,12 @@ function pushToLogManual() {
     entry: entryPrice,
     tp: tp,
     sl: sl,
-    dep: `$${inputBalance.toFixed(2)}`, // Жестко фиксируем сумму с сотыми
+    dep: `$${inputBalance.toFixed(2)}`,
     details: `$${volume} / ${qty}`,
   };
 
-  // Проверка дубликатов: не даем занести одну и ту же неизмененную сделку дважды
   if (tradingLog.length > 0) {
-    const last = tradingLog;
+    const last = tradingLog[0];
     if (
       last.pair === logItem.pair &&
       last.market === logItem.market &&
@@ -389,7 +386,6 @@ function pushToLogManual() {
   localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
   renderLogTable();
 
-  // Визуальный премиальный фидбэк на кнопке
   const addBtn = document.getElementById("add-to-log-btn");
   const btnText = document.getElementById("add-to-log-text");
   const btnSvg = document.getElementById("add-to-log-svg");
@@ -400,7 +396,6 @@ function pushToLogManual() {
 
     btnText.innerText = "Расчет зафиксирован в дневник!";
     btnSvg.innerHTML = `<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>`;
-
     addBtn.style.background = "rgba(3, 194, 126, 0.15)";
     addBtn.style.borderColor = "var(--c-green)";
     addBtn.style.color = "var(--c-green)";
@@ -417,83 +412,67 @@ function pushToLogManual() {
   }
 }
 
-// Переключение тумблера приглушения (тусклости) для строки ордера по её ID
 function toggleMuteLogRow(id) {
   tradingLog = tradingLog.map((item) => {
-    if (item.id === id) {
-      item.isMuted = !item.isMuted;
-    }
+    if (item.id === id) item.isMuted = !item.isMuted;
     return item;
   });
   localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
   renderLogTable();
 }
 
-// ОБНОВЛЕНО: Сгенерирована выделенная ячейка для Депозита, а вывод деталей очищен
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
   if (!tbody || !counter) return;
 
-  counter.innerText = tradingLog.length;
+  counter.innerText = tradingLog.length.toString() + " записей";
   tbody.innerHTML = "";
 
   tradingLog.forEach((item) => {
     const tr = document.createElement("tr");
     tr.className = item.sideClass + (item.isMuted ? " muted-row" : "");
-
     const displayDate = item.date || "—";
-
-    let leverageMarkup = "";
-    if (item.leverage) {
-      leverageMarkup = `${item.leverage}<span style="opacity: 0.5; font-size: 9px; margin-left: 1px; font-weight: 700; text-transform: lowercase;">x</span>`;
-    }
-
+    const leverageMarkup = item.leverage
+      ? `${item.leverage}<span style="opacity:0.5; font-size:9px; margin-left:1px; font-weight:700; text-transform:lowercase;">x</span>`
+      : "";
     const displayDep = item.dep || "—";
 
     tr.innerHTML = `
       <td>
-        <div style="display: flex; flex-direction: column; line-height: 1.3; font-size: 11px;">
-          <span style="color: var(--text-main); font-weight: 700;">${displayDate}</span>
-          <span style="color: var(--text-muted); font-size: 9px; font-weight: 500;">${item.time}</span>
+        <div style="display:flex; flex-direction:column; line-height:1.3; font-size:11px;">
+          <span style="color:var(--text-main); font-weight:700;">${displayDate}</span>
+          <span style="color:var(--text-muted); font-size:9px; font-weight:500;">${item.time}</span>
         </div>
       </td>
-      <!-- ОБНОВЛЕНО: Новая независимая контрастная ячейка депозита в строке -->
-      <td style="color: var(--text-main); font-weight: 700;">${displayDep}</td>
+      <td style="color:var(--text-main); font-weight:700;">${displayDep}</td>
       <td>${item.pair}</td>
-      <td style="color: var(--text-main); font-weight: 700;">${leverageMarkup}</td>
+      <td style="color:var(--text-main); font-weight:700;">${leverageMarkup}</td>
       <td class="${item.badgeClass}">${item.market}</td>
       <td>${item.type}</td>
       <td>${item.entry}</td>
       <td style="color:var(--c-green);">${item.tp}</td>
       <td style="color:var(--c-red);">${item.sl}</td>
-      <!-- ОБНОВЛЕНО: Колонка деталей очищена от дублирования надписи Dep -->
       <td style="color:var(--c-orange); font-size:10px;">${item.details}</td>
-      <td style="text-align: center;">
+      <td style="text-align:center;">
         <button class="log-row-mute-btn" onclick="toggleMuteLogRow(${item.id})" title="Приглушить/Активировать строку ордера">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
         </button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
+/* === КОНЕЦ ЧАСТИ 4 === */
+/* === НАЧАЛО ЧАСТИ 5 === */
 
-/* === КОНЕЦ ЧАСТИ 3 === */
-/* === НАЧАЛО ЧАСТИ 4 === */
-
-// Скрытие журнала с полной Flicker-защитой и компенсацией пустых зон
 function toggleLogVisibility() {
   document.documentElement.classList.remove("init-log-hidden");
-
   const logBlock = document.getElementById("global-table-log-block");
   const toggleBtn = document.getElementById("log-global-toggle-btn");
   if (!logBlock || !toggleBtn) return;
 
   const isCollapsed = logBlock.classList.toggle("collapsed");
-
   if (isCollapsed) {
     toggleBtn.classList.remove("active-log-btn");
     localStorage.setItem("bybit_log_visible", "hidden");
@@ -511,28 +490,21 @@ function clearLog() {
   }
 }
 
-// ОБНОВЛЕНО: Структура выгрузки CSV выровнена с новой очередностью колонок (Деп сразу после Времени)
 function exportLogToCSV() {
   if (tradingLog.length === 0) {
     alert("Журнал пуст. Нечего экспортировать.");
     return;
   }
-
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent +=
     "Дата и Время;Деп;Пара;Плечо;Рынок;Тип Ордера;Цена Входа;TP;SL;Объем и Монеты\r\n";
 
   tradingLog.forEach((row) => {
-    const fullDateTime = `${row.date || "—"} ${row.time}`;
-    const csvLeverage = row.leverage || "";
-    const csvDep = row.dep || "—";
-
-    // Склеиваем поля в новом точном порядке колонок таблицы
     const line = [
-      fullDateTime,
-      csvDep,
+      `${row.date || "—"} ${row.time}`,
+      row.dep || "—",
       row.pair,
-      csvLeverage,
+      row.leverage || "",
       row.market,
       row.type,
       row.entry,
@@ -557,21 +529,19 @@ function exportLogToCSV() {
 
 function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
-  const entryInput = document.getElementById("entry-price");
-  entryInput.value = coinConfig[selectedPair].price;
+  document.getElementById("entry-price").value = coinConfig[selectedPair].price;
   saveToStorage();
   calculate();
+  initWebSocketInformer();
 }
 
 function copyData(elementId, btnElement) {
   const valueText = document.getElementById(elementId).innerText;
   if (valueText === "—" || btnElement.closest(".disabled-element")) return;
 
-  let textToCopy = valueText;
-  if (textToCopy.startsWith("$")) {
-    textToCopy = textToCopy.substring(1);
-  }
-
+  let textToCopy = valueText.startsWith("$")
+    ? valueText.substring(1)
+    : valueText;
   navigator.clipboard.writeText(textToCopy);
 
   const oldSvg = btnElement.innerHTML;
@@ -584,7 +554,6 @@ function copyData(elementId, btnElement) {
   }, 1200);
 }
 
-// Сброс настроек больше НЕ уничтожает массив логов и ключ журнала из памяти
 function resetTerminal() {
   localStorage.removeItem("bybit_tab");
   localStorage.removeItem("bybit_side");
@@ -604,6 +573,174 @@ function resetTerminal() {
 
   restoreTabsVisualOnly();
   calculate();
+  initWebSocketInformer();
+}
+
+// АРХИТЕКТУРА ИНФОРМЕРА BYBIT WEBSOCKET V5 БЕЗ СЕНТИМЕНТ-БАРА
+let informerWs = null;
+let informerPingInterval = null;
+let informerCountdownInterval = null;
+let informerFlatTimeout = null;
+let infNextFundingTimestamp = 0;
+let informerLastPrice = 0;
+const INF_CRITICAL_LIMIT = 0.05;
+
+function initWebSocketInformer() {
+  if (informerWs) {
+    clearInterval(informerPingInterval);
+    clearInterval(informerCountdownInterval);
+    clearTimeout(informerFlatTimeout);
+    informerWs.close();
+  }
+
+  const livePriceEl = document.getElementById("live-price");
+  const arrowEl = document.getElementById("live-arrow");
+  const askEl = document.getElementById("live-ask");
+  const bidEl = document.getElementById("live-bid");
+  const spreadEl = document.getElementById("live-spread");
+  const fundingBox = document.getElementById("live-funding-box");
+  const fundingRateEl = document.getElementById("live-funding-rate");
+  const fundingTimeEl = document.getElementById("live-funding-time");
+
+  const selectedPair = document.getElementById("pair").value;
+  fundingBox.style.display = currentTab === "futures" ? "flex" : "none";
+
+  const baseParts = [
+    "wss",
+    "://",
+    "stream",
+    ".",
+    "bybit",
+    ".",
+    "com",
+    "/v5/public/",
+  ];
+  baseParts.push(currentTab === "futures" ? "linear" : "spot");
+  const wsUrl = baseParts.join("");
+
+  informerWs = new WebSocket(wsUrl);
+
+  informerWs.onopen = () => {
+    if (informerWs.readyState === WebSocket.OPEN) {
+      informerWs.send(
+        JSON.stringify({
+          op: "subscribe",
+          args: [`orderbook.1.${selectedPair}`],
+        }),
+      );
+      if (currentTab === "futures") {
+        informerWs.send(
+          JSON.stringify({
+            op: "subscribe",
+            args: [`tickers.${selectedPair}`],
+          }),
+        );
+      }
+    }
+
+    informerPingInterval = setInterval(() => {
+      if (informerWs && informerWs.readyState === WebSocket.OPEN) {
+        informerWs.send(JSON.stringify({ op: "ping" }));
+      }
+    }, 20000);
+
+    if (currentTab === "futures") {
+      informerCountdownInterval = setInterval(() => {
+        if (infNextFundingTimestamp <= 0) return;
+        const dist = infNextFundingTimestamp - Date.now();
+        if (dist <= 0) {
+          fundingTimeEl.innerText = "00:00:00";
+          return;
+        }
+        const h = Math.floor((dist % 86400000) / 3600000);
+        const m = Math.floor((dist % 3600000) / 60000);
+        const s = Math.floor((dist % 60000) / 1000);
+        fundingTimeEl.innerText = `через ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      }, 1000);
+    }
+  };
+
+  informerWs.onmessage = (event) => {
+    const res = JSON.parse(event.data);
+    if (res.op === "pong") return;
+
+    if (res.topic === `orderbook.1.${selectedPair}` && res.data) {
+      const ob = res.data;
+      let up = false;
+      let curBid =
+        parseFloat(bidEl.innerText.replace(/[A-Za-z: ,$]/g, "")) || 0;
+      let curAsk =
+        parseFloat(askEl.innerText.replace(/[A-Za-z: ,$]/g, "")) || 0;
+
+      if (ob.b && ob.b.length > 0) {
+        curBid = parseFloat(ob.b);
+        up = true;
+      }
+      if (ob.a && ob.a.length > 0) {
+        curAsk = parseFloat(ob.a);
+        up = true;
+      }
+
+      if (curBid > 0 && curAsk > 0 && up) {
+        const mid = (curAsk + curBid) / 2;
+
+        askEl.innerText = `Ask: ${formatSmartValue(curAsk, coinConfig[selectedPair].priceDecimals)}`;
+        bidEl.innerText = `Bid: ${formatSmartValue(curBid, coinConfig[selectedPair].priceDecimals)}`;
+        livePriceEl.innerText = formatSmartValue(
+          mid,
+          coinConfig[selectedPair].priceDecimals,
+        );
+
+        clearTimeout(informerFlatTimeout);
+        if (informerLastPrice > 0) {
+          if (mid > informerLastPrice) {
+            livePriceEl.className = "live-price-val up";
+            arrowEl.className = "live-arrow up";
+            arrowEl.innerText = "▲";
+          } else if (mid < informerLastPrice) {
+            livePriceEl.className = "live-price-val down";
+            arrowEl.className = "live-arrow down";
+            arrowEl.innerText = "▼";
+          }
+        } else {
+          arrowEl.className = "live-arrow flat";
+          arrowEl.innerText = "▬";
+        }
+        informerLastPrice = mid;
+
+        informerFlatTimeout = setTimeout(() => {
+          arrowEl.className = "live-arrow flat";
+          arrowEl.innerText = "▬";
+          livePriceEl.className = "live-price-val";
+        }, 1500);
+
+        const sprAbs = curAsk - curBid;
+        const sprPct = (sprAbs / curBid) * 100;
+        spreadEl.innerText = `${sprAbs.toFixed(coinConfig[selectedPair].priceDecimals)} (${sprPct.toFixed(3)}%)`;
+      }
+    }
+
+    if (
+      currentTab === "futures" &&
+      res.topic === `tickers.${selectedPair}` &&
+      res.data
+    ) {
+      const t = Array.isArray(res.data) ? res.data : res.data;
+      if (t && t.fundingRate !== undefined) {
+        const rate = parseFloat(t.fundingRate) * 100;
+        fundingRateEl.innerText = `Fnd: ${rate > 0 ? "+" : ""}${rate.toFixed(4)}%`;
+        fundingRateEl.style.color = rate >= 0 ? "#0ecb81" : "#f6465d";
+
+        if (Math.abs(rate) >= INF_CRITICAL_LIMIT) {
+          fundingBox.classList.add("critical-alert");
+        } else {
+          fundingBox.classList.remove("critical-alert");
+        }
+      }
+      if (t && t.nextFundingTime !== undefined)
+        infNextFundingTimestamp = parseInt(t.nextFundingTime);
+    }
+  };
 }
 
 document.getElementById("balance").addEventListener("input", saveToStorage);
@@ -611,6 +748,8 @@ document.getElementById("entry-price").addEventListener("input", saveToStorage);
 
 window.onload = () => {
   loadFromStorage();
+  initWebSocketInformer();
+
   const savedLogState = localStorage.getItem("bybit_log_visible");
   const logBlock = document.getElementById("global-table-log-block");
   const toggleBtn = document.getElementById("log-global-toggle-btn");
@@ -623,5 +762,4 @@ window.onload = () => {
     toggleBtn.classList.add("active-log-btn");
   }
 };
-
-/* === КОНЕЦ ЧАСТИ 4 === */
+/* === КОНЕЦ ЧАСТИ 5 === */

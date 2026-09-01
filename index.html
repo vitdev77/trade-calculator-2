@@ -26,9 +26,11 @@
     </script>
   </head>
   <body>
+    <!-- === КОНЕЦ ЧАСТИ 1 === -->
+    <!-- === НАЧАЛО ЧАСТИ 2 === -->
     <!-- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
     <div class="terminal-top-bar">
-      <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА С ТЕКСТОВЫМ ЯКОРЕМ -->
+      <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА -->
       <div class="clean-balance-widget">
         <span class="balance-widget-label-dep">DEP</span>
         <input
@@ -43,7 +45,6 @@
 
       <!-- СЕРВИСНЫЕ КНОПКИ GOOGLE -->
       <div class="google-utility-capsule">
-        <!-- Кнопка быстрого управления видимостью всего журнала -->
         <button
           class="google-action-icon-btn"
           id="log-global-toggle-btn"
@@ -78,9 +79,35 @@
     <div class="glow-sphere sphere-3"></div>
 
     <div class="glass-container">
+      <!-- ИНФОРМЕР ВСТРОЕН ВНУТРЬ СТЕКЛЯННОГО КОНТЕЙНЕРА НА ВСЮ ШИРИНУ -->
+      <div class="bybit-live-informer">
+        <!-- Блок живой цены со стрелкой -->
+        <div class="live-price-block">
+          <span id="live-arrow" class="live-arrow"></span>
+          <span id="live-price" class="live-price-val">Загрузка...</span>
+        </div>
+
+        <!-- Спред и мини-стакан Ask / Bid -->
+        <div class="live-book-block">
+          <span class="book-tick ask">A: <span id="live-ask">0.00</span></span>
+          <span class="book-tick bid">B: <span id="live-bid">0.00</span></span>
+        </div>
+
+        <div class="live-spread-block">
+          <span class="spread-label">Спред:</span>
+          <span id="live-spread" class="spread-val">0.00 (0.00%)</span>
+        </div>
+
+        <!-- Блок Фандинга (динамический) -->
+        <div id="live-funding-box" class="live-funding-block">
+          <span id="live-funding-rate" class="funding-rate-val">0.0000%</span>
+          <span id="live-funding-time" class="funding-time-val">--:--:--</span>
+        </div>
+      </div>
+      <!-- === КОНЕЦ ЧАСТИ 2 === -->
+      <!-- === НАЧАЛО ЧАСТИ 3 === -->
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
-        <!-- ПРИОРИТЕТ №1: Глобальный переключатель рынков -->
         <div class="input-item full-width">
           <div class="market-king-tabs">
             <button
@@ -100,9 +127,7 @@
           </div>
         </div>
 
-        <!-- Сетка параметров ввода -->
         <div class="fields-grid-priority">
-          <!-- Тип ордера -->
           <div class="input-item full-width">
             <div class="order-type-container">
               <button
@@ -123,9 +148,7 @@
             <span class="left-field-desc">Тип ордера исполнения</span>
           </div>
 
-          <!-- Объединенная группа актива и стоимости -->
           <div class="input-row trade-group-row">
-            <!-- Выбор пары (50%) -->
             <div class="input-item pair-item-width">
               <div class="select-custom-wrapper">
                 <select id="pair" onchange="handlePairChange()">
@@ -141,7 +164,6 @@
               <span class="left-field-desc">Торговая пара</span>
             </div>
 
-            <!-- Поле Цены входа (50%) -->
             <div class="input-item price-item-width input-group-king">
               <div class="king-input-wrapper">
                 <input
@@ -159,7 +181,6 @@
           </div>
         </div>
 
-        <!-- ПРИОРИТЕТ №3: Финальный триггер действия (Лонг/Шорт) -->
         <div class="side-fade-wrapper" id="side-item-wrapper">
           <div class="input-item full-width">
             <div class="toggle-container container-medium" id="side-container">
@@ -177,21 +198,18 @@
           </div>
         </div>
 
-        <!-- Системный подвал -->
         <div class="system-footer-row">
           <button class="reset-link-btn" onclick="resetTerminal()">
             Сбросить настройки
           </button>
         </div>
       </div>
-      <!-- === КОНЕЦ ЧАСТИ 1 === -->
-      <!-- === НАЧАЛО ЧАСТИ 2 === -->
+      <!-- === КОНЕЦ ЧАСТИ 3 === -->
+      <!-- === НАЧАЛО ЧАСТИ 4 === -->
       <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="panel-right">
         <div class="results-display">
-          <!-- СЕКЦИЯ 1: ВСЕ ПАРАМЕТРЫ ПРЕДСТОЯЩЕГО ОРДЕРА -->
           <div class="results-section">
-            <!-- 1. Главный копируемый объем -->
             <div class="display-row val-orange-text">
               <div class="field-info">
                 <span class="field-name">Объем в USDT (Value)</span>
@@ -214,7 +232,6 @@
               </div>
             </div>
 
-            <!-- 2. Количество монет -->
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Количество (Qty в монетах)</span>
@@ -225,7 +242,6 @@
               </div>
             </div>
 
-            <!-- 3. Занятая маржа -->
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Занятая маржа (Cost)</span>
@@ -236,7 +252,6 @@
               </div>
             </div>
 
-            <!-- 4. Рабочее плечо Bybit -->
             <div class="display-row val-orange-text" id="res-leverage-section">
               <div class="field-info">
                 <span class="field-name">Рабочее плечо Bybit</span>
@@ -259,10 +274,9 @@
               </div>
             </div>
           </div>
-
-          <!-- СЕКЦИЯ 2: ЦЕЛЕВЫЕ ТАРГЕТЫ ЗАЩИТЫ (TP / SL) -->
+          <!-- === КОНЕЦ ЧАСТИ 4 === -->
+          <!-- === НАЧАЛО ЧАСТИ 5 === -->
           <div class="results-section">
-            <!-- Тейк Профит -->
             <div class="display-row val-green">
               <div class="field-info">
                 <span class="field-name">Тейк Профит</span>
@@ -288,7 +302,6 @@
               </div>
             </div>
 
-            <!-- Стоп Лосс -->
             <div class="display-row val-red">
               <div class="field-info">
                 <span class="field-name">Стоп Лосс</span>
@@ -315,7 +328,6 @@
             </div>
           </div>
 
-          <!-- СЕКЦИЯ 3: ИНФОРМАЦИЯ О РИСКАХ И ЗАПАСАХ НА ДЕПОЗИТ -->
           <div class="results-section">
             <div class="display-row low-accent-row" id="liq-section">
               <div class="field-info">
@@ -341,7 +353,6 @@
             </div>
           </div>
 
-          <!-- ОБНОВЛЕННАЯ СЕКЦИЯ 4: ИНТЕГРИРОВАННЫЙ СВОД АНАЛИТИКИ -->
           <div
             class="results-section no-border analytics-footer-row"
             style="padding-bottom: 0 !important; border-bottom: none !important"
@@ -368,7 +379,6 @@
             </div>
           </div>
 
-          <!-- Кнопка фиксации расчета в торговый дневник -->
           <div style="width: 100%; padding-top: 14px; margin-bottom: 12px">
             <button
               class="modal-action-btn"
@@ -411,8 +421,8 @@
           </div>
         </div>
       </div>
-
-      <!-- Журнал ордеров внутри главного контейнера -->
+      <!-- === КОНЕЦ ЧАСТИ 5 === -->
+      <!-- === НАЧАЛО ЧАСТИ 6 === -->
       <div class="table-log-container" id="global-table-log-block">
         <div class="table-log-header">
           <div class="table-log-title">
@@ -436,7 +446,6 @@
             <thead>
               <tr>
                 <th>Время</th>
-                <!-- ОБНОВЛЕНО: Добавлена новая независимая колонка Деп -->
                 <th>Деп</th>
                 <th>Пара</th>
                 <th>Плечо</th>
@@ -449,9 +458,7 @@
                 <th style="text-align: center; width: 50px">Действие</th>
               </tr>
             </thead>
-            <tbody id="log-table-body">
-              <!-- Строки генерируются динамически через JS -->
-            </tbody>
+            <tbody id="log-table-body"></tbody>
           </table>
         </div>
       </div>
@@ -460,4 +467,4 @@
     <script src="./script.js"></script>
   </body>
 </html>
-<!-- === КОНЕЦ ЧАСТИ 2 === -->
+<!-- === КОНЕЦ ЧАСТИ 6 === -->
