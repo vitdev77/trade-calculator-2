@@ -4,10 +4,10 @@ let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 
-// Кошелек coinConfig с торговыми параметрами Bybit
+// Кошелек coinConfig с обновленными десятичными знаками для BTCUSDT (priceDecimals: 2)
 const coinConfig = {
-  BTCUSDT: { price: 79670, priceDecimals: 0, qtyDecimals: 5, recLeverage: 20 },
-  ETHUSDT: { price: 2510, priceDecimals: 0, qtyDecimals: 4, recLeverage: 10 },
+  BTCUSDT: { price: 79670, priceDecimals: 2, qtyDecimals: 5, recLeverage: 20 },
+  ETHUSDT: { price: 2510, priceDecimals: 2, qtyDecimals: 4, recLeverage: 10 },
   TONUSDT: { price: 5.345, priceDecimals: 3, qtyDecimals: 2, recLeverage: 3 },
   XAUTUSDT: {
     price: 4582.6,
