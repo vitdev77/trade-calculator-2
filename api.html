@@ -1,0 +1,565 @@
+<!-- === НАЧАЛО ЧАСТИ 1 === -->
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bybit Real-Time Ticker & Risk Alert</title>
+    <style>
+      :root {
+        --bg-color: #131722;
+        --card-bg: #1c2030;
+        --text-color: #ffffff;
+        --text-muted: #848e9c;
+        --green: #0ecb81;
+        --red: #f6465d;
+        --accent: #f3a411;
+        --input-bg: #2a2e3d;
+        --border: #2a2e3d;
+        --alert-bg: rgba(246, 70, 93, 0.15);
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .ticker-card {
+        background-color: var(--card-bg);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        width: 360px;
+        text-align: center;
+        border: 1px solid var(--border);
+        transition: border-color 0.3s ease;
+      }
+
+      .market-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background-color: var(--input-bg);
+        padding: 4px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #363c4e;
+      }
+
+      .tab-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        padding: 8px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .tab-btn.active {
+        background-color: var(--accent);
+        color: #000000;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+      }
+
+      .symbol-select {
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border: 1px solid #363c4e;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        outline: none;
+        flex-grow: 1;
+        transition: border-color 0.2s;
+      }
+
+      .symbol-select:focus {
+        border-color: var(--accent);
+      }
+
+      .price-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin: 20px 0 10px 0;
+      }
+
+      .direction-arrow {
+        font-size: 1.8rem;
+        transition: color 0.1s ease;
+        width: 24px;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .price-container {
+        font-size: 2.8rem;
+        font-weight: bold;
+        transition: color 0.1s ease;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .orderbook-mini {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 0;
+        background-color: rgba(0, 0, 0, 0.15);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #2a2e3d;
+      }
+
+      .order-box {
+        text-align: center;
+      }
+
+      .order-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .order-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .order-value.ask {
+        color: var(--red);
+      }
+      .order-value.bid {
+        color: var(--green);
+      }
+
+      .spread-bar {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .spread-value {
+        color: var(--accent);
+        font-weight: bold;
+      }
+
+      .funding-container {
+        display: none;
+        margin-top: 12px;
+        padding: 10px;
+        border-top: 1px dashed #2a2e3d;
+        border-radius: 8px;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        font-size: 0.85rem;
+        text-align: left;
+        transition: all 0.3s ease;
+      }
+
+      .funding-val {
+        font-weight: bold;
+        color: var(--text-color);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .funding-container.critical-alert {
+        background-color: var(--alert-bg);
+        border: 1px solid var(--red);
+        animation: pulse-alert 2s infinite alternate;
+      }
+
+      @keyframes pulse-alert {
+        0% {
+          box-shadow: 0 0 4px rgba(246, 70, 53, 0.2);
+        }
+        100% {
+          box-shadow: 0 0 16px rgba(246, 70, 53, 0.5);
+        }
+      }
+
+      .status {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--text-muted);
+      }
+
+      .status-dot.connected {
+        background-color: var(--green);
+        box-shadow: 0 0 8px var(--green);
+      }
+
+      .up {
+        color: var(--green) !important;
+      }
+      .down {
+        color: var(--red) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main-card" class="ticker-card">
+      <div class="market-tabs">
+        <button class="tab-btn active" data-market="spot">Спот (Spot)</button>
+        <button class="tab-btn" data-market="linear">
+          Бессрочные фьючерсы
+        </button>
+      </div>
+
+      <div class="header">
+        <select id="symbol-select" class="symbol-select">
+          <option value="BTCUSDT">BTC / USDT</option>
+          <option value="ETHUSDT">ETH / USDT</option>
+          <option value="SOLUSDT">SOL / USDT</option>
+          <option value="XRPUSDT">XRP / USDT</option>
+          <option value="MNTUSDT">MNT / USDT</option>
+          <option value="XAUTUSDT">XAUT / USDT</option>
+          <option value="ZECUSDT">ZEC / USDT</option>
+        </select>
+      </div>
+
+      <div class="price-wrapper">
+        <span id="direction-arrow" class="direction-arrow"></span>
+        <div class="price-container" id="price">Загрузка...</div>
+      </div>
+
+      <div class="orderbook-mini">
+        <div class="order-box">
+          <div class="order-label">Продажа (Ask)</div>
+          <div class="order-value ask" id="ask-price">0.00</div>
+        </div>
+        <div class="order-box">
+          <div class="order-label">Покупка (Bid)</div>
+          <div class="order-value bid" id="bid-price">0.00</div>
+        </div>
+      </div>
+
+      <div class="spread-bar">
+        Спред: <span id="spread-info" class="spread-value">0.00 (0.00%)</span>
+      </div>
+
+      <div class="funding-container" id="funding-box">
+        <div>
+          Ставка: <span id="funding-rate" class="funding-val">0.0000%</span>
+        </div>
+        <div style="text-align: right">
+          Смена через:
+          <span id="funding-time" class="funding-val">--:--:--</span>
+        </div>
+      </div>
+
+      <div class="status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Подключение...</span>
+      </div>
+    </div>
+    <!-- === КОНЕЦ ЧАСТИ 1 === -->
+    <!-- === НАЧАЛО ЧАСТИ 2 === -->
+    <script>
+      const symbolSelect = document.getElementById("symbol-select");
+      const priceEl = document.getElementById("price");
+      const arrowEl = document.getElementById("direction-arrow");
+      const askEl = document.getElementById("ask-price");
+      const bidEl = document.getElementById("bid-price");
+      const spreadInfo = document.getElementById("spread-info");
+      const mainCard = document.getElementById("main-card");
+      const fundingBox = document.getElementById("funding-box");
+      const fundingRateEl = document.getElementById("funding-rate");
+      const fundingTimeEl = document.getElementById("funding-time");
+      const statusDot = document.getElementById("status-dot");
+      const statusText = document.getElementById("status-text");
+      const tabBtns = document.querySelectorAll(".tab-btn");
+
+      let currentMarket = "spot";
+      let currentSymbol = symbolSelect.value;
+      let lastPrice = 0;
+      let ws = null;
+      let pingInterval = null;
+      let countdownInterval = null;
+      let nextFundingTimestamp = 0;
+
+      const CRITICAL_FUNDING_LIMIT = 0.05;
+
+      function getWsUrl(market) {
+        const base = [
+          "wss",
+          "://",
+          "stream",
+          ".",
+          "bybit",
+          ".",
+          "com",
+          "/v5/public/",
+        ];
+        base.push(market);
+        return base.join("");
+      }
+
+      function formatCoinPrice(val) {
+        return val.toLocaleString("en-US", {
+          minimumFractionDigits: val < 1 ? 4 : 2,
+        });
+      }
+
+      function updateFundingCountdown() {
+        if (nextFundingTimestamp <= 0) return;
+
+        const now = Date.now();
+        const distance = nextFundingTimestamp - now;
+
+        if (distance <= 0) {
+          fundingTimeEl.innerText = "00:00:00";
+          return;
+        }
+
+        const hours = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const pad = (num) => String(num).padStart(2, "0");
+        fundingTimeEl.innerText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+      }
+
+      function connectWebSocket() {
+        if (ws) {
+          clearInterval(pingInterval);
+          clearInterval(countdownInterval);
+          ws.close();
+        }
+
+        fundingBox.style.display = currentMarket === "linear" ? "grid" : "none";
+
+        const url = getWsUrl(currentMarket);
+        ws = new WebSocket(url);
+
+        ws.onopen = () => {
+          statusDot.classList.add("connected");
+          statusText.innerText = `В сети (${currentMarket === "spot" ? "Спот" : "Фьючерсы"})`;
+          subscribe(currentSymbol);
+
+          pingInterval = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ op: "ping" }));
+            }
+          }, 20000);
+
+          if (currentMarket === "linear") {
+            countdownInterval = setInterval(updateFundingCountdown, 1000);
+          }
+        };
+
+        ws.onmessage = (event) => {
+          const response = JSON.parse(event.data);
+          if (response.op === "pong") return;
+
+          if (
+            response.topic === `orderbook.1.${currentSymbol}` &&
+            response.data
+          ) {
+            const obData = response.data;
+            let hasUpdates = false;
+            let currentBid = 0;
+            let currentAsk = 0;
+
+            if (obData.b && obData.b.length > 0) {
+              currentBid = parseFloat(obData.b);
+              bidEl.innerText = formatCoinPrice(currentBid);
+              hasUpdates = true;
+            } else {
+              currentBid = parseFloat(bidEl.innerText.replace(/,/g, ""));
+            }
+
+            if (obData.a && obData.a.length > 0) {
+              currentAsk = parseFloat(obData.a);
+              askEl.innerText = formatCoinPrice(currentAsk);
+              hasUpdates = true;
+            } else {
+              currentAsk = parseFloat(askEl.innerText.replace(/,/g, ""));
+            }
+
+            if (currentBid > 0 && currentAsk > 0 && hasUpdates) {
+              const midPrice = (currentAsk + currentBid) / 2;
+              priceEl.innerText = formatCoinPrice(midPrice);
+
+              if (lastPrice > 0) {
+                if (midPrice > lastPrice) {
+                  priceEl.className = "price-container up";
+                  arrowEl.className = "direction-arrow up";
+                  arrowEl.innerText = "▲";
+                } else if (midPrice < lastPrice) {
+                  priceEl.className = "price-container down";
+                  arrowEl.className = "direction-arrow down";
+                  arrowEl.innerText = "▼";
+                }
+              }
+              lastPrice = midPrice;
+
+              const spreadAbsolute = currentAsk - currentBid;
+              const spreadPercent = (spreadAbsolute / currentBid) * 100;
+              const spreadDigits = spreadAbsolute < 0.1 ? 4 : 2;
+
+              spreadInfo.innerText = `${spreadAbsolute.toFixed(spreadDigits)} (${spreadPercent.toFixed(3)}%)`;
+            }
+          }
+
+          if (
+            currentMarket === "linear" &&
+            response.topic === `tickers.${currentSymbol}` &&
+            response.data
+          ) {
+            const rawData = response.data;
+            const data = Array.isArray(rawData) ? rawData : rawData;
+
+            if (data && data.fundingRate !== undefined) {
+              const rate = parseFloat(data.fundingRate) * 100;
+              fundingRateEl.innerText = `${rate > 0 ? "+" : ""}${rate.toFixed(4)}%`;
+              fundingRateEl.style.color = rate >= 0 ? "#0ecb81" : "#f6465d";
+
+              if (Math.abs(rate) >= CRITICAL_FUNDING_LIMIT) {
+                fundingBox.classList.add("critical-alert");
+                mainCard.style.borderColor = "var(--red)";
+              } else {
+                fundingBox.classList.remove("critical-alert");
+                mainCard.style.borderColor = "var(--border)";
+              }
+            }
+
+            if (data && data.nextFundingTime !== undefined) {
+              nextFundingTimestamp = parseInt(data.nextFundingTime);
+              updateFundingCountdown();
+            }
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error("WebSocket Error:", error);
+          statusText.innerText = "Ошибка соединения";
+          statusDot.classList.remove("connected");
+        };
+
+        ws.onclose = (e) => {
+          if (e.wasClean) return;
+          statusText.innerText = "Отключено. Переподключение...";
+          statusDot.classList.remove("connected");
+          clearInterval(pingInterval);
+          clearInterval(countdownInterval);
+          setTimeout(connectWebSocket, 5000);
+        };
+      }
+
+      function subscribe(symbol) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(
+            JSON.stringify({
+              op: "subscribe",
+              args: [`orderbook.1.${symbol}`],
+            }),
+          );
+          if (currentMarket === "linear") {
+            ws.send(
+              JSON.stringify({ op: "subscribe", args: [`tickers.${symbol}`] }),
+            );
+          }
+        }
+      }
+
+      function unsubscribe(symbol) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(
+            JSON.stringify({
+              op: "unsubscribe",
+              args: [`orderbook.1.${symbol}`],
+            }),
+          );
+          if (currentMarket === "linear") {
+            ws.send(
+              JSON.stringify({
+                op: "unsubscribe",
+                args: [`tickers.${symbol}`],
+              }),
+            );
+          }
+        }
+      }
+
+      function resetUI() {
+        priceEl.innerText = "Загрузка...";
+        priceEl.className = "price-container";
+        arrowEl.innerText = "";
+        arrowEl.className = "direction-arrow";
+        askEl.innerText = "0.00";
+        bidEl.innerText = "0.00";
+        spreadInfo.innerText = "0.00 (0.00%)";
+        fundingRateEl.innerText = "0.0000%";
+        fundingRateEl.style.color = "var(--text-color)";
+        fundingTimeEl.innerText = "--:--:--";
+        fundingBox.classList.remove("critical-alert");
+        mainCard.style.borderColor = "var(--border)";
+        lastPrice = 0;
+        nextFundingTimestamp = 0;
+      }
+
+      symbolSelect.addEventListener("change", (e) => {
+        unsubscribe(currentSymbol);
+        resetUI();
+        currentSymbol = e.target.value;
+        subscribe(currentSymbol);
+      });
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const targetMarket = e.target.getAttribute("data-market");
+          if (targetMarket === currentMarket) return;
+
+          tabBtns.forEach((b) => b.classList.remove("active"));
+          e.target.classList.add("active");
+
+          currentMarket = targetMarket;
+          resetUI();
+          connectWebSocket();
+        });
+      });
+
+      connectWebSocket();
+    </script>
+  </body>
+</html>
+<!-- === КОНЕЦ ЧАСТИ 2 === -->
