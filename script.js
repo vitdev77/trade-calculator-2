@@ -127,6 +127,18 @@ function restoreTabsVisualOnly() {
     if (resLeverageSection)
       resLeverageSection.classList.add("disabled-element");
   }
+
+  // РЕАКТИВНОЕ ПЕРЕКЛЮЧЕНИЕ НЕОНОВОГО КОНТУРА ПРАВОЙ ПАНЕЛИ
+  const resultsDisplay = document.querySelector(".results-display");
+  if (resultsDisplay) {
+    if (currentSide === "Long") {
+      resultsDisplay.classList.remove("active-short");
+      resultsDisplay.classList.add("active-long");
+    } else {
+      resultsDisplay.classList.remove("active-long");
+      resultsDisplay.classList.add("active-short");
+    }
+  }
 }
 
 // Заглушка-ссылка под интерфейсный коннект
@@ -150,6 +162,7 @@ function setSide(side) {
     document.getElementById("side-short").classList.add("active");
   }
   saveToStorage();
+  restoreTabsVisualOnly(); // ИСПРАВЛЕНО: Теперь интерфейс перерисовывается мгновенно
   calculate();
 }
 

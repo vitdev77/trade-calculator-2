@@ -823,15 +823,42 @@ html.light-theme .google-action-icon-btn:hover {
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.01);
-  border-radius: 8px;
+  border-radius: 24px; /* Изменено скругление на 24px */
   border: 1px solid rgba(255, 255, 255, 0.04);
   padding: 4px 16px;
   flex-grow: 1;
   justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 html.light-theme .results-display {
   background: rgba(255, 255, 255, 0.3);
   border-color: rgba(0, 0, 0, 0.04);
+}
+
+/* ТОЛСТЫЙ И ВЫРАЗИТЕЛЬНЫЙ НЕОНОВЫЙ БОРДЕР НАПРАВЛЕНИЯ ТОРГОВ */
+.results-display.active-long {
+  border: 2px solid rgba(0, 255, 157, 0.8) !important;
+  box-shadow:
+    0 0 45px rgba(0, 255, 157, 0.25),
+    0 0 15px rgba(0, 255, 157, 0.15),
+    inset 0 0 15px rgba(0, 255, 157, 0.05);
+}
+.results-display.active-short {
+  border: 2px solid rgba(255, 91, 96, 0.8) !important;
+  box-shadow:
+    0 0 45px rgba(255, 91, 96, 0.25),
+    0 0 15px rgba(255, 91, 96, 0.15),
+    inset 0 0 15px rgba(255, 91, 96, 0.05);
+}
+
+/* Утолщенный бордер для высококонтрастной светлой темы */
+html.light-theme .results-display.active-long {
+  border: 2px solid rgba(21, 163, 74, 0.8) !important;
+  box-shadow: 0 0 25px rgba(21, 163, 74, 0.3);
+}
+html.light-theme .results-display.active-short {
+  border: 2px solid rgba(220, 38, 38, 0.8) !important;
+  box-shadow: 0 0 25px rgba(220, 38, 38, 0.3);
 }
 
 .results-section {
@@ -872,13 +899,12 @@ html.light-theme .results-section {
   font-weight: 400;
   color: rgba(255, 255, 255, 0.2);
   letter-spacing: 0.2px;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 html.light-theme .field-sub {
   color: rgba(15, 23, 42, 0.35);
 }
 
-/* Теоретические проценты сверху теперь нейтральные */
 .val-green .field-sub,
 .val-red .field-sub {
   color: var(--text-muted) !important;
@@ -886,7 +912,6 @@ html.light-theme .field-sub {
   font-size: 10px !important;
 }
 
-/* Реальные биржевые метки Bybit теперь подсвечены цветами */
 .bybit-compare-badge {
   font-size: 10px;
   font-weight: 700;
