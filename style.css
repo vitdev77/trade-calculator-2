@@ -878,15 +878,29 @@ html.light-theme .field-sub {
   color: rgba(15, 23, 42, 0.35);
 }
 
-.val-green .field-sub {
-  color: var(--c-green) !important;
-  font-weight: 700 !important;
-  font-size: 11px !important;
-}
+/* Теоретические проценты сверху теперь нейтральные */
+.val-green .field-sub,
 .val-red .field-sub {
+  color: var(--text-muted) !important;
+  font-weight: 500 !important;
+  font-size: 10px !important;
+}
+
+/* Реальные биржевые метки Bybit теперь подсвечены цветами */
+.bybit-compare-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin-top: 3px;
+  transition: opacity 0.2s ease;
+}
+.val-green .bybit-compare-badge {
+  color: var(--c-green) !important;
+  text-shadow: 0 0 8px var(--c-green-glow);
+}
+.val-red .bybit-compare-badge {
   color: var(--c-red) !important;
-  font-weight: 700 !important;
-  font-size: 11px !important;
+  text-shadow: 0 0 8px var(--c-red-glow);
 }
 
 .field-info {

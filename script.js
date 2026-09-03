@@ -223,6 +223,11 @@ function calculate() {
     cashLoss = riskAmount,
     cashProfit = riskAmount * 2;
 
+  let bybitRawProfit = 0;
+  let bybitRawLoss = 0;
+  let bybitRoiTP = 0;
+  let bybitRoiSL = 0;
+
   if (currentTab === "futures") {
     const rPct = 0.02;
     const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
@@ -235,13 +240,22 @@ function calculate() {
       liq = entryPrice * (1 - 1 / leverage + MMR);
       pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
       pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
+
+      bybitRawProfit = (tp - entryPrice) * qty;
+      bybitRawLoss = (entryPrice - sl) * qty;
     } else {
       sl = entryPrice * ((1 + rPct / 5 + entryFee) / (1 - exitFeeSL));
       tp = entryPrice * ((1 - (2 * rPct) / 5 - entryFee) / (1 + exitFeeTP));
       liq = entryPrice * (1 + 1 / leverage - MMR);
       pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
+
+      bybitRawProfit = (entryPrice - tp) * qty;
+      bybitRawLoss = (sl - entryPrice) * qty;
     }
+
+    bybitRoiTP = (bybitRawProfit / cost) * 100;
+    bybitRoiSL = (bybitRawLoss / cost) * 100;
   } else {
     const spotFee = 0.001;
     const spotSlippage = currentOrderType === "market" ? 0.0005 : 0;
@@ -250,6 +264,11 @@ function calculate() {
     liq = "—";
     pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
     pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
+
+    bybitRawProfit = (tp - entryPrice) * qty;
+    bybitRawLoss = (entryPrice - sl) * qty;
+    bybitRoiTP = (bybitRawProfit / cost) * 100;
+    bybitRoiSL = (bybitRawLoss / cost) * 100;
   }
 
   if (sl < 0) sl = 0;
@@ -265,12 +284,43 @@ function calculate() {
     levCopyEl.innerText =
       currentTab === "futures" ? Math.round(leverage).toString() : "—";
 
+  // Теоретические проценты теперь выводятся в виде чистого модуля движения цены
   document.getElementById("pct-tp").innerText =
-    `${pctChangeTP > 0 ? "+" : ""}${pctChangeTP.toFixed(2)}%`;
-  document.getElementById("pct-sl").innerText =
-    `${pctChangeSL > 0 ? "-" : ""}${Math.abs(pctChangeSL).toFixed(2)}%`;
+    `${Math.abs(pctChangeTP).toFixed(2)}%`;
   document.getElementById("cash-tp").innerText = `(+$${cashProfit.toFixed(2)})`;
+
+  document.getElementById("pct-sl").innerText =
+    `${Math.abs(pctChangeSL).toFixed(2)}%`;
   document.getElementById("cash-sl").innerText = `(-$${cashLoss.toFixed(2)})`;
+
+  let bybitTpView = document.getElementById("bybit-tp-view");
+  let bybitSlView = document.getElementById("bybit-sl-view");
+
+  if (!bybitTpView && document.getElementById("pct-tp")) {
+    bybitTpView = document.createElement("div");
+    bybitTpView.id = "bybit-tp-view";
+    bybitTpView.className = "bybit-compare-badge";
+    document.getElementById("pct-tp").parentNode.appendChild(bybitTpView);
+  }
+  if (!bybitSlView && document.getElementById("pct-sl")) {
+    bybitSlView = document.createElement("div");
+    bybitSlView.id = "bybit-sl-view";
+    bybitSlView.className = "bybit-compare-badge";
+    document.getElementById("pct-sl").parentNode.appendChild(bybitSlView);
+  }
+
+  if (bybitTpView && bybitSlView) {
+    if (currentTab === "futures") {
+      bybitTpView.innerText = `Bybit: ROI +${bybitRoiTP.toFixed(2)}% (+${bybitRawProfit.toFixed(4)} USDT)`;
+      bybitSlView.innerText = `Bybit: ROI -${bybitRoiSL.toFixed(2)}% (-${bybitRawLoss.toFixed(4)} USDT)`;
+      bybitTpView.style.display = "block";
+      bybitSlView.style.display = "block";
+    } else {
+      bybitTpView.style.display = "none";
+      bybitSlView.style.display = "none";
+    }
+  }
+
   document.getElementById("res-cost").innerText = cost.toFixed(2);
   document.getElementById("res-qty").innerText = qty.toFixed(
     config.qtyDecimals,
