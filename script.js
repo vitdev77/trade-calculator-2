@@ -356,6 +356,18 @@ function pushToLogManual() {
   const inputBalance =
     parseFloat(document.getElementById("balance").value) || 0;
 
+  // Извлекаем текущие текстовые значения биржевых блоков для подсказки
+  const bybitTpEl = document.getElementById("bybit-tp-view");
+  const bybitSlEl = document.getElementById("bybit-sl-view");
+
+  let bybitTpText = "";
+  let bybitSlText = "";
+
+  if (currentTab === "futures" && bybitTpEl && bybitSlEl) {
+    bybitTpText = bybitTpEl.innerText.replace("Bybit: ", "");
+    bybitSlText = bybitSlEl.innerText.replace("Bybit: ", "");
+  }
+
   if (tp === "—" || sl === "—" || !entryPrice) return;
 
   const now = new Date();
@@ -395,6 +407,9 @@ function pushToLogManual() {
     sl: sl,
     dep: `$${inputBalance.toFixed(2)}`,
     details: `$${volume} / ${qty}`,
+    // Сохраняем данные Bybit для всплывающего тайтла
+    bybitTpData: bybitTpText,
+    bybitSlData: bybitSlText,
   };
 
   if (tradingLog.length > 0) {
@@ -468,6 +483,14 @@ function renderLogTable() {
       : "";
     const displayDep = item.dep || "—";
 
+    // Формируем чистый текст для всплывающей подсказки браузера
+    let titleTooltip = "";
+    if (item.bybitTpData && item.bybitSlData) {
+      titleTooltip = `Bybit Ориентиры:\nTP: ${item.bybitTpData}\nSL: ${item.bybitSlData}`;
+    } else {
+      titleTooltip = "Расчет объема позиции";
+    }
+
     tr.innerHTML = `
       <td>
         <div style="display:flex; flex-direction:column; line-height:1.3; font-size:11px;">
@@ -483,7 +506,10 @@ function renderLogTable() {
       <td>${item.entry}</td>
       <td style="color:var(--c-green);">${item.tp}</td>
       <td style="color:var(--c-red);">${item.sl}</td>
-      <td style="color:var(--c-orange); font-size:10px;">${item.details}</td>
+      <td>
+        <!-- Внедряем titleTooltip во всплывающий атрибут title, сохраняя ячейку компактной -->
+        <div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>
+      </td>
       <td style="text-align:center;">
         <button class="log-row-mute-btn" onclick="toggleMuteLogRow(${item.id})" title="Приглушить/Активировать строку ордера">
           <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
