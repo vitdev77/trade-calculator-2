@@ -610,12 +610,12 @@ html.light-theme .bybit-live-informer {
   margin-right: 4px;
 }
 
+/* МОДИФИКАЦИЯ: Убраны тиски width: 1em и height: 1em. Добавлен свободный inline-flex фрейм */
 .live-arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1em;
-  height: 1em;
+  flex-shrink: 0;
   transition: color 0.1s ease;
 }
 .live-arrow.up {
@@ -654,7 +654,7 @@ html.light-theme .bybit-live-informer {
   flex-direction: column;
   gap: 3px;
   font-size: 11px;
-  min-width: 125px; /* Немного расширили полку стакана под невзрачный текст */
+  min-width: 125px;
   border-left: 1px dashed var(--input-border);
   padding-left: 14px;
 }
@@ -665,13 +665,12 @@ html.light-theme .bybit-live-informer {
   width: 100%;
 }
 
-/* СВЕРХНЕВЗРАЧНЫЙ СТИЛЬ ДЛЯ ТЕКСТОВЫХ ПОДПИСЕЙ ASK/BID */
 .book-text-label {
   font-size: 8px;
   text-transform: uppercase;
   font-weight: 500;
   color: var(--text-main);
-  opacity: 0.22; /* Легкая дымчатая прозрачность */
+  opacity: 0.22;
   min-width: 18px;
   user-select: none;
 }

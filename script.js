@@ -77,8 +77,8 @@ function loadFromStorage() {
       localStorage.getItem("bybit_balance");
   }
   if (localStorage.getItem("bybit_pr_ratio")) {
-    document.getElementById("pr-ratio").value =
-      localStorage.getItem("bybit_pr_ratio");
+    const prSelect = document.getElementById("pr-ratio");
+    if (prSelect) prSelect.value = localStorage.getItem("bybit_pr_ratio");
     currentPrRatio = localStorage.getItem("bybit_pr_ratio");
   }
 
@@ -96,21 +96,31 @@ function loadFromStorage() {
 }
 
 function restoreTabsVisualOnly() {
-  document.getElementById("tab-spot").classList.remove("active");
-  document.getElementById("tab-futures").classList.remove("active");
-  document.getElementById(`tab-${currentTab}`).classList.add("active");
+  const tabSpot = document.getElementById("tab-spot");
+  const tabFutures = document.getElementById("tab-futures");
+  if (tabSpot) tabSpot.classList.remove("active");
+  if (tabFutures) tabFutures.classList.remove("active");
 
-  document.getElementById("side-long").classList.remove("active");
-  document.getElementById("side-short").classList.remove("active");
-  if (currentSide === "Long") {
-    document.getElementById("side-long").classList.add("active");
-  } else {
-    document.getElementById("side-short").classList.add("active");
-  }
+  const currentTabBtn = document.getElementById(`tab-${currentTab}`);
+  if (currentTabBtn) currentTabBtn.classList.add("active");
 
-  document.getElementById("order-limit").classList.remove("active");
-  document.getElementById("order-market").classList.remove("active");
-  document.getElementById(`order-${currentOrderType}`).classList.add("active");
+  const sideLong = document.getElementById("side-long");
+  const sideShort = document.getElementById("side-short");
+  if (sideLong) sideLong.classList.remove("active");
+  if (sideShort) sideShort.classList.remove("active");
+
+  const currentSideBtn = document.getElementById(
+    currentSide === "Long" ? "side-long" : "side-short",
+  );
+  if (currentSideBtn) currentSideBtn.classList.add("active");
+
+  const orderLimit = document.getElementById("order-limit");
+  const orderMarket = document.getElementById("order-market");
+  if (orderLimit) orderLimit.classList.remove("active");
+  if (orderMarket) orderMarket.classList.remove("active");
+
+  const currentOrderBtn = document.getElementById(`order-${currentOrderType}`);
+  if (currentOrderBtn) currentOrderBtn.classList.add("active");
 
   const entryLabel = document.getElementById("entry-label");
   const resEntryLabel = document.getElementById("res-entry-label");
@@ -163,13 +173,16 @@ function switchTab(tab) {
 function setSide(side) {
   if (currentTab === "spot" && side === "Short") return;
   currentSide = side;
-  document.getElementById("side-long").classList.remove("active");
-  document.getElementById("side-short").classList.remove("active");
-  if (side === "Long") {
-    document.getElementById("side-long").classList.add("active");
-  } else {
-    document.getElementById("side-short").classList.add("active");
-  }
+  const sideLong = document.getElementById("side-long");
+  const sideShort = document.getElementById("side-short");
+  if (sideLong) sideLong.classList.remove("active");
+  if (sideShort) sideShort.classList.remove("active");
+
+  const currentSideBtn = document.getElementById(
+    side === "Long" ? "side-long" : "side-short",
+  );
+  if (currentSideBtn) currentSideBtn.classList.add("active");
+
   saveToStorage();
   restoreTabsVisualOnly();
   calculate();
@@ -177,9 +190,14 @@ function setSide(side) {
 
 function setOrderType(type) {
   currentOrderType = type;
-  document.getElementById("order-limit").classList.remove("active");
-  document.getElementById("order-market").classList.remove("active");
-  document.getElementById(`order-${type}`).classList.add("active");
+  const orderLimit = document.getElementById("order-limit");
+  const orderMarket = document.getElementById("order-market");
+  if (orderLimit) orderLimit.classList.remove("active");
+  if (orderMarket) orderMarket.classList.remove("active");
+
+  const currentOrderBtn = document.getElementById(`order-${type}`);
+  if (currentOrderBtn) currentOrderBtn.classList.add("active");
+
   const entryInput = document.getElementById("entry-price");
   const entryLabel = document.getElementById("entry-label");
   const resEntryLabel = document.getElementById("res-entry-label");
@@ -192,15 +210,15 @@ function setOrderType(type) {
     if (entryLabel) entryLabel.innerText = "Цена входа (USDT)";
     if (resEntryLabel) resEntryLabel.innerText = "Цена входа (USDT)";
   }
-  entryInput.value = coinConfig[selectedPair].price;
+  if (entryInput) entryInput.value = coinConfig[selectedPair].price;
 
   saveToStorage();
   calculate();
 }
 
-// НОВЫЙ ОБРАБОТЧИК ДЛЯ СЕЛЕКТОРА СООТНОШЕНИЯ СТОРОН
 function handlePrRatioChange() {
-  currentPrRatio = document.getElementById("pr-ratio").value;
+  const prSelect = document.getElementById("pr-ratio");
+  if (prSelect) currentPrRatio = prSelect.value;
   saveToStorage();
   calculate();
 }
@@ -698,12 +716,11 @@ const INF_CRITICAL_LIMIT = 0.05;
 let localCachedBid = 0;
 let localCachedAsk = 0;
 
-// Высококонтрастные сплошные SVG-треугольники тренда (размер 1.2em под высоту шрифта цены)
-const SVG_TREND_UP = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M12 6l-8 12h16z"/></svg>`;
-const SVG_TREND_DOWN = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M12 18L4 6h16z"/></svg>`;
-const SVG_TREND_FLAT = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; fill:currentColor; vertical-align:middle;"><path d="M19 13H5v-2h14v2z"/></svg>`;
+// ПОЛНОЦЕННЫЕ КРУПНЫЕ ТREУГОЛЬНИКИ ТРЕНДА С ЗАЩИЩЕННЫМИ ОДИНОЧНЫМИ КАВЫЧКАМИ
+const SVG_TREND_UP = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-green); filter: drop-shadow(0 0 6px var(--c-green-glow)); vertical-align:middle; display:inline-block;'><path d='M12 3l10 16H2z'/></svg>`;
+const SVG_TREND_DOWN = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-red); filter: drop-shadow(0 0 6px var(--c-red-glow)); vertical-align:middle; display:inline-block;'><path d='M12 21L2 5h20z'/></svg>`;
+const SVG_TREND_FLAT = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--text-muted); opacity:0.4; vertical-align:middle; display:inline-block;'><path d='M20 13H4v-2h16z'/></svg>`;
 
-// Функция точечного переноса цены в калькулятор с автоматическим округлением под правила тикера
 function injectPriceToCalculator(value) {
   if (!value || isNaN(value) || value <= 0) return;
 
@@ -731,12 +748,10 @@ function initWebSocketInformer() {
     informerWs.close();
   }
 
-  // Полное обнуление кэша котировок при смене монеты
   localCachedBid = 0;
   localCachedAsk = 0;
   informerLastPrice = 0;
 
-  // Извлекаем существующие элементы из разметки карточки
   const informerContainer = document.querySelector(".bybit-live-informer");
   const livePriceEl = document.getElementById("live-price");
   const arrowEl = document.getElementById("live-arrow");
@@ -747,23 +762,26 @@ function initWebSocketInformer() {
   const fundingRateEl = document.getElementById("live-funding-rate");
   const fundingTimeEl = document.getElementById("live-funding-time");
 
-  const selectedPair = document.getElementById("pair").value;
+  const selectedPair = document.getElementById("pair")
+    ? document.getElementById("pair").value
+    : "BTCUSDT";
   if (fundingBox)
     fundingBox.style.display = currentTab === "futures" ? "flex" : "none";
 
-  // ИСПРАВЛЕНИЕ: Мягкий и безопасный сброс текста в режим ожидания (без innerHTML деструкции)
   if (livePriceEl) {
     livePriceEl.innerText = "Загрузка...";
-    livePriceEl.className = "live-price-val"; // сброс цветовых классов up/down
+    livePriceEl.className = "live-price-val";
   }
   if (askEl) askEl.innerText = "0.00";
   if (bidEl) bidEl.innerText = "0.00";
   if (spreadEl) spreadEl.innerText = "0.00 (0.00%)";
-  if (arrowEl) arrowEl.innerHTML = SVG_TREND_FLAT;
+  if (arrowEl) {
+    arrowEl.innerHTML = SVG_TREND_FLAT;
+    arrowEl.className = "live-arrow flat";
+  }
   if (informerContainer)
     informerContainer.classList.remove("trend-up", "trend-down");
 
-  // НАВЕШИВАНИЕ ОБРАБОТЧИКОВ КЛИКА ДЛЯ СВЯЗКИ С КАЛЬКУЛЯТОРОМ
   if (livePriceEl) {
     livePriceEl.style.cursor = "copy";
     livePriceEl.onclick = () => {
@@ -786,7 +804,6 @@ function initWebSocketInformer() {
     };
   }
 
-  // Твой оригинальный посимвольный обход адреса API Bybit V5
   const baseParts = [
     "wss",
     "://",
@@ -831,8 +848,10 @@ function initWebSocketInformer() {
       informerCountdownInterval = setInterval(() => {
         if (infNextFundingTimestamp <= 0) return;
         const dist = infNextFundingTimestamp - Date.now();
-        if (dist <= 0)
-          return fundingTimeEl ? (fundingTimeEl.innerText = "00:00:00") : null;
+        if (dist <= 0) {
+          if (fundingTimeEl) fundingTimeEl.innerText = "00:00:00";
+          return;
+        }
         const h = Math.floor((dist % 86400000) / 3600000);
         const m = Math.floor((dist % 3600000) / 60000);
         const s = Math.floor((dist % 60000) / 1000);
@@ -944,8 +963,11 @@ function initWebSocketInformer() {
   };
 }
 
-document.getElementById("balance").addEventListener("input", saveToStorage);
-document.getElementById("entry-price").addEventListener("input", saveToStorage);
+// БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ СЛУШАТЕЛЕЙ
+const balanceInput = document.getElementById("balance");
+const entryPriceInput = document.getElementById("entry-price");
+if (balanceInput) balanceInput.addEventListener("input", saveToStorage);
+if (entryPriceInput) entryPriceInput.addEventListener("input", saveToStorage);
 
 window.onload = () => {
   loadFromStorage();
