@@ -4,20 +4,32 @@ let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 let currentPrRatio = localStorage.getItem("bybit_pr_ratio") || "3";
+let currentRiskPercent =
+  parseFloat(localStorage.getItem("bybit_risk_percent")) || 2;
 
-// Кошелек coinConfig с торговыми параметрами Bybit — TONUSDT полностью удален
+// Кошелек конфигурации Bybit — базовые ориентиры цены центов и монет. Плечо теперь адаптивное (ATR)
 const coinConfig = {
-  BTCUSDT: { price: 79670, priceDecimals: 2, qtyDecimals: 5, recLeverage: 20 },
-  ETHUSDT: { price: 2510, priceDecimals: 2, qtyDecimals: 4, recLeverage: 10 },
+  BTCUSDT: { price: 79670, priceDecimals: 2, qtyDecimals: 5, baseLeverage: 20 },
+  ETHUSDT: { price: 2510, priceDecimals: 2, qtyDecimals: 4, baseLeverage: 10 },
   XAUTUSDT: {
     price: 4582.6,
     priceDecimals: 2,
     qtyDecimals: 4,
-    recLeverage: 10,
+    baseLeverage: 10,
   },
-  SOLUSDT: { price: 106.45, priceDecimals: 2, qtyDecimals: 3, recLeverage: 5 },
-  ZECUSDT: { price: 802.84, priceDecimals: 2, qtyDecimals: 3, recLeverage: 3 },
-  MNTUSDT: { price: 0.5231, priceDecimals: 4, qtyDecimals: 2, recLeverage: 3 },
+  SOLUSDT: { price: 106.45, priceDecimals: 2, qtyDecimals: 3, baseLeverage: 5 },
+  ZECUSDT: { price: 802.84, priceDecimals: 2, qtyDecimals: 3, baseLeverage: 3 },
+  MNTUSDT: { price: 0.5231, priceDecimals: 4, qtyDecimals: 2, baseLeverage: 3 },
+};
+
+// Глобальный динамический кэш ATR по монетам (защита от частых запросов)
+let cachedVolatilityATR = {
+  BTCUSDT: 0.025,
+  ETHUSDT: 0.032,
+  XAUTUSDT: 0.015,
+  SOLUSDT: 0.045,
+  ZECUSDT: 0.05,
+  MNTUSDT: 0.04,
 };
 
 const TAKER_FEE = 0.00055;
@@ -29,6 +41,7 @@ function saveToStorage() {
   localStorage.setItem("bybit_order_type", currentOrderType);
   localStorage.setItem("bybit_theme", currentTheme);
   localStorage.setItem("bybit_pr_ratio", currentPrRatio);
+  localStorage.setItem("bybit_risk_percent", currentRiskPercent);
   localStorage.setItem(
     "bybit_balance",
     document.getElementById("balance").value,
@@ -45,11 +58,13 @@ function toggleTheme() {
   if (currentTheme === "dark") {
     currentTheme = "light";
     document.documentElement.classList.add("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text-muted);stroke-width:2;stroke-linecap:round;"><circle cx="12" cy="12" r="5" fill="var(--text-muted)" stroke="none"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.93" y1="4.93" x2="6.03" y2="6.03"/><line x1="17.97" y1="17.97" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.03" y2="17.97"/><line x1="17.97" y1="6.03" x2="19.07" y2="4.93"/></svg>`;
+    if (btn)
+      btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text-muted);stroke-width:2;stroke-linecap:round;"><circle cx="12" cy="12" r="5" fill="var(--text-muted)" stroke="none"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.93" y1="4.93" x2="6.03" y2="6.03"/><line x1="17.97" y1="17.97" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.03" y2="17.97"/><line x1="17.97" y1="6.03" x2="19.07" y2="4.93"/></svg>`;
   } else {
     currentTheme = "dark";
     document.documentElement.classList.remove("light-theme");
-    btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+    if (btn)
+      btn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
   }
   saveToStorage();
 }
@@ -91,8 +106,17 @@ function loadFromStorage() {
       coinConfig[selectedPair].price;
   }
 
+  // Восстановление активного состояния кнопок процента риска
+  document
+    .querySelectorAll(".risk-toggle-btn")
+    .forEach((b) => b.classList.remove("active"));
+  const targetRiskBtn = document.getElementById(
+    `risk-${Math.round(currentRiskPercent)}`,
+  );
+  if (targetRiskBtn) targetRiskBtn.classList.add("active");
+
   restoreTabsVisualOnly();
-  calculate();
+  fetchBybitVolatilityATR(selectedPair); // Асинхронный старт REST-анализа волатильности
 }
 
 function restoreTabsVisualOnly() {
@@ -161,6 +185,35 @@ function restoreTabsVisualOnly() {
   }
 }
 
+// АСИНХРОННЫЙ REST-ДВИЖОК СВЕЧЕЙ ДЛЯ РАСЧЕТА ВОЛАТИЛЬНОСТИ ATR
+async function fetchBybitVolatilityATR(pair) {
+  try {
+    const res = await fetch(`https://bybit.com{pair}&interval=1&limit=15`);
+    const json = await res.json();
+    if (json.result && json.result.list && json.result.list.length >= 14) {
+      let trSum = 0;
+      const list = json.result.list; // Свечи идут от новых к старым
+      for (let i = 0; i < 14; i++) {
+        const high = parseFloat(list[i][2]);
+        const low = parseFloat(list[i][3]);
+        const closePrev = parseFloat(list[i + 1] ? list[i + 1][4] : list[i][4]);
+        const tr = Math.max(
+          high - low,
+          Math.abs(high - closePrev),
+          Math.abs(low - closePrev),
+        );
+        trSum += tr;
+      }
+      const atrAbs = trSum / 14;
+      const currentPrice = parseFloat(list[0][4]);
+      cachedVolatilityATR[pair] = atrAbs / currentPrice; // Запись коэффициента волатильности монеты
+      calculate();
+    }
+  } catch (e) {
+    console.log("Bybit ATR REST Offline, задействован локальный кэш защиты", e);
+  }
+}
+
 function switchTab(tab) {
   currentTab = tab;
   restoreTabsVisualOnly();
@@ -173,45 +226,17 @@ function switchTab(tab) {
 function setSide(side) {
   if (currentTab === "spot" && side === "Short") return;
   currentSide = side;
-  const sideLong = document.getElementById("side-long");
-  const sideShort = document.getElementById("side-short");
-  if (sideLong) sideLong.classList.remove("active");
-  if (sideShort) sideShort.classList.remove("active");
-
-  const currentSideBtn = document.getElementById(
-    side === "Long" ? "side-long" : "side-short",
-  );
-  if (currentSideBtn) currentSideBtn.classList.add("active");
-
-  saveToStorage();
   restoreTabsVisualOnly();
+  saveToStorage();
   calculate();
 }
 
 function setOrderType(type) {
   currentOrderType = type;
-  const orderLimit = document.getElementById("order-limit");
-  const orderMarket = document.getElementById("order-market");
-  if (orderLimit) orderLimit.classList.remove("active");
-  if (orderMarket) orderMarket.classList.remove("active");
-
-  const currentOrderBtn = document.getElementById(`order-${type}`);
-  if (currentOrderBtn) currentOrderBtn.classList.add("active");
-
   const entryInput = document.getElementById("entry-price");
-  const entryLabel = document.getElementById("entry-label");
-  const resEntryLabel = document.getElementById("res-entry-label");
   const selectedPair = document.getElementById("pair").value;
-
-  if (type === "market") {
-    if (entryLabel) entryLabel.innerText = "Текущая цена Bybit (USDT)";
-    if (resEntryLabel) resEntryLabel.innerText = "Текущая цена Bybit (USDT)";
-  } else {
-    if (entryLabel) entryLabel.innerText = "Цена входа (USDT)";
-    if (resEntryLabel) resEntryLabel.innerText = "Цена входа (USDT)";
-  }
   if (entryInput) entryInput.value = coinConfig[selectedPair].price;
-
+  restoreTabsVisualOnly();
   saveToStorage();
   calculate();
 }
@@ -219,6 +244,18 @@ function setOrderType(type) {
 function handlePrRatioChange() {
   const prSelect = document.getElementById("pr-ratio");
   if (prSelect) currentPrRatio = prSelect.value;
+  saveToStorage();
+  calculate();
+}
+
+// ОБРАБОТЧИК КНОПОК БЫСТРОГО РИСКА
+function setRiskPercent(val) {
+  currentRiskPercent = val;
+  document
+    .querySelectorAll(".risk-toggle-btn")
+    .forEach((b) => b.classList.remove("active"));
+  const activeBtn = document.getElementById(`risk-${val}`);
+  if (activeBtn) activeBtn.classList.add("active");
   saveToStorage();
   calculate();
 }
@@ -248,7 +285,7 @@ function calculate() {
   const config = coinConfig[selectedPair] || {
     priceDecimals: 2,
     qtyDecimals: 2,
-    recLeverage: 1,
+    baseLeverage: 10,
   };
 
   const resEntryDupEl = document.getElementById("res-entry-dup");
@@ -259,7 +296,21 @@ function calculate() {
     );
   }
 
-  const leverage = currentTab === "futures" ? config.recLeverage : 1;
+  // ИНТЕЛЛЕКТУАЛЬНЫЙ АВТОПОДБОР ПЛЕЧА НА ОСНОВЕ АКТУАЛЬНОЙ ВОЛАТИЛЬНОСТИ ATR
+  const marketVolatility = cachedVolatilityATR[selectedPair] || 0.025;
+  let leverage = config.baseLeverage;
+  if (currentTab === "futures") {
+    leverage = Math.max(
+      1,
+      Math.min(
+        100,
+        Math.round(config.baseLeverage * (0.025 / marketVolatility)),
+      ),
+    );
+  } else {
+    leverage = 1;
+  }
+
   const cost = balance / 5;
   const qty = (cost * leverage) / entryPrice;
   const totalVolume = cost * leverage;
@@ -271,13 +322,12 @@ function calculate() {
   document.getElementById("margin-trades").innerText =
     `Запас на ${remainingTrades} сделки`;
 
-  const riskAmount = balance * 0.02;
+  // ДИНАМИЧЕСКИЙ РИСК НА ОСНОВЕ НАЖАТОЙ КНОПКИ В ИНТЕРФЕЙСЕ
+  const riskAmount = balance * (currentRiskPercent / 100);
   document.getElementById("risk-cash").innerText = `$${riskAmount.toFixed(2)}`;
 
-  // МОДИФИКАЦИЯ: Множитель прибыли теперь динамический и читается из интерфейса
   const rewardMultiplier = parseInt(currentPrRatio) || 3;
 
-  // Динамически переписываем строку P/R Ratio на правой панели в футере
   const prRatioEl = document.getElementById("res-pr-ratio");
   if (prRatioEl) {
     prRatioEl.innerText = `1 : ${rewardMultiplier}`;
@@ -291,16 +341,16 @@ function calculate() {
     cashLoss = riskAmount,
     cashProfit = riskAmount * rewardMultiplier;
 
-  let bybitRawProfit = 0;
-  let bybitRawLoss = 0;
-  let bybitRoiTP = 0;
-  let bybitRoiSL = 0;
+  let bybitRawProfit = 0,
+    bybitRawLoss = 0,
+    bybitRoiTP = 0,
+    bybitRoiSL = 0;
 
   if (currentTab === "futures") {
-    const rPct = 0.02;
+    const rPct = currentRiskPercent / 100;
     const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
-    const exitFeeSL = 0.00055;
-    const exitFeeTP = 0.00055;
+    const exitFeeSL = 0.00055,
+      exitFeeTP = 0.00055;
 
     if (currentSide === "Long") {
       sl = entryPrice * ((1 - rPct / 5 - entryFee) / (1 + exitFeeSL));
@@ -310,7 +360,6 @@ function calculate() {
       liq = entryPrice * (1 - 1 / leverage + MMR);
       pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
       pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
-
       bybitRawProfit = (tp - entryPrice) * qty;
       bybitRawLoss = (entryPrice - sl) * qty;
     } else {
@@ -321,7 +370,6 @@ function calculate() {
       liq = entryPrice * (1 + 1 / leverage - MMR);
       pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
-
       bybitRawProfit = (entryPrice - tp) * qty;
       bybitRawLoss = (sl - entryPrice) * qty;
     }
@@ -337,7 +385,6 @@ function calculate() {
     liq = "—";
     pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
     pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
-
     bybitRawProfit = (tp - entryPrice) * qty;
     bybitRawLoss = (entryPrice - sl) * qty;
     bybitRoiTP = (bybitRawProfit / cost) * 100;
@@ -405,10 +452,75 @@ function calculate() {
     sl,
     config.priceDecimals,
   );
-  document.getElementById("res-liq").innerText =
-    currentTab === "futures" && liq !== "—"
-      ? formatSmartValue(liq, config.priceDecimals)
-      : "—";
+
+  // ИНТЕРАКТИВНЫЙ РИСК-ДАШБОРД С СОВЕТНИКОМ ТОРГОВЛИ И ДИНАМИЧЕСКИМ ЦВЕТОМ ШКАЛЫ
+  const liqValEl = document.getElementById("res-liq");
+  const barWrapper = document.getElementById("res-liq-bar-wrapper");
+  const barFill = document.getElementById("res-liq-bar-fill");
+  const statusTxt = document.getElementById("res-liq-status-text");
+  const safetyPctEl = document.getElementById("res-liq-safety-pct");
+
+  if (liqValEl) {
+    if (currentTab === "futures" && liq !== "—" && liq > 0) {
+      liqValEl.innerText = formatSmartValue(liq, config.priceDecimals);
+
+      const distanceToLiq = Math.abs(entryPrice - liq);
+      const distanceToSL = Math.abs(entryPrice - sl);
+      let safetyPercent = Math.max(
+        0,
+        Math.min(100, (1 - distanceToSL / distanceToLiq) * 100),
+      );
+
+      if (barWrapper) barWrapper.style.display = "block";
+      if (safetyPctEl) safetyPctEl.innerText = `${Math.round(safetyPercent)}%`;
+
+      if (barFill && statusTxt) {
+        barFill.style.transform = `scaleX(${safetyPercent / 100})`;
+        barFill.style.boxShadow = "none"; // Сброс неоновых теней предыдущих зон
+
+        // КРИТИЧЕСКИЙ АНАЛИЗ ЗАПАСА ХОДА ЦЕНЫ С ДИНАМИЧЕСКИМ ОКРАШИВАНИЕМ ПОЛОСЫ
+        if (
+          (currentSide === "Long" && sl <= liq) ||
+          (currentSide === "Short" && sl >= liq) ||
+          safetyPercent < 25
+        ) {
+          barFill.className = "liquidation-bar-fill liquidation-critical-flash";
+          statusTxt.innerText = "🛑 АЛЕРТ: Ликвидация ближе Стопа! Убавь риск!";
+          statusTxt.style.color = "var(--c-red)";
+          liqValEl.style.color = "var(--c-red)";
+          liqValEl.style.textShadow = "0 0 10px var(--c-red-glow)";
+        } else if (safetyPercent >= 25 && safetyPercent < 60) {
+          barFill.className = "liquidation-bar-fill";
+          barFill.style.backgroundColor = "var(--c-king)"; // Оранжевая опасная зона
+          statusTxt.innerText = "⚠️ ВНИМАНИЕ: Опасная зона, снизь плечо";
+          statusTxt.style.color = "var(--c-king)";
+          liqValEl.style.color = "var(--c-king)";
+          liqValEl.style.textShadow = "0 0 10px var(--c-orange-glow)";
+        } else if (safetyPercent >= 60 && safetyPercent < 85) {
+          barFill.className = "liquidation-bar-fill";
+          barFill.style.backgroundColor = "var(--text-main)"; // Дымчатый белый цвет нормы
+          statusTxt.innerText = "⚡ В НОРМЕ: Запас волатильности учтен";
+          statusTxt.style.color = "var(--text-main)";
+          liqValEl.style.color = "var(--c-orange)";
+          liqValEl.style.textShadow = "none";
+        } else {
+          // ИСПРАВЛЕНИЕ: Теперь при идеальном запасе прочности (>85%) вся полоса горит сочным зеленым неоном
+          barFill.className = "liquidation-bar-fill";
+          barFill.style.backgroundColor = "var(--c-green)";
+          barFill.style.boxShadow = "0 0 8px var(--c-green-glow)";
+          statusTxt.innerText = "🟢 ИДЕАЛЬНО: Полная защита от ATR выноса";
+          statusTxt.style.color = "var(--c-green)";
+          liqValEl.style.color = "var(--c-green)";
+          liqValEl.style.textShadow = "none";
+        }
+      }
+    } else {
+      liqValEl.innerText = "—";
+      liqValEl.style.color = "var(--text-main)";
+      liqValEl.style.textShadow = "none";
+      if (barWrapper) barWrapper.style.display = "none";
+    }
+  }
 
   renderLogTable();
 }
@@ -652,11 +764,12 @@ function exportLogToCSV() {
   document.body.removeChild(link);
 }
 
+// ПРИ СМЕНЕ МОНЕТЫ ЗАПУСКАЕМ ТАКЖЕ REST-ЗАПРОС ДЛЯ ПОЛУЧЕНИЯ ATR
 function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
   document.getElementById("entry-price").value = coinConfig[selectedPair].price;
   saveToStorage();
-  calculate();
+  fetchBybitVolatilityATR(selectedPair); // Подтягиваем волатильность с биржи на лету
   initWebSocketInformer();
 }
 
@@ -687,11 +800,13 @@ function resetTerminal() {
   localStorage.removeItem("bybit_pair");
   localStorage.removeItem("bybit_entry");
   localStorage.removeItem("bybit_pr_ratio");
+  localStorage.removeItem("bybit_risk_percent");
 
   currentTab = "futures";
   currentSide = "Long";
   currentOrderType = "limit";
   currentPrRatio = "3";
+  currentRiskPercent = 2;
   const defaultPair = "BTCUSDT";
 
   document.getElementById("balance").value = "100";
@@ -699,8 +814,14 @@ function resetTerminal() {
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
   document.getElementById("pr-ratio").value = "3";
 
+  document
+    .querySelectorAll(".risk-toggle-btn")
+    .forEach((b) => b.classList.remove("active"));
+  const r2 = document.getElementById("risk-2");
+  if (r2) r2.classList.add("active");
+
   restoreTabsVisualOnly();
-  calculate();
+  fetchBybitVolatilityATR(defaultPair);
   initWebSocketInformer();
 }
 /* === КОНЕЦ ЧАСТИ 5 === */
@@ -716,7 +837,7 @@ const INF_CRITICAL_LIMIT = 0.05;
 let localCachedBid = 0;
 let localCachedAsk = 0;
 
-// ПОЛНОЦЕННЫЕ КРУПНЫЕ ТREУГОЛЬНИКИ ТРЕНДА С ЗАЩИЩЕННЫМИ ОДИНОЧНЫМИ КАВЫЧКАМИ
+// ПОЛНОЦЕННЫЕ КРУПНЫЕ ТРЕУГОЛЬНИКИ ТРЕНДА С ЗАЩИЩЕННЫМИ ОДИНОЧНЫМИ КАВЫЧКАМИ
 const SVG_TREND_UP = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-green); filter: drop-shadow(0 0 6px var(--c-green-glow)); vertical-align:middle; display:inline-block;'><path d='M12 3l10 16H2z'/></svg>`;
 const SVG_TREND_DOWN = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-red); filter: drop-shadow(0 0 6px var(--c-red-glow)); vertical-align:middle; display:inline-block;'><path d='M12 21L2 5h20z'/></svg>`;
 const SVG_TREND_FLAT = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--text-muted); opacity:0.4; vertical-align:middle; display:inline-block;'><path d='M20 13H4v-2h16z'/></svg>`;
@@ -860,6 +981,9 @@ function initWebSocketInformer() {
         }
       }, 1000);
     }
+
+    // ИСПРАВЛЕНИЕ: Триггерим расчет ядра сразу при открытии канала сокета, чтобы подгрузить шкалу
+    calculate();
   };
 
   informerWs.onmessage = (event) => {
@@ -919,6 +1043,12 @@ function initWebSocketInformer() {
             arrowEl.innerHTML = SVG_TREND_FLAT;
           }
         }
+
+        // ИСПРАВЛЕНИЕ: Если это самый первый запуск (информер до этого молчал), принудительно пересчитываем ядро
+        if (informerLastPrice === 0) {
+          calculate();
+        }
+
         informerLastPrice = mid;
 
         informerFlatTimeout = setTimeout(() => {

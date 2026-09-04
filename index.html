@@ -30,7 +30,7 @@
     <!-- === НАЧАЛО ЧАСТИ 2 === -->
     <!-- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
     <div class="terminal-top-bar">
-      <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА -->
+      <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА И КНОПКИ РИСКА -->
       <div class="clean-balance-widget">
         <span class="balance-widget-label-dep">DEP</span>
         <input
@@ -40,7 +40,34 @@
           oninput="calculate()"
           title="Кликните, чтобы изменить депозит ордера"
         />
-        <span class="balance-widget-asset">USDT</span>
+        <span class="balance-widget-asset" style="margin-right: 12px"
+          >USDT</span
+        >
+
+        <!-- БЫСТРЫЕ КНОПКИ РЕАКТИВНОГО ПЕРЕКЛЮЧЕНИЯ РИСКА -->
+        <div class="risk-btn-group">
+          <button
+            class="risk-toggle-btn"
+            id="risk-1"
+            onclick="setRiskPercent(1)"
+          >
+            1%
+          </button>
+          <button
+            class="risk-toggle-btn active"
+            id="risk-2"
+            onclick="setRiskPercent(2)"
+          >
+            2%
+          </button>
+          <button
+            class="risk-toggle-btn"
+            id="risk-3"
+            onclick="setRiskPercent(3)"
+          >
+            3%
+          </button>
+        </div>
       </div>
 
       <!-- СЕРВИСНЫЕ КНОПКИ GOOGLE -->
@@ -87,7 +114,7 @@
           <span id="live-price" class="live-price-val">Загрузка...</span>
         </div>
 
-        <!-- Спред и мини-стакан Ask / Bid -->
+        <!-- Спред и mini-атлас Ask / Bid -->
         <div class="live-book-block">
           <span class="book-tick ask"
             >Ask: <span id="live-ask">0.00</span></span
@@ -383,6 +410,41 @@
                 <span class="display-value" id="res-liq">—</span>
               </div>
             </div>
+
+            <!-- МОДИФИКАЦИЯ: РАСШИРЕННЫЙ КАНАЛ ИНФОРМАТИВНОЙ ШКАЛЫ СОВЕТНИКА -->
+            <div
+              id="res-liq-bar-wrapper"
+              style="width: 100%; display: none; margin: 4px 0 8px 0"
+            >
+              <div class="liquidation-bar-container">
+                <div class="liquidation-bar-fill" id="res-liq-bar-fill"></div>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-top: 4px;
+                  font-size: 9px;
+                  font-weight: 700;
+                "
+              >
+                <span
+                  id="res-liq-status-text"
+                  style="text-transform: uppercase; letter-spacing: 0.3px"
+                  >Загрузка...</span
+                >
+                <span
+                  id="res-liq-safety-pct"
+                  style="
+                    color: var(--text-main);
+                    font-variant-numeric: tabular-nums;
+                  "
+                  >0%</span
+                >
+              </div>
+            </div>
+
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Запас маржи (Остаток)</span>
@@ -420,7 +482,6 @@
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">P/R Ratio</span>
-              <!-- МОДИФИКАЦИЯ: Добавлен ID для динамического изменения соотношения -->
               <span class="an-value an-v-orange" id="res-pr-ratio">1 : 3</span>
             </div>
           </div>
