@@ -245,13 +245,22 @@ function calculate() {
   const riskAmount = balance * 0.02;
   document.getElementById("risk-cash").innerText = `$${riskAmount.toFixed(2)}`;
 
+  // КОНФИГУРАЦИЯ МАТЕМАТИЧЕСКОГО ОЖИДАНИЯ СДЕЛКИ (P/R RATIO)
+  const rewardMultiplier = 3; // Текущий коэффициент 1 : 3
+
+  // Реактивное обновление показателя P/R Ratio в футере правой панели
+  const prRatioEl = document.getElementById("res-pr-ratio");
+  if (prRatioEl) {
+    prRatioEl.innerText = `1 : ${rewardMultiplier}`;
+  }
+
   let sl = 0,
     tp = 0,
     liq = "—",
     pctChangeSL = 0,
     pctChangeTP = 0,
     cashLoss = riskAmount,
-    cashProfit = riskAmount * 2;
+    cashProfit = riskAmount * rewardMultiplier;
 
   let bybitRawProfit = 0;
   let bybitRawLoss = 0;
@@ -266,7 +275,9 @@ function calculate() {
 
     if (currentSide === "Long") {
       sl = entryPrice * ((1 - rPct / 5 - entryFee) / (1 + exitFeeSL));
-      tp = entryPrice * ((1 + (2 * rPct) / 5 + entryFee) / (1 - exitFeeTP));
+      tp =
+        entryPrice *
+        ((1 + (rewardMultiplier * rPct) / 5 + entryFee) / (1 - exitFeeTP));
       liq = entryPrice * (1 - 1 / leverage + MMR);
       pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
       pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
@@ -275,7 +286,9 @@ function calculate() {
       bybitRawLoss = (entryPrice - sl) * qty;
     } else {
       sl = entryPrice * ((1 + rPct / 5 + entryFee) / (1 - exitFeeSL));
-      tp = entryPrice * ((1 - (2 * rPct) / 5 - entryFee) / (1 + exitFeeTP));
+      tp =
+        entryPrice *
+        ((1 - (rewardMultiplier * rPct) / 5 - entryFee) / (1 + exitFeeTP));
       liq = entryPrice * (1 + 1 / leverage - MMR);
       pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
@@ -290,7 +303,8 @@ function calculate() {
     const spotFee = 0.001;
     const spotSlippage = currentOrderType === "market" ? 0.0005 : 0;
     sl = entryPrice * (1 - riskAmount / cost - spotFee * 2 - spotSlippage);
-    tp = entryPrice * (1 + (riskAmount * 2) / cost + spotFee * 2);
+    tp =
+      entryPrice * (1 + (riskAmount * rewardMultiplier) / cost + spotFee * 2);
     liq = "—";
     pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
     pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
