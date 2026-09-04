@@ -3,6 +3,7 @@ let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
 let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
+let currentPrRatio = localStorage.getItem("bybit_pr_ratio") || "3";
 
 // Кошелек coinConfig с торговыми параметрами Bybit — TONUSDT полностью удален
 const coinConfig = {
@@ -27,6 +28,7 @@ function saveToStorage() {
   localStorage.setItem("bybit_side", currentSide);
   localStorage.setItem("bybit_order_type", currentOrderType);
   localStorage.setItem("bybit_theme", currentTheme);
+  localStorage.setItem("bybit_pr_ratio", currentPrRatio);
   localStorage.setItem(
     "bybit_balance",
     document.getElementById("balance").value,
@@ -74,6 +76,11 @@ function loadFromStorage() {
     document.getElementById("balance").value =
       localStorage.getItem("bybit_balance");
   }
+  if (localStorage.getItem("bybit_pr_ratio")) {
+    document.getElementById("pr-ratio").value =
+      localStorage.getItem("bybit_pr_ratio");
+    currentPrRatio = localStorage.getItem("bybit_pr_ratio");
+  }
 
   const selectedPair = document.getElementById("pair").value;
   if (localStorage.getItem("bybit_entry")) {
@@ -105,7 +112,6 @@ function restoreTabsVisualOnly() {
   document.getElementById("order-market").classList.remove("active");
   document.getElementById(`order-${currentOrderType}`).classList.add("active");
 
-  // СИНХРОННОЕ ОБНОВЛЕНИЕ ТЕКСТА ПОДПИСЕЙ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
   const entryLabel = document.getElementById("entry-label");
   const resEntryLabel = document.getElementById("res-entry-label");
 
@@ -179,7 +185,6 @@ function setOrderType(type) {
   const resEntryLabel = document.getElementById("res-entry-label");
   const selectedPair = document.getElementById("pair").value;
 
-  // ДИНАМИЧЕСКОЕ ИЗМЕНЕНИЕ НАДПИСЕЙ НА ЛЕВОЙ И ПРАВОЙ ПАНЕЛИ ОДНОВРЕМЕННО
   if (type === "market") {
     if (entryLabel) entryLabel.innerText = "Текущая цена Bybit (USDT)";
     if (resEntryLabel) resEntryLabel.innerText = "Текущая цена Bybit (USDT)";
@@ -189,6 +194,13 @@ function setOrderType(type) {
   }
   entryInput.value = coinConfig[selectedPair].price;
 
+  saveToStorage();
+  calculate();
+}
+
+// НОВЫЙ ОБРАБОТЧИК ДЛЯ СЕЛЕКТОРА СООТНОШЕНИЯ СТОРОН
+function handlePrRatioChange() {
+  currentPrRatio = document.getElementById("pr-ratio").value;
   saveToStorage();
   calculate();
 }
@@ -221,7 +233,6 @@ function calculate() {
     recLeverage: 1,
   };
 
-  // ДИНАМИЧЕСКИЙ ДУБЛИКАТ ЦЕНЫ ВХОДА НА ПРАВУЮ СТОРОНУ (ПОД ШАГ ЦЕНЫ ТИКЕРА)
   const resEntryDupEl = document.getElementById("res-entry-dup");
   if (resEntryDupEl) {
     resEntryDupEl.innerText = formatSmartValue(
@@ -245,10 +256,10 @@ function calculate() {
   const riskAmount = balance * 0.02;
   document.getElementById("risk-cash").innerText = `$${riskAmount.toFixed(2)}`;
 
-  // КОНФИГУРАЦИЯ МАТЕМАТИЧЕСКОГО ОЖИДАНИЯ СДЕЛКИ (P/R RATIO)
-  const rewardMultiplier = 3; // Текущий коэффициент 1 : 3
+  // МОДИФИКАЦИЯ: Множитель прибыли теперь динамический и читается из интерфейса
+  const rewardMultiplier = parseInt(currentPrRatio) || 3;
 
-  // Реактивное обновление показателя P/R Ratio в футере правой панели
+  // Динамически переписываем строку P/R Ratio на правой панели в футере
   const prRatioEl = document.getElementById("res-pr-ratio");
   if (prRatioEl) {
     prRatioEl.innerText = `1 : ${rewardMultiplier}`;
@@ -657,15 +668,18 @@ function resetTerminal() {
   localStorage.removeItem("bybit_balance");
   localStorage.removeItem("bybit_pair");
   localStorage.removeItem("bybit_entry");
+  localStorage.removeItem("bybit_pr_ratio");
 
   currentTab = "futures";
   currentSide = "Long";
   currentOrderType = "limit";
+  currentPrRatio = "3";
   const defaultPair = "BTCUSDT";
 
   document.getElementById("balance").value = "100";
   document.getElementById("pair").value = defaultPair;
   document.getElementById("entry-price").value = coinConfig[defaultPair].price;
+  document.getElementById("pr-ratio").value = "3";
 
   restoreTabsVisualOnly();
   calculate();

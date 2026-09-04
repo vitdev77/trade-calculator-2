@@ -201,6 +201,22 @@
           </div>
         </div>
 
+        <!-- ИНТЕРАКТИВНЫЙ ВЫБОР P/R RATIO В НИЖНЕЙ ЧАСТИ ПАНЕЛИ -->
+        <div class="input-item full-width" style="margin-top: 4px">
+          <div class="select-custom-wrapper">
+            <select id="pr-ratio" onchange="handlePrRatioChange()">
+              <option value="1">P/R Ratio 1 : 1</option>
+              <option value="2">P/R Ratio 1 : 2</option>
+              <option value="3" selected>P/R Ratio 1 : 3</option>
+              <option value="4">P/R Ratio 1 : 4</option>
+              <option value="5">P/R Ratio 1 : 5</option>
+            </select>
+          </div>
+          <span class="left-field-desc"
+            >Математическое соотношение Риск / Прибыль</span
+          >
+        </div>
+
         <div class="system-footer-row">
           <button class="reset-link-btn" onclick="resetTerminal()">
             Сбросить настройки
