@@ -105,11 +105,16 @@ function restoreTabsVisualOnly() {
   document.getElementById("order-market").classList.remove("active");
   document.getElementById(`order-${currentOrderType}`).classList.add("active");
 
+  // СИНХРОННОЕ ОБНОВЛЕНИЕ ТЕКСТА ПОДПИСЕЙ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
   const entryLabel = document.getElementById("entry-label");
+  const resEntryLabel = document.getElementById("res-entry-label");
+
   if (currentOrderType === "market") {
-    entryLabel.innerText = "Текущая цена Bybit (USDT)";
+    if (entryLabel) entryLabel.innerText = "Текущая цена Bybit (USDT)";
+    if (resEntryLabel) resEntryLabel.innerText = "Текущая цена Bybit (USDT)";
   } else {
-    entryLabel.innerText = "Цена входа (USDT)";
+    if (entryLabel) entryLabel.innerText = "Цена входа (USDT)";
+    if (resEntryLabel) resEntryLabel.innerText = "Цена входа (USDT)";
   }
 
   const sideItemWrapper = document.getElementById("side-item-wrapper");
@@ -128,7 +133,6 @@ function restoreTabsVisualOnly() {
       resLeverageSection.classList.add("disabled-element");
   }
 
-  // РЕАКТИВНОЕ ПЕРЕКЛЮЧЕНИЕ НЕОНОВОГО КОНТУРА ПРАВОЙ ПАНЕЛИ
   const resultsDisplay = document.querySelector(".results-display");
   if (resultsDisplay) {
     if (currentSide === "Long") {
@@ -141,7 +145,6 @@ function restoreTabsVisualOnly() {
   }
 }
 
-// Заглушка-ссылка под интерфейсный коннект
 function switchTab(tab) {
   currentTab = tab;
   restoreTabsVisualOnly();
@@ -162,7 +165,7 @@ function setSide(side) {
     document.getElementById("side-short").classList.add("active");
   }
   saveToStorage();
-  restoreTabsVisualOnly(); // ИСПРАВЛЕНО: Теперь интерфейс перерисовывается мгновенно
+  restoreTabsVisualOnly();
   calculate();
 }
 
@@ -173,12 +176,16 @@ function setOrderType(type) {
   document.getElementById(`order-${type}`).classList.add("active");
   const entryInput = document.getElementById("entry-price");
   const entryLabel = document.getElementById("entry-label");
+  const resEntryLabel = document.getElementById("res-entry-label");
   const selectedPair = document.getElementById("pair").value;
 
+  // ДИНАМИЧЕСКОЕ ИЗМЕНЕНИЕ НАДПИСЕЙ НА ЛЕВОЙ И ПРАВОЙ ПАНЕЛИ ОДНОВРЕМЕННО
   if (type === "market") {
-    entryLabel.innerText = "Текущая цена Bybit (USDT)";
+    if (entryLabel) entryLabel.innerText = "Текущая цена Bybit (USDT)";
+    if (resEntryLabel) resEntryLabel.innerText = "Текущая цена Bybit (USDT)";
   } else {
-    entryLabel.innerText = "Цена входа (USDT)";
+    if (entryLabel) entryLabel.innerText = "Цена входа (USDT)";
+    if (resEntryLabel) resEntryLabel.innerText = "Цена входа (USDT)";
   }
   entryInput.value = coinConfig[selectedPair].price;
 
@@ -213,6 +220,16 @@ function calculate() {
     qtyDecimals: 2,
     recLeverage: 1,
   };
+
+  // ДИНАМИЧЕСКИЙ ДУБЛИКАТ ЦЕНЫ ВХОДА НА ПРАВУЮ СТОРОНУ (ПОД ШАГ ЦЕНЫ ТИКЕРА)
+  const resEntryDupEl = document.getElementById("res-entry-dup");
+  if (resEntryDupEl) {
+    resEntryDupEl.innerText = formatSmartValue(
+      entryPrice,
+      config.priceDecimals,
+    );
+  }
+
   const leverage = currentTab === "futures" ? config.recLeverage : 1;
   const cost = balance / 5;
   const qty = (cost * leverage) / entryPrice;
@@ -297,7 +314,6 @@ function calculate() {
     levCopyEl.innerText =
       currentTab === "futures" ? Math.round(leverage).toString() : "—";
 
-  // Теоретические проценты теперь выводятся в виде чистого модуля движения цены
   document.getElementById("pct-tp").innerText =
     `${Math.abs(pctChangeTP).toFixed(2)}%`;
   document.getElementById("cash-tp").innerText = `(+$${cashProfit.toFixed(2)})`;

@@ -280,6 +280,32 @@
           <!-- === КОНЕЦ ЧАСТИ 4 === -->
           <!-- === НАЧАЛО ЧАСТИ 5 === -->
           <div class="results-section">
+            <!-- КОНТРОЛЬНЫЙ ДУБЛИКАТ ЦЕНЫ ВХОДА С ДИНАМИЧЕСКИМ ЛЕЙБЛОМ -->
+            <div class="display-row val-orange-text">
+              <div class="field-info">
+                <span class="field-name" id="res-entry-label"
+                  >Цена входа (USDT)</span
+                >
+                <span class="field-sub"
+                  >Контрольный дубль цены из калькулятора</span
+                >
+              </div>
+              <div class="value-action">
+                <span class="display-value" id="res-entry-dup">—</span>
+                <button
+                  class="google-copy-btn btn-orange"
+                  onclick="copyData('res-entry-dup', this)"
+                  title="Копировать цену входа"
+                >
+                  <svg class="icon-copy" viewBox="0 0 24 24">
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
             <div class="display-row val-green">
               <div class="field-info">
                 <span class="field-name">Тейк Профит</span>
@@ -425,6 +451,7 @@
         </div>
       </div>
       <!-- === КОНЕЦ ЧАСТИ 5 === -->
+
       <!-- === НАЧАЛО ЧАСТИ 6 === -->
       <div class="table-log-container" id="global-table-log-block">
         <div class="table-log-header">
