@@ -525,7 +525,8 @@ function pushToLogManual() {
     document.getElementById("pair").options[
       document.getElementById("pair").selectedIndex
     ].text;
-  const entryPrice = document.getElementById("entry-price").value;
+  const entryPrice =
+    parseFloat(document.getElementById("entry-price").value) || 0;
   const tp = document.getElementById("res-tp").innerText;
   const sl = document.getElementById("res-sl").innerText;
   const volume = document.getElementById("res-volume-copy").innerText;
@@ -543,7 +544,22 @@ function pushToLogManual() {
     bybitSlText = bybitSlEl.innerText.replace("Bybit: ", "");
   }
 
-  if (tp === "—" || sl === "—" || !entryPrice) return;
+  if (tp === "—" || sl === "—" || entryPrice <= 0) return;
+
+  let computedBePrice = entryPrice;
+  if (currentTab === "futures") {
+    const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
+    const exitFee = 0.00055;
+    if (currentSide === "Long") {
+      computedBePrice = entryPrice * (1 + entryFee + exitFee);
+    } else {
+      computedBePrice = entryPrice * (1 - entryFee - exitFee);
+    }
+  } else {
+    const spotFee = 0.001;
+    const spotSlippage = currentOrderType === "market" ? 0.0005 : 0;
+    computedBePrice = entryPrice * (1 + spotFee * 2 + spotSlippage);
+  }
 
   const now = new Date();
   const dateStr = now.toLocaleDateString([], {
@@ -578,12 +594,14 @@ function pushToLogManual() {
     pair: pairText,
     type: currentOrderType === "limit" ? "Лимит" : "Рынок",
     entry: entryPrice,
+    bePrice: computedBePrice,
     tp: tp,
     sl: sl,
     dep: `$${inputBalance.toFixed(2)}`,
     details: `$${volume} / ${qty}`,
     bybitTpData: bybitTpText,
     bybitSlData: bybitSlText,
+    rawSide: currentSide,
   };
 
   if (tradingLog.length > 0) {
@@ -658,6 +676,33 @@ function renderLogTable() {
       : "";
     const displayDep = item.dep || "—";
 
+    let beCellMarkup = "—";
+    if (item.bePrice) {
+      const selectedPair = document.getElementById("pair").value;
+      const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
+      const decimals = coinConfig[cleanPairName]
+        ? coinConfig[cleanPairName].priceDecimals
+        : 2;
+      const formattedBe = item.bePrice.toFixed(decimals);
+
+      const isSamePair = selectedPair === cleanPairName;
+      let isBeReached = false;
+
+      if (isSamePair && informerLastPrice > 0 && !item.isMuted) {
+        if (item.market === "Спот" || item.rawSide === "Long") {
+          if (informerLastPrice >= item.bePrice) isBeReached = true;
+        } else if (item.rawSide === "Short") {
+          if (informerLastPrice <= item.bePrice) isBeReached = true;
+        }
+      }
+
+      if (isBeReached) {
+        beCellMarkup = `<div class="be-reached-glow" title="Цена Bybit прошла уровень безубытка!">${formattedBe} <span style="font-size:8px; display:block; font-weight:800; letter-spacing:0.2px;">[ДВИГАЙ SL!]</span></div>`;
+      } else {
+        beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
+      }
+    }
+
     let titleTooltip =
       item.bybitTpData && item.bybitSlData
         ? `Bybit Ориентиры:\nTP: ${item.bybitTpData}\nSL: ${item.bybitSlData}`
@@ -676,6 +721,7 @@ function renderLogTable() {
       <td class="${item.badgeClass}">${item.market}</td>
       <td>${item.type}</td>
       <td>${item.entry}</td>
+      <td>${beCellMarkup}</td>
       <td style="color:var(--c-green);">${item.tp}</td>
       <td style="color:var(--c-red);">${item.sl}</td>
       <td>
@@ -1020,6 +1066,8 @@ function initWebSocketInformer() {
 
         if (informerLastPrice === 0) calculate();
         informerLastPrice = mid;
+
+        renderLogTable();
 
         informerFlatTimeout = setTimeout(() => {
           if (arrowEl) {

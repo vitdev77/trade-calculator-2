@@ -1287,6 +1287,29 @@ html.light-theme .table-log-counter {
   fill: var(--text-muted);
 }
 
+.be-reached-glow {
+  color: var(--c-green) !important;
+  background: rgba(0, 255, 157, 0.07);
+  border-radius: 4px;
+  padding: 2px 6px !important;
+  animation: pulse-be-alert 1.2s infinite alternate ease-in-out;
+}
+html.light-theme .be-reached-glow {
+  background: rgba(21, 163, 74, 0.1);
+  color: var(--c-green) !important;
+}
+
+@keyframes pulse-be-alert {
+  0% {
+    box-shadow: 0 0 2px rgba(0, 255, 157, 0.1);
+    text-shadow: 0 0 2px rgba(0, 255, 157, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+    text-shadow: 0 0 8px rgba(0, 255, 157, 0.6);
+  }
+}
+
 @media (max-width: 768px) {
   body {
     padding: 12px;
