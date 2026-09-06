@@ -7,7 +7,6 @@ let currentPrRatio = localStorage.getItem("bybit_pr_ratio") || "3";
 let currentRiskPercent =
   parseFloat(localStorage.getItem("bybit_risk_percent")) || 2;
 
-// Кошелек конфигурации Bybit — базовые ориентиры цены центов и монет. Плечо теперь адаптивное (ATR)
 const coinConfig = {
   BTCUSDT: { price: 79670, priceDecimals: 2, qtyDecimals: 5, baseLeverage: 20 },
   ETHUSDT: { price: 2510, priceDecimals: 2, qtyDecimals: 4, baseLeverage: 10 },
@@ -22,7 +21,6 @@ const coinConfig = {
   MNTUSDT: { price: 0.5231, priceDecimals: 4, qtyDecimals: 2, baseLeverage: 3 },
 };
 
-// Глобальный динамический кэш ATR по монетам (защита от частых запросов)
 let cachedVolatilityATR = {
   BTCUSDT: 0.025,
   ETHUSDT: 0.032,
@@ -188,8 +186,9 @@ function restoreTabsVisualOnly() {
 /* === НАЧАЛО ЧАСТИ 4 === */
 async function fetchBybitVolatilityATR(pair) {
   try {
+    const category = currentTab === "futures" ? "linear" : "spot";
     const res = await fetch(
-      `https://bybit.com{currentTab === "futures" ? "linear" : "spot"}&symbol=${pair}&interval=1&limit=15`,
+      `https://bybit.com{category}&symbol=${pair}&interval=1&limit=15`,
     );
     const json = await res.json();
     if (json.result && json.result.list && json.result.list.length >= 14) {
@@ -349,7 +348,6 @@ function calculate() {
       exitFeeTP = 0.00055;
 
     if (currentSide === "Long") {
-      // ИСПРАВЛЕНО: Добавлен знак умножения (*) между параметрами
       sl = entryPrice * ((1 - rPct / 5 - entryFee) / (1 + exitFeeSL));
       tp =
         entryPrice *
@@ -360,7 +358,6 @@ function calculate() {
       bybitRawProfit = (tp - entryPrice) * qty;
       bybitRawLoss = (entryPrice - sl) * qty;
     } else {
-      // ИСПРАВЛЕНО: Добавлен знак умножения (*) между параметрами
       sl = entryPrice * ((1 + rPct / 5 + entryFee) / (1 - exitFeeSL));
       tp =
         entryPrice *
@@ -546,6 +543,7 @@ function pushToLogManual() {
 
   if (tp === "—" || sl === "—" || entryPrice <= 0) return;
 
+  // РАСЧЕТ МАТЕМАТИЧЕСКОГО БЕЗУБЫТКА ДЛЯ ОРДЕРА В КАНАЛЕ ДНЕВНИКА
   let computedBePrice = entryPrice;
   if (currentTab === "futures") {
     const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
@@ -572,15 +570,19 @@ function pushToLogManual() {
     minute: "2-digit",
     second: "2-digit",
   });
-  const currentLeverage = coinConfig[selectedPair]
-    ? coinConfig[selectedPair].baseLeverage
-    : 1;
+
+  // ИСПРАВЛЕНИЕ: Читаем точное динамическое плечо прямо с экрана дисплея результатов
+  const displayedLeverageEl = document.getElementById("res-leverage-copy");
+  const currentLeverage = displayedLeverageEl
+    ? displayedLeverageEl.innerText
+    : "1";
 
   const logItem = {
     id: Date.now(),
     isMuted: false,
     date: dateStr,
     time: timeStr,
+    // Если Спот — плечо пустое, если Фьючерсы — берется точное круглое значение с экрана
     leverage: currentTab === "futures" ? currentLeverage : "",
     market: currentTab === "futures" ? "Фьючерсы" : "Спот",
     sideClass:
@@ -605,8 +607,9 @@ function pushToLogManual() {
   };
 
   if (tradingLog.length > 0) {
-    const last = tradingLog[0];
+    const last = tradingLog.at(0);
     if (
+      last &&
       last.pair === logItem.pair &&
       last.market === logItem.market &&
       last.entry === logItem.entry &&
@@ -631,7 +634,7 @@ function pushToLogManual() {
     const oldText = btnText.innerText;
     const oldSvgPath = btnSvg.innerHTML;
 
-    btnText.innerText = "Расчет зафиксирован в дневник!";
+    btnText.innerText = "Расчет зафиксирован in дневник!";
     btnSvg.innerHTML = `<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>`;
     addBtn.style.background = "rgba(3, 194, 126, 0.15)";
     addBtn.style.borderColor = "var(--c-green)";
@@ -650,15 +653,6 @@ function pushToLogManual() {
 }
 /* === КОНЕЦ ЧАСТИ 8 === */
 /* === НАЧАЛО ЧАСТИ 9 === */
-function toggleMuteLogRow(id) {
-  tradingLog = tradingLog.map((item) => {
-    if (item.id === id) item.isMuted = !item.isMuted;
-    return item;
-  });
-  localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
-  renderLogTable();
-}
-
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
@@ -667,28 +661,32 @@ function renderLogTable() {
   counter.innerText = tradingLog.length.toString() + " записей";
   tbody.innerHTML = "";
 
+  const currentSelectedPair = document.getElementById("pair")
+    ? document.getElementById("pair").value
+    : "";
+
   tradingLog.forEach((item) => {
     const tr = document.createElement("tr");
-    tr.className = item.sideClass + (item.isMuted ? " muted-row" : "");
+    tr.className = item.sideClass;
     const displayDate = item.date || "—";
     const leverageMarkup = item.leverage
       ? `${item.leverage}<span style="opacity:0.5; font-size:9px; margin-left:1px; font-weight:700; text-transform:lowercase;">x</span>`
       : "";
     const displayDep = item.dep || "—";
 
+    // ПРОВЕРКА ДОСТИЖЕНИЯ БЕЗУБЫТКА В РЕАЛЬНОМ ВРЕМЕНИ С УТОНЧЕННОЙ КАПСУЛОЙ
     let beCellMarkup = "—";
     if (item.bePrice) {
-      const selectedPair = document.getElementById("pair").value;
       const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
       const decimals = coinConfig[cleanPairName]
         ? coinConfig[cleanPairName].priceDecimals
         : 2;
       const formattedBe = item.bePrice.toFixed(decimals);
 
-      const isSamePair = selectedPair === cleanPairName;
+      const isSamePair = currentSelectedPair === cleanPairName;
       let isBeReached = false;
 
-      if (isSamePair && informerLastPrice > 0 && !item.isMuted) {
+      if (isSamePair && informerLastPrice > 0) {
         if (item.market === "Спот" || item.rawSide === "Long") {
           if (informerLastPrice >= item.bePrice) isBeReached = true;
         } else if (item.rawSide === "Short") {
@@ -697,7 +695,14 @@ function renderLogTable() {
       }
 
       if (isBeReached) {
-        beCellMarkup = `<div class="be-reached-glow" title="Цена Bybit прошла уровень безубытка!">${formattedBe} <span style="font-size:8px; display:block; font-weight:800; letter-spacing:0.2px;">[ДВИГАЙ SL!]</span></div>`;
+        // МОДИФИКАЦИЯ: Уменьшены отступы, шрифт изменен на стандартный 600, размер снижен до 11px
+        beCellMarkup = `
+          <div title="СИГНАЛ: Цена Bybit в зоне Б/У! Передвиньте Стоп-Лосс!" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#00ff9d !important; color:#000000 !important; font-weight:600 !important; font-size:11px !important; padding:2px 8px; border-radius:20px; box-shadow:0 0 12px rgba(0,255,157,0.6); animation: pulse-top-alert 0.8s infinite alternate ease-in-out; text-shadow:none !important; border:1px solid rgba(255,255,255,0.4);">
+            <span>${formattedBe}</span>
+            <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:#000000; vertical-align:middle; display:inline-block;">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+            </svg>
+          </div>`;
       } else {
         beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
       }
@@ -726,11 +731,6 @@ function renderLogTable() {
       <td style="color:var(--c-red);">${item.sl}</td>
       <td>
         <div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>
-      </td>
-      <td style="text-align:center;">
-        <button class="log-row-mute-btn" onclick="toggleMuteLogRow(${item.id})" title="Приглушить/Активировать строку ордера">
-          <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-        </button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -1119,6 +1119,9 @@ if (entryPriceInput) entryPriceInput.addEventListener("input", saveToStorage);
 window.onload = () => {
   loadFromStorage();
   initWebSocketInformer();
+
+  // ПРИНУДИТЕЛЬНЫЙ СТАРТ ТАБЛИЦЫ: Загружаем лог из localStorage сразу при инициализации страницы
+  renderLogTable();
 
   const savedLogState = localStorage.getItem("bybit_log_visible");
   const logBlock = document.getElementById("global-table-log-block");

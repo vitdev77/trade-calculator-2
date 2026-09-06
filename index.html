@@ -528,47 +528,51 @@
           </div>
         </div>
       </div>
-      <!-- === КОНЕЦ ЧАСТИ 5 === -->
-      <!-- === НАЧАЛО ЧАСТИ 6 === -->
-      <div class="table-log-container" id="global-table-log-block">
-        <div class="table-log-header">
-          <div class="table-log-title">
-            <span>🗒 Журнал ордеров</span>
-            <span class="table-log-counter" id="log-counter">0 записей</span>
-          </div>
-          <div class="table-log-actions">
-            <button class="log-action-btn-link" onclick="exportLogToCSV()">
-              Экспорт CSV
-            </button>
-            <button
-              class="log-action-btn-link btn-clear-danger"
-              onclick="clearLog()"
-            >
-              Очистить лог
-            </button>
-          </div>
+    </div>
+    <!-- ЗДЕСЬ МЫ ЗАКРЫЛИ .glass-container ОСТАВИВ КАЛЬКУЛЯТОР НЕЗАВИСИМЫМ -->
+    <!-- === КОНЕЦ ЧАСТИ 5 === -->
+    <!-- === НАЧАЛО ЧАСТИ 6 === -->
+    <!-- НЕЗАВИСИМЫЙ ШИРОКИЙ ДАШБОРД ЖУРНАЛА ОРДЕРОВ -->
+    <div
+      class="table-log-container standalone-log-layout"
+      id="global-table-log-block"
+    >
+      <div class="table-log-header">
+        <div class="table-log-title">
+          <span>🗒 Журнал ордеров</span>
+          <span class="table-log-counter" id="log-counter">0 записей</span>
         </div>
-        <div class="table-log-scroll-area">
-          <table class="premium-log-table">
-            <thead>
-              <tr>
-                <th>Время</th>
-                <th>Деп</th>
-                <th>Пара</th>
-                <th>Плечо</th>
-                <th>Рынок</th>
-                <th>Тип</th>
-                <th>Вход (USDT)</th>
-                <th>BE (В ноль)</th>
-                <th>TP</th>
-                <th>SL</th>
-                <th>Объем / Монеты</th>
-                <th style="text-align: center; width: 50px">Действие</th>
-              </tr>
-            </thead>
-            <tbody id="log-table-body"></tbody>
-          </table>
+        <div class="table-log-actions">
+          <button class="log-action-btn-link" onclick="exportLogToCSV()">
+            Экспорт CSV
+          </button>
+          <button
+            class="log-action-btn-link btn-clear-danger"
+            onclick="clearLog()"
+          >
+            Очистить лог
+          </button>
         </div>
+      </div>
+      <div class="table-log-scroll-area">
+        <table class="premium-log-table">
+          <thead>
+            <tr>
+              <th>Время</th>
+              <th>Деп</th>
+              <th>Пара</th>
+              <th>Плечо</th>
+              <th>Рынок</th>
+              <th>Тип</th>
+              <th>Вход (USDT)</th>
+              <th>BE (В ноль)</th>
+              <th>TP</th>
+              <th>SL</th>
+              <th>Объем / Монеты</th>
+            </tr>
+          </thead>
+          <tbody id="log-table-body"></tbody>
+        </table>
       </div>
     </div>
 
