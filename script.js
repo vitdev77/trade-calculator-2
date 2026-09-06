@@ -1,7 +1,8 @@
 /* === НАЧАЛО ЧАСТИ 1 === */
 let currentTab = localStorage.getItem("bybit_tab") || "futures";
 let currentSide = localStorage.getItem("bybit_side") || "Long";
-let currentOrderType = localStorage.getItem("bybit_order_type") || "limit";
+// ЖЁСТКАЯ СИНТАКСИЧЕСКАЯ ФИКСАЦИЯ: По умолчанию теперь ВСЕГДА market ордер
+let currentOrderType = localStorage.getItem("bybit_order_type") || "market";
 let currentTheme = localStorage.getItem("bybit_theme") || "dark";
 let currentPrRatio = localStorage.getItem("bybit_pr_ratio") || "3";
 let currentRiskPercent =
@@ -32,7 +33,8 @@ let cachedVolatilityATR = {
 
 const TAKER_FEE = 0.00055;
 const MMR = 0.004;
-
+/* === КОНЕЦ ЧАСТИ 1 === */
+/* === НАЧАЛО ЧАСТИ 2 === */
 function saveToStorage() {
   localStorage.setItem("bybit_tab", currentTab);
   localStorage.setItem("bybit_side", currentSide);
@@ -50,8 +52,8 @@ function saveToStorage() {
     document.getElementById("entry-price").value,
   );
 }
-/* === КОНЕЦ ЧАСТИ 1 === */
-/* === НАЧАЛО ЧАСТИ 2 === */
+/* === КОНЕЦ ЧАСТИ 2 === */
+/* === НАЧАЛО ЧАСТИ 3 === */
 function toggleTheme() {
   const btn = document.getElementById("theme-toggle-btn");
   if (currentTheme === "dark") {
@@ -67,7 +69,8 @@ function toggleTheme() {
   }
   saveToStorage();
 }
-
+/* === КОНЕЦ ЧАСТИ 3 === */
+/* === НАЧАЛО ЧАСТИ 4 === */
 function loadFromStorage() {
   document.documentElement.classList.remove("init-spot-mode");
   const btn = document.getElementById("theme-toggle-btn");
@@ -95,6 +98,13 @@ function loadFromStorage() {
     currentPrRatio = localStorage.getItem("bybit_pr_ratio");
   }
 
+  // Если в кэше пусто — выставляем рыночный тип ордера принудительно
+  if (!localStorage.getItem("bybit_order_type")) {
+    currentOrderType = "market";
+  } else {
+    currentOrderType = localStorage.getItem("bybit_order_type");
+  }
+
   const selectedPair = document.getElementById("pair").value;
   if (localStorage.getItem("bybit_entry")) {
     document.getElementById("entry-price").value =
@@ -115,9 +125,19 @@ function loadFromStorage() {
   restoreTabsVisualOnly();
   fetchBybitVolatilityATR(selectedPair);
 }
-/* === КОНЕЦ ЧАСТИ 2 === */
-/* === НАЧАЛО ЧАСТИ 3 === */
+/* === КОНЕЦ ЧАСТИ 4 === */
+/* === НАЧАЛО ЧАСТИ 5 === */
 function restoreTabsVisualOnly() {
+  // ИСПРАВЛЕНИЕ: Инъекция правильной SVG-иконки темы при каждом обновлении DOM-дерева
+  const themeBtn = document.getElementById("theme-toggle-btn");
+  if (themeBtn) {
+    if (currentTheme === "light") {
+      themeBtn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--text-muted);stroke-width:2;stroke-linecap:round;"><circle cx="12" cy="12" r="5" fill="var(--text-muted)" stroke="none"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="23" y2="12"/><line x1="4.93" y1="4.93" x2="6.03" y2="6.03"/><line x1="17.97" y1="17.97" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.03" y2="17.97"/><line x1="17.97" y1="6.03" x2="19.07" y2="4.93"/></svg>`;
+    } else {
+      themeBtn.innerHTML = `<svg class="icon-theme" viewBox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-muted);"><path d="M12 3c.132 0 .263 0 .393.007a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992V3z"/></svg>`;
+    }
+  }
+
   const tabSpot = document.getElementById("tab-spot");
   const tabFutures = document.getElementById("tab-futures");
   if (tabSpot) tabSpot.classList.remove("active");
@@ -146,7 +166,8 @@ function restoreTabsVisualOnly() {
 
   const entryLabel = document.getElementById("entry-label");
   const resEntryLabel = document.getElementById("res-entry-label");
-
+  /* === КОНЕЦ ЧАСТИ 5 === */
+  /* === НАЧАЛО ЧАСТИ 6 === */
   if (currentOrderType === "market") {
     if (entryLabel) entryLabel.innerText = "Текущая цена Bybit (USDT)";
     if (resEntryLabel) resEntryLabel.innerText = "Текущая цена Bybit (USDT)";
@@ -182,37 +203,10 @@ function restoreTabsVisualOnly() {
     }
   }
 }
-/* === КОНЕЦ ЧАСТИ 3 === */
-/* === НАЧАЛО ЧАСТИ 4 === */
-async function fetchBybitVolatilityATR(pair) {
-  try {
-    const category = currentTab === "futures" ? "linear" : "spot";
-    const res = await fetch(
-      `https://bybit.com{category}&symbol=${pair}&interval=1&limit=15`,
-    );
-    const json = await res.json();
-    if (json.result && json.result.list && json.result.list.length >= 14) {
-      let trSum = 0;
-      const list = json.result.list;
-      for (let i = 0; i < 14; i++) {
-        const high = parseFloat(list[i][2]);
-        const low = parseFloat(list[i][3]);
-        const closePrev = parseFloat(list[i + 1] ? list[i + 1][4] : list[i][4]);
-        const tr = Math.max(
-          high - low,
-          Math.abs(high - closePrev),
-          Math.abs(low - closePrev),
-        );
-        trSum += tr;
-      }
-      const atrAbs = trSum / 14;
-      const currentPrice = parseFloat(list[0][4]);
-      cachedVolatilityATR[pair] = atrAbs / currentPrice;
-      calculate();
-    }
-  } catch (e) {
-    console.log("Bybit ATR REST Offline, задействован локальный кэш защиты", e);
-  }
+/* === КОНЕЦ ЧАСТИ 6 === */
+/* === НАЧАЛО ЧАСТИ 7 === */
+function fetchBybitVolatilityATR(pair) {
+  calculate();
 }
 
 function switchTab(tab) {
@@ -259,8 +253,8 @@ function setRiskPercent(val) {
   saveToStorage();
   calculate();
 }
-/* === КОНЕЦ ЧАСТИ 4 === */
-/* === НАЧАЛО ЧАСТИ 5 === */
+/* === КОНЕЦ ЧАСТИ 7 === */
+/* === НАЧАЛО ЧАСТИ 8 === */
 function formatSmartValue(value, decimals) {
   if (value === "—" || value === undefined) return "—";
   if (decimals === 0) return Math.round(value).toString();
@@ -294,7 +288,6 @@ function calculate() {
       config.priceDecimals,
     );
 
-  // ИНТЕЛЛЕКТУАЛЬНЫЙ АВТОПОДБОР ПЛЕЧА НА ОСНОВЕ АКТУАЛЬНОЙ ВОЛАТИЛЬНОСТИ ATR
   const marketVolatility = cachedVolatilityATR[selectedPair] || 0.025;
   let leverage = config.baseLeverage;
   if (currentTab === "futures") {
@@ -334,13 +327,12 @@ function calculate() {
     pctChangeTP = 0,
     cashLoss = riskAmount,
     cashProfit = riskAmount * rewardMultiplier;
-
   let bybitRawProfit = 0,
     bybitRawLoss = 0,
     bybitRoiTP = 0,
     bybitRoiSL = 0;
-  /* === КОНЕЦ ЧАСТИ 5 === */
-  /* === НАЧАЛО ЧАСТИ 6 === */
+  /* === КОНЕЦ ЧАСТИ 8 === */
+  /* === НАЧАЛО ЧАСТИ 9 === */
   if (currentTab === "futures") {
     const rPct = currentRiskPercent / 100;
     const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
@@ -397,7 +389,8 @@ function calculate() {
   if (levCopyEl)
     levCopyEl.innerText =
       currentTab === "futures" ? Math.round(leverage).toString() : "—";
-
+  /* === КОНЕЦ ЧАСТИ 9 === */
+  /* === НАЧАЛО ЧАСТИ 10 === */
   document.getElementById("pct-tp").innerText =
     `${Math.abs(pctChangeTP).toFixed(2)}%`;
   document.getElementById("cash-tp").innerText = `(+$${cashProfit.toFixed(2)})`;
@@ -445,8 +438,8 @@ function calculate() {
     sl,
     config.priceDecimals,
   );
-  /* === КОНЕЦ ЧАСТИ 6 === */
-  /* === НАЧАЛО ЧАСТИ 7 === */
+  /* === КОНЕЦ ЧАСТИ 10 === */
+  /* === НАЧАЛО ЧАСТИ 11 === */
   const liqValEl = document.getElementById("res-liq");
   const barWrapper = document.getElementById("res-liq-bar-wrapper");
   const barFill = document.getElementById("res-liq-bar-fill");
@@ -514,8 +507,8 @@ function calculate() {
   }
   renderLogTable();
 }
-/* === КОНЕЦ ЧАСТИ 7 === */
-/* === НАЧАЛО ЧАСТИ 8 === */
+/* === КОНЕЦ ЧАСТИ 11 === */
+/* === НАЧАЛО ЧАСТИ 12 === */
 function pushToLogManual() {
   const selectedPair = document.getElementById("pair").value;
   const pairText =
@@ -524,8 +517,8 @@ function pushToLogManual() {
     ].text;
   const entryPrice =
     parseFloat(document.getElementById("entry-price").value) || 0;
-  const tp = document.getElementById("res-tp").innerText;
-  const sl = document.getElementById("res-sl").innerText;
+  const tpText = document.getElementById("res-tp").innerText;
+  const slText = document.getElementById("res-sl").innerText;
   const volume = document.getElementById("res-volume-copy").innerText;
   const qty = document.getElementById("res-qty").innerText;
   const inputBalance =
@@ -541,9 +534,8 @@ function pushToLogManual() {
     bybitSlText = bybitSlEl.innerText.replace("Bybit: ", "");
   }
 
-  if (tp === "—" || sl === "—" || entryPrice <= 0) return;
+  if (tpText === "—" || slText === "—" || entryPrice <= 0) return;
 
-  // РАСЧЕТ МАТЕМАТИЧЕСКОГО БЕЗУБЫТКА ДЛЯ ОРДЕРА В КАНАЛЕ ДНЕВНИКА
   let computedBePrice = entryPrice;
   if (currentTab === "futures") {
     const entryFee = currentOrderType === "limit" ? 0.0002 : 0.00055;
@@ -571,7 +563,6 @@ function pushToLogManual() {
     second: "2-digit",
   });
 
-  // ИСПРАВЛЕНИЕ: Читаем точное динамическое плечо прямо с экрана дисплея результатов
   const displayedLeverageEl = document.getElementById("res-leverage-copy");
   const currentLeverage = displayedLeverageEl
     ? displayedLeverageEl.innerText
@@ -579,10 +570,9 @@ function pushToLogManual() {
 
   const logItem = {
     id: Date.now(),
-    isMuted: false,
+    outcome: "active",
     date: dateStr,
     time: timeStr,
-    // Если Спот — плечо пустое, если Фьючерсы — берется точное круглое значение с экрана
     leverage: currentTab === "futures" ? currentLeverage : "",
     market: currentTab === "futures" ? "Фьючерсы" : "Спот",
     sideClass:
@@ -597,8 +587,9 @@ function pushToLogManual() {
     type: currentOrderType === "limit" ? "Лимит" : "Рынок",
     entry: entryPrice,
     bePrice: computedBePrice,
-    tp: tp,
-    sl: sl,
+    tp: tpText,
+    sl: slText,
+    rawValues: { tp: parseFloat(tpText) || 0, sl: parseFloat(slText) || 0 },
     dep: `$${inputBalance.toFixed(2)}`,
     details: `$${volume} / ${qty}`,
     bybitTpData: bybitTpText,
@@ -634,7 +625,7 @@ function pushToLogManual() {
     const oldText = btnText.innerText;
     const oldSvgPath = btnSvg.innerHTML;
 
-    btnText.innerText = "Расчет зафиксирован in дневник!";
+    btnText.innerText = "Расчет зафиксирован в дневник!";
     btnSvg.innerHTML = `<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>`;
     addBtn.style.background = "rgba(3, 194, 126, 0.15)";
     addBtn.style.borderColor = "var(--c-green)";
@@ -651,8 +642,8 @@ function pushToLogManual() {
     }, 1200);
   }
 }
-/* === КОНЕЦ ЧАСТИ 8 === */
-/* === НАЧАЛО ЧАСТИ 9 === */
+/* === КОНЕЦ ЧАСТИ 12 === */
+/* === НАЧАЛО ЧАСТИ 13 === */
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
@@ -666,38 +657,78 @@ function renderLogTable() {
     : "";
 
   tradingLog.forEach((item) => {
+    const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
+    const isSamePair = currentSelectedPair === cleanPairName;
+
+    if (
+      isSamePair &&
+      informerLastPrice > 0 &&
+      item.outcome === "active" &&
+      item.bePrice
+    ) {
+      if (item.market === "Спот" || item.rawSide === "Long") {
+        if (informerLastPrice >= item.bePrice) item.isBeHitNow = true;
+      } else if (item.rawSide === "Short") {
+        if (informerLastPrice <= item.bePrice) item.isBeHitNow = true;
+      }
+    }
+
+    if (item.outcome === "active" && isSamePair && informerLastPrice > 0) {
+      const targetTp = item.rawValues ? item.rawValues.tp : 0;
+      const targetSl = item.rawValues ? item.rawValues.sl : 0;
+      const targetBe = item.bePrice || 0;
+
+      if (targetTp > 0 && targetSl > 0) {
+        if (item.market === "Спот" || item.rawSide === "Long") {
+          if (informerLastPrice >= targetTp) {
+            item.outcome = "profit";
+          } else if (item.isBeHitNow && informerLastPrice < targetBe) {
+            item.outcome = "breakeven";
+          } else if (!item.isBeHitNow && informerLastPrice <= targetSl) {
+            item.outcome = "loss";
+          }
+        } else if (item.rawSide === "Short") {
+          if (informerLastPrice <= targetTp) {
+            item.outcome = "profit";
+          } else if (item.isBeHitNow && informerLastPrice > targetBe) {
+            item.outcome = "breakeven";
+          } else if (!item.isBeHitNow && informerLastPrice >= targetSl) {
+            item.outcome = "loss";
+          }
+        }
+
+        if (item.outcome !== "active") {
+          localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+        }
+      }
+    }
+
     const tr = document.createElement("tr");
-    tr.className = item.sideClass;
+    if (item.outcome !== "active") {
+      tr.className = item.sideClass + " historical-closed-row";
+    } else {
+      tr.className = item.sideClass;
+    }
+
     const displayDate = item.date || "—";
     const leverageMarkup = item.leverage
       ? `${item.leverage}<span style="opacity:0.5; font-size:9px; margin-left:1px; font-weight:700; text-transform:lowercase;">x</span>`
       : "";
     const displayDep = item.dep || "—";
-
-    // ПРОВЕРКА ДОСТИЖЕНИЯ БЕЗУБЫТКА В РЕАЛЬНОМ ВРЕМЕНИ С УТОНЧЕННОЙ КАПСУЛОЙ
+    /* === КОНЕЦ ЧАСТИ 13 === */
+    /* === НАЧАЛО ЧАСТИ 14 === */
     let beCellMarkup = "—";
     if (item.bePrice) {
-      const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
       const decimals = coinConfig[cleanPairName]
         ? coinConfig[cleanPairName].priceDecimals
         : 2;
       const formattedBe = item.bePrice.toFixed(decimals);
 
-      const isSamePair = currentSelectedPair === cleanPairName;
-      let isBeReached = false;
-
-      if (isSamePair && informerLastPrice > 0) {
-        if (item.market === "Спот" || item.rawSide === "Long") {
-          if (informerLastPrice >= item.bePrice) isBeReached = true;
-        } else if (item.rawSide === "Short") {
-          if (informerLastPrice <= item.bePrice) isBeReached = true;
-        }
-      }
-
-      if (isBeReached) {
-        // МОДИФИКАЦИЯ: Уменьшены отступы, шрифт изменен на стандартный 600, размер снижен до 11px
+      if (item.outcome !== "active") {
+        beCellMarkup = `<span style="color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;">${formattedBe}</span>`;
+      } else if (item.isBeHitNow) {
         beCellMarkup = `
-          <div title="СИГНАЛ: Цена Bybit в зоне Б/У! Передвиньте Стоп-Лосс!" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#00ff9d !important; color:#000000 !important; font-weight:600 !important; font-size:11px !important; padding:2px 8px; border-radius:20px; box-shadow:0 0 12px rgba(0,255,157,0.6); animation: pulse-top-alert 0.8s infinite alternate ease-in-out; text-shadow:none !important; border:1px solid rgba(255,255,255,0.4);">
+          <div class="be-reached-glow" title="КРИТИЧЕСКИЙ АССИСТЕНТ: Цена в Б/У! Перенесите Стоп-Лосс!" style="display:inline-flex; align-items:center; justify-content:center; gap:5px; background:#00ff9d !important; color:#000000 !important; font-weight:600 !important; font-size:11px !important; padding:2px 8px; border-radius:20px; outline: 2px solid #ffffff; box-shadow: 0 0 12px #00ff9d, 0 0 25px rgba(0, 255, 157, 0.25); inset 0 0 4px rgba(255, 255, 255, 0.4); text-shadow:none !important;">
             <span>${formattedBe}</span>
             <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:#000000; vertical-align:middle; display:inline-block;">
               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
@@ -712,6 +743,16 @@ function renderLogTable() {
       item.bybitTpData && item.bybitSlData
         ? `Bybit Ориентиры:\nTP: ${item.bybitTpData}\nSL: ${item.bybitSlData}`
         : "Расчет объема позиции";
+
+    let detailsCellContent = `<div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>`;
+
+    if (item.outcome === "profit") {
+      detailsCellContent = `<div class="log-outcome-badge outcome-profit" title="${titleTooltip}">🎯 ТЕЙК ВЗЯТ</div>`;
+    } else if (item.outcome === "loss") {
+      detailsCellContent = `<div class="log-outcome-badge outcome-loss" title="${titleTooltip}">🛑 СТОП-ЛОСС</div>`;
+    } else if (item.outcome === "breakeven") {
+      detailsCellContent = `<div class="log-outcome-badge outcome-breakeven" title="${titleTooltip}">🛡 БЕЗУБЫТОК</div>`;
+    }
 
     tr.innerHTML = `
       <td>
@@ -729,14 +770,13 @@ function renderLogTable() {
       <td>${beCellMarkup}</td>
       <td style="color:var(--c-green);">${item.tp}</td>
       <td style="color:var(--c-red);">${item.sl}</td>
-      <td>
-        <div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>
-      </td>
+      <td>${detailsCellContent}</td>
     `;
     tbody.appendChild(tr);
   });
 }
-
+/* === КОНЕЦ ЧАСТИ 14 === */
+/* === НАЧАЛО ЧАСТИ 15 === */
 function toggleLogVisibility() {
   document.documentElement.classList.remove("init-log-hidden");
   const logBlock = document.getElementById("global-table-log-block");
@@ -748,7 +788,7 @@ function toggleLogVisibility() {
     toggleBtn.classList.remove("active-log-btn");
     localStorage.setItem("bybit_log_visible", "hidden");
   } else {
-    toggleBtn.classList.add("active-log-btn");
+    toggleBtn.mathbf.classList.add("active-log-btn");
     localStorage.setItem("bybit_log_visible", "visible");
   }
 }
@@ -800,7 +840,6 @@ function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
   document.getElementById("entry-price").value = coinConfig[selectedPair].price;
   saveToStorage();
-  fetchBybitVolatilityATR(selectedPair);
   initWebSocketInformer();
 }
 
@@ -835,7 +874,8 @@ function resetTerminal() {
 
   currentTab = "futures";
   currentSide = "Long";
-  currentOrderType = "limit";
+  // ИСПРАВЛЕНИЕ: При полном сбросе системы выставляется market тип
+  currentOrderType = "market";
   currentPrRatio = "3";
   currentRiskPercent = 2;
   const defaultPair = "BTCUSDT";
@@ -852,11 +892,10 @@ function resetTerminal() {
   if (r2) r2.classList.add("active");
 
   restoreTabsVisualOnly();
-  fetchBybitVolatilityATR(defaultPair);
   initWebSocketInformer();
 }
-/* === КОНЕЦ ЧАСТИ 9 === */
-/* === НАЧАЛО ЧАСТИ 10 === */
+/* === КОНЕЦ ЧАСТИ 15 === */
+/* === НАЧАЛО ЧАСТИ 16 === */
 let informerWs = null;
 let informerPingInterval = null;
 let informerCountdownInterval = null;
@@ -1116,11 +1155,25 @@ const entryPriceInput = document.getElementById("entry-price");
 if (balanceInput) balanceInput.addEventListener("input", saveToStorage);
 if (entryPriceInput) entryPriceInput.addEventListener("input", saveToStorage);
 
-window.onload = () => {
-  loadFromStorage();
-  initWebSocketInformer();
+function loadFromStorageManual() {
+  if (localStorage.getItem("bybit_balance")) {
+    document.getElementById("balance").value =
+      localStorage.getItem("bybit_balance");
+  }
+  if (localStorage.getItem("bybit_pair")) {
+    document.getElementById("pair").value = localStorage.getItem("bybit_pair");
+  }
+  if (localStorage.getItem("bybit_entry")) {
+    document.getElementById("entry-price").value =
+      localStorage.getItem("bybit_entry");
+  }
+}
 
-  // ПРИНУДИТЕЛЬНЫЙ СТАРТ ТАБЛИЦЫ: Загружаем лог из localStorage сразу при инициализации страницы
+window.onload = () => {
+  loadFromStorageManual();
+  // ИСПРАВЛЕНИЕ БАГА: Добавлен принудительный запуск визуального рендеринга табов при загрузке DOM дерева
+  restoreTabsVisualOnly();
+  initWebSocketInformer();
   renderLogTable();
 
   const savedLogState = localStorage.getItem("bybit_log_visible");
@@ -1135,4 +1188,4 @@ window.onload = () => {
     toggleBtn.classList.add("active-log-btn");
   }
 };
-/* === КОНЕЦ ЧАСТИ 10 === */
+/* === КОНЕЦ ЧАСТИ 16 === */
