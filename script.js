@@ -598,7 +598,8 @@ function pushToLogManual() {
         ? `log-badge-${currentSide.toLowerCase()}`
         : "log-badge-long",
     pair: pairText,
-    type: currentOrderType === "limit" ? "Лимит" : "Рынок",
+    // МОДИФИКАЦИЯ: Замена сокращенных названий типов на развернутые биржевые термины
+    type: currentOrderType === "limit" ? "Лимитный" : "Рыночный",
     entry: entryPrice,
     bePrice: computedBePrice,
     tp: tpText,
@@ -758,8 +759,8 @@ function renderLogTable(currentMidPrice) {
 
     // Инкрементальный патч: обновляем ячейку BE в уже существующей DOM-строке
     if (!isNewRow) {
-      if (tr.cells && tr.cells[7]) {
-        tr.cells[7].innerHTML = beCellMarkup;
+      if (tr.cells && tr.cells[6]) {
+        tr.cells[6].innerHTML = beCellMarkup;
       }
       return;
     }
@@ -785,6 +786,13 @@ function renderLogTable(currentMidPrice) {
         <span style="color:var(--c-red); font-weight:600; opacity:0.85;">${item.sl}</span>
       </div>`;
 
+    // ОБЪЕДИНЕННАЯ СТРУКТУРА ДЛЯ СТОЛБЦА РЕЖИМ / ТИП ОРДЕРА
+    const combinedMarketTypeMarkup = `
+      <div style="display:flex; flex-direction:column; line-height:1.2;">
+        <span class="${item.badgeClass}" style="font-weight:700;">${item.market}</span>
+        <span style="color:var(--text-muted); font-size:9px; font-weight:500; margin-top:1px;">${item.type}</span>
+      </div>`;
+
     tr.innerHTML = `
       <td>
         <div style="display:flex; flex-direction:column; line-height:1.3; font-size:11px;">
@@ -795,8 +803,7 @@ function renderLogTable(currentMidPrice) {
       <td style="color:var(--text-main); font-weight:700;">${displayDep}</td>
       <td>${item.pair}</td>
       <td style="color:var(--text-main); font-weight:700;">${leverageMarkup}</td>
-      <td class="${item.badgeClass}">${item.market}</td>
-      <td>${item.type}</td>
+      <td>${combinedMarketTypeMarkup}</td>
       <td>${item.entry}</td>
       <td>${beCellMarkup}</td>
       <td>${combinedTpSlMarkup}</td>
@@ -1187,7 +1194,7 @@ function initWebSocketInformer() {
                 item.isBePersistent = true;
                 needSave = true;
               } else if (mid < item.bePrice && item.isBePersistent) {
-                item.isBePersistent = false; // СБРАСЫВАЕМ ПОДСВЕТКУ, ЕСЛИ ЦЕНА УШЛА НАЗАД В УБЫТОК
+                item.isBePersistent = false;
                 needSave = true;
               }
             } else if (item.rawSide === "Short") {
@@ -1195,7 +1202,7 @@ function initWebSocketInformer() {
                 item.isBePersistent = true;
                 needSave = true;
               } else if (mid > item.bePrice && item.isBePersistent) {
-                item.isBePersistent = false; // СБРАСЫВАЕМ ПОДСВЕТКУ, ЕСЛИ ЦЕНА УШЛА НАЗАД В УБЫТОК
+                item.isBePersistent = false;
                 needSave = true;
               }
             }
