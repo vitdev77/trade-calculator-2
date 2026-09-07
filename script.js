@@ -505,7 +505,7 @@ function calculate() {
       if (barWrapper) barWrapper.style.display = "none";
     }
   }
-  renderLogTable();
+  renderLogTable(entryPrice);
 }
 /* === КОНЕЦ ЧАСТИ 11 === */
 /* === НАЧАЛО ЧАСТИ 12 === */
@@ -668,7 +668,7 @@ function forceCloseOrder(id) {
   }
 }
 
-function renderLogTable() {
+function renderLogTable(currentMidPrice) {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
   if (!tbody || !counter) return;
@@ -714,15 +714,30 @@ function renderLogTable() {
       : 2;
     const formattedBe = item.bePrice ? item.bePrice.toFixed(decimals) : "—";
 
+    // АКТИВАЦИЯ СВЕЧЕНИЯ ПРИ ДОСТИЖЕНИИ ЦЕНЫ БЕЗУБЫТКА
+    let isBeReached = false;
+    if (item.outcome !== "closed" && currentMidPrice && item.bePrice) {
+      if (item.rawSide === "Long" && currentMidPrice >= item.bePrice) {
+        isBeReached = true;
+      } else if (item.rawSide === "Short" && currentMidPrice <= item.bePrice) {
+        isBeReached = true;
+      }
+    }
+
     let beCellMarkup = "";
     if (item.outcome === "closed") {
       beCellMarkup = `<span style="color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;">${formattedBe}</span>`;
+    } else if (isBeReached) {
+      beCellMarkup = `<span class="be-reached-glow" style="font-weight:700; padding: 2px 6px; border-radius: 4px; display: inline-block;">${formattedBe}</span>`;
     } else {
       beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
     }
 
-    // Защита DOM от затирания сокетом: если tr существует, выходим из итерации
+    // ИСПРАВЛЕНИЕ: Точечно инжектим разметку в 7-ю ячейку строки (индекс 7 для BE в ноль), защищая DOM от мерцания сокета
     if (!isNewRow) {
+      if (tr.cells && tr.cells[7]) {
+        tr.cells[7].innerHTML = beCellMarkup;
+      }
       return;
     }
 
@@ -731,7 +746,6 @@ function renderLogTable() {
         ? `Bybit Ориентиры:\nTP: ${item.bybitTpData}\nSL: ${item.bybitSlData}`
         : "Расчет объема позиции";
 
-    // Возвращаем стандартный вывод параметров объема вместо бейджей исходов
     let detailsCellContent = `<div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>`;
 
     let actionCellMarkup = "—";
@@ -1134,7 +1148,8 @@ function initWebSocketInformer() {
         if (informerLastPrice === 0) calculate();
         informerLastPrice = mid;
 
-        renderLogTable();
+        // ПЕРЕДАЕМ ЖИВУЮ ЦЕНУ ДЛЯ ПРОВЕРКИ БЕЗУБЫТКА
+        renderLogTable(mid);
 
         informerFlatTimeout = setTimeout(() => {
           if (arrowEl) {
