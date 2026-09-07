@@ -128,7 +128,7 @@ body {
   margin-top: 8px;
 }
 
-/* ИСПРАВЛЕНА GRID-СЕТКА СТЕКЛЯННОГО КОРПУСА ПОД ДВЕ СТРОКИ С ИНФОРМЕРОМ */
+/* ФИКС: ОПТИМИЗИРОВАННЫЙ СЦЕНАРИЙ КОМПАКТНОЙ ДВУХКОЛОНОЧНОЙ СЕТКИ */
 .glass-container {
   background: var(--glass-bg);
   backdrop-filter: blur(35px);
@@ -136,7 +136,8 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 38px;
   padding: 30px;
-  width: 860px;
+  width: 100%; /* Занимает всю ширину родительского флекса */
+  max-width: 1020px; /* Жесткий верхний предел, чтобы блок не расползался на Ultra-Wide */
   min-height: 440px;
   height: auto;
   display: grid;
@@ -160,6 +161,14 @@ html.light-theme .glass-container {
   box-shadow:
     0 30px 60px rgba(15, 23, 42, 0.08),
     inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+/* СИНХРОНИЗАЦИЯ: Журнал ордеров идеально повторяет ширину калькулятора */
+.standalone-log-layout {
+  width: 100% !important;
+  max-width: 1020px !important;
+  z-index: 1;
+  margin-top: -4px; /* Мягкий отступ для сохранения плотности интерфейса */
 }
 
 .side-fade-wrapper {
