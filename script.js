@@ -714,13 +714,22 @@ function renderLogTable(currentMidPrice) {
       : 2;
     const formattedBe = item.bePrice ? item.bePrice.toFixed(decimals) : "—";
 
-    // АКТИВАЦИЯ СВЕЧЕНИЯ ПРИ ДОСТИЖЕНИИ ЦЕНЫ БЕЗУБЫТКА
-    let isBeReached = false;
-    if (item.outcome !== "closed" && currentMidPrice && item.bePrice) {
+    // УЛУЧШЕННАЯ ЛОГИКА: Флаг активируется либо по живой цене (для текущей пары), либо берется из памяти (если БУ был достигнут ранее)
+    let isBeReached = !!item.isBePersistent;
+
+    if (
+      !isBeReached &&
+      item.outcome !== "closed" &&
+      currentMidPrice &&
+      item.bePrice &&
+      isSamePair
+    ) {
       if (item.rawSide === "Long" && currentMidPrice >= item.bePrice) {
         isBeReached = true;
+        item.isBePersistent = true; // Запоминаем состояние в объекте
       } else if (item.rawSide === "Short" && currentMidPrice <= item.bePrice) {
         isBeReached = true;
+        item.isBePersistent = true; // Запоминаем состояние в объекте
       }
     }
 
@@ -733,7 +742,7 @@ function renderLogTable(currentMidPrice) {
       beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
     }
 
-    // ИСПРАВЛЕНИЕ: Точечно инжектим разметку в 7-ю ячейку строки (индекс 7 для BE в ноль), защищая DOM от мерцания сокета
+    // Инкрементальный патч: обновляем ячейку BE в уже существующей DOM-строке
     if (!isNewRow) {
       if (tr.cells && tr.cells[7]) {
         tr.cells[7].innerHTML = beCellMarkup;
@@ -1148,8 +1157,40 @@ function initWebSocketInformer() {
         if (informerLastPrice === 0) calculate();
         informerLastPrice = mid;
 
-        // ПЕРЕДАЕМ ЖИВУЮ ЦЕНУ ДЛЯ ПРОВЕРКИ БЕЗУБЫТКА
         renderLogTable(mid);
+
+        // ДВУСТОРОННИЙ ДИНАМИЧЕСКИЙ ТРЕКИНГ БЕЗУБЫТКА ДЛЯ АКТИВНОЙ ПАРЫ
+        const activeLogItems = tradingLog.filter(
+          (item) => item.outcome !== "closed",
+        );
+        let needSave = false;
+
+        activeLogItems.forEach((item) => {
+          const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
+          if (selectedPair === cleanPairName && item.bePrice) {
+            if (item.rawSide === "Long") {
+              if (mid >= item.bePrice && !item.isBePersistent) {
+                item.isBePersistent = true;
+                needSave = true;
+              } else if (mid < item.bePrice && item.isBePersistent) {
+                item.isBePersistent = false; // СБРАСЫВАЕМ ПОДСВЕТКУ, ЕСЛИ ЦЕНА УШЛА НАЗАД В УБЫТОК
+                needSave = true;
+              }
+            } else if (item.rawSide === "Short") {
+              if (mid <= item.bePrice && !item.isBePersistent) {
+                item.isBePersistent = true;
+                needSave = true;
+              } else if (mid > item.bePrice && item.isBePersistent) {
+                item.isBePersistent = false; // СБРАСЫВАЕМ ПОДСВЕТКУ, ЕСЛИ ЦЕНА УШЛА НАЗАД В УБЫТОК
+                needSave = true;
+              }
+            }
+          }
+        });
+
+        if (needSave) {
+          localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+        }
 
         informerFlatTimeout = setTimeout(() => {
           if (arrowEl) {
@@ -1191,7 +1232,6 @@ function initWebSocketInformer() {
         infNextFundingTimestamp = parseInt(t.nextFundingTime);
     }
 
-    // МГНОВЕННОЕ УДЕРЖАНИЕ СТЭЙТА ВИДИМОСТИ ЖУРНАЛА ОТ СБРОСА КОТИРОВКАМИ СОКЕТА
     syncLogVisibilityState();
   };
 }
