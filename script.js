@@ -644,67 +644,59 @@ function pushToLogManual() {
 }
 /* === КОНЕЦ ЧАСТИ 12 === */
 /* === НАЧАЛО ЧАСТИ 13 === */
+// РЕАКТИВНАЯ РУЧНАЯ МОДИФИКАЦИЯ: Переводим строку в приглушенный стейт С ПОДТВЕРЖДЕНИЕМ
+function forceCloseOrder(id) {
+  const targetOrder = tradingLog.find((o) => o.id === id);
+  if (!targetOrder) return;
+
+  // ОКНО АЛЕРТА: Запрашиваем жесткое подтверждение трейдера перед архивацией
+  const confirmClose = confirm(
+    `Вы уверены, что хотите завершить ордер по паре ${targetOrder.pair}?\nСтрока будет приглушена, кнопка управления удалена.`,
+  );
+  if (!confirmClose) return; // Прерываем выполнение, если нажата отмена
+
+  targetOrder.outcome = "closed";
+  localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+
+  // Точечно тушим строку в DOM без жесткой перезаписи innerHTML
+  const tr = document.querySelector(`tr[data-id="${id}"]`);
+  if (tr) {
+    tr.classList.add("historical-closed-row");
+    // Удаляем кнопку завершения, так как ордер уже закрыт
+    const actionCell = tr.cells[tr.cells.length - 1]; // Последняя ячейка Действия
+    if (actionCell) actionCell.innerHTML = "—";
+  }
+}
+
 function renderLogTable() {
   const tbody = document.getElementById("log-table-body");
   const counter = document.getElementById("log-counter");
   if (!tbody || !counter) return;
 
   counter.innerText = tradingLog.length.toString() + " записей";
-  tbody.innerHTML = "";
 
   const currentSelectedPair = document.getElementById("pair")
     ? document.getElementById("pair").value
     : "";
 
+  const currentLogIds = new Set();
+
   tradingLog.forEach((item) => {
     const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
     const isSamePair = currentSelectedPair === cleanPairName;
+    currentLogIds.add(item.id.toString());
 
-    if (
-      isSamePair &&
-      informerLastPrice > 0 &&
-      item.outcome === "active" &&
-      item.bePrice
-    ) {
-      if (item.market === "Спот" || item.rawSide === "Long") {
-        if (informerLastPrice >= item.bePrice) item.isBeHitNow = true;
-      } else if (item.rawSide === "Short") {
-        if (informerLastPrice <= item.bePrice) item.isBeHitNow = true;
-      }
+    // Чистый инкрементальный патч DOM
+    let tr = document.querySelector(`tr[data-id="${item.id}"]`);
+    const isNewRow = !tr;
+
+    if (isNewRow) {
+      tr = document.createElement("tr");
+      tr.setAttribute("data-id", item.id);
     }
 
-    if (item.outcome === "active" && isSamePair && informerLastPrice > 0) {
-      const targetTp = item.rawValues ? item.rawValues.tp : 0;
-      const targetSl = item.rawValues ? item.rawValues.sl : 0;
-      const targetBe = item.bePrice || 0;
-
-      if (targetTp > 0 && targetSl > 0) {
-        if (item.market === "Спот" || item.rawSide === "Long") {
-          if (informerLastPrice >= targetTp) {
-            item.outcome = "profit";
-          } else if (item.isBeHitNow && informerLastPrice < targetBe) {
-            item.outcome = "breakeven";
-          } else if (!item.isBeHitNow && informerLastPrice <= targetSl) {
-            item.outcome = "loss";
-          }
-        } else if (item.rawSide === "Short") {
-          if (informerLastPrice <= targetTp) {
-            item.outcome = "profit";
-          } else if (item.isBeHitNow && informerLastPrice > targetBe) {
-            item.outcome = "breakeven";
-          } else if (!item.isBeHitNow && informerLastPrice >= targetSl) {
-            item.outcome = "loss";
-          }
-        }
-
-        if (item.outcome !== "active") {
-          localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
-        }
-      }
-    }
-
-    const tr = document.createElement("tr");
-    if (item.outcome !== "active") {
+    // Приглушаем строку на 65%, если выставился ручной флаг closed
+    if (item.outcome === "closed") {
       tr.className = item.sideClass + " historical-closed-row";
     } else {
       tr.className = item.sideClass;
@@ -717,26 +709,21 @@ function renderLogTable() {
     const displayDep = item.dep || "—";
     /* === КОНЕЦ ЧАСТИ 13 === */
     /* === НАЧАЛО ЧАСТИ 14 === */
-    let beCellMarkup = "—";
-    if (item.bePrice) {
-      const decimals = coinConfig[cleanPairName]
-        ? coinConfig[cleanPairName].priceDecimals
-        : 2;
-      const formattedBe = item.bePrice.toFixed(decimals);
+    const decimals = coinConfig[cleanPairName]
+      ? coinConfig[cleanPairName].priceDecimals
+      : 2;
+    const formattedBe = item.bePrice ? item.bePrice.toFixed(decimals) : "—";
 
-      if (item.outcome !== "active") {
-        beCellMarkup = `<span style="color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;">${formattedBe}</span>`;
-      } else if (item.isBeHitNow) {
-        beCellMarkup = `
-          <div class="be-reached-glow" title="КРИТИЧЕСКИЙ АССИСТЕНТ: Цена в Б/У! Перенесите Стоп-Лосс!" style="display:inline-flex; align-items:center; justify-content:center; gap:5px; background:#00ff9d !important; color:#000000 !important; font-weight:600 !important; font-size:11px !important; padding:2px 8px; border-radius:20px; outline: 2px solid #ffffff; box-shadow: 0 0 12px #00ff9d, 0 0 25px rgba(0, 255, 157, 0.25); inset 0 0 4px rgba(255, 255, 255, 0.4); text-shadow:none !important;">
-            <span>${formattedBe}</span>
-            <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:#000000; vertical-align:middle; display:inline-block;">
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-            </svg>
-          </div>`;
-      } else {
-        beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
-      }
+    let beCellMarkup = "";
+    if (item.outcome === "closed") {
+      beCellMarkup = `<span style="color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;">${formattedBe}</span>`;
+    } else {
+      beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
+    }
+
+    // Защита DOM от затирания сокетом: если tr существует, выходим из итерации
+    if (!isNewRow) {
+      return;
     }
 
     let titleTooltip =
@@ -744,15 +731,22 @@ function renderLogTable() {
         ? `Bybit Ориентиры:\nTP: ${item.bybitTpData}\nSL: ${item.bybitSlData}`
         : "Расчет объема позиции";
 
+    // Возвращаем стандартный вывод параметров объема вместо бейджей исходов
     let detailsCellContent = `<div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>`;
 
-    if (item.outcome === "profit") {
-      detailsCellContent = `<div class="log-outcome-badge outcome-profit" title="${titleTooltip}">🎯 ТЕЙК ВЗЯТ</div>`;
-    } else if (item.outcome === "loss") {
-      detailsCellContent = `<div class="log-outcome-badge outcome-loss" title="${titleTooltip}">🛑 СТОП-ЛОСС</div>`;
-    } else if (item.outcome === "breakeven") {
-      detailsCellContent = `<div class="log-outcome-badge outcome-breakeven" title="${titleTooltip}">🛡 БЕЗУБЫТОК</div>`;
+    let actionCellMarkup = "—";
+    if (item.outcome !== "closed") {
+      actionCellMarkup = `
+        <button onclick="event.stopPropagation(); forceCloseOrder(${item.id})" class="log-close-trigger" title="Завершить сделку вручную (приглушить строчку)">
+          ✕
+        </button>`;
     }
+
+    const combinedTpSlMarkup = `
+      <div style="display:flex; flex-direction:column; gap:1px; line-height:1.2;">
+        <span style="color:var(--c-green); font-weight:700;">${item.tp}</span>
+        <span style="color:var(--c-red); font-weight:600; opacity:0.85;">${item.sl}</span>
+      </div>`;
 
     tr.innerHTML = `
       <td>
@@ -768,11 +762,17 @@ function renderLogTable() {
       <td>${item.type}</td>
       <td>${item.entry}</td>
       <td>${beCellMarkup}</td>
-      <td style="color:var(--c-green);">${item.tp}</td>
-      <td style="color:var(--c-red);">${item.sl}</td>
+      <td>${combinedTpSlMarkup}</td>
       <td>${detailsCellContent}</td>
+      <td>${actionCellMarkup}</td>
     `;
     tbody.appendChild(tr);
+  });
+
+  // Удаление фантомных записей из таблицы
+  Array.from(tbody.querySelectorAll("tr[data-id]")).forEach((row) => {
+    const rowId = row.getAttribute("data-id");
+    if (!currentLogIds.has(rowId)) row.remove();
   });
 }
 /* === КОНЕЦ ЧАСТИ 14 === */
@@ -788,8 +788,24 @@ function toggleLogVisibility() {
     toggleBtn.classList.remove("active-log-btn");
     localStorage.setItem("bybit_log_visible", "hidden");
   } else {
-    toggleBtn.mathbf.classList.add("active-log-btn");
+    toggleBtn.classList.add("active-log-btn");
     localStorage.setItem("bybit_log_visible", "visible");
+  }
+}
+
+function syncLogVisibilityState() {
+  const savedLogState = localStorage.getItem("bybit_log_visible");
+  const logBlock = document.getElementById("global-table-log-block");
+  const toggleBtn = document.getElementById("log-global-toggle-btn");
+  if (!logBlock || !toggleBtn) return;
+
+  if (savedLogState === "hidden") {
+    logBlock.classList.add("collapsed");
+    toggleBtn.classList.remove("active-log-btn");
+  } else {
+    document.documentElement.classList.remove("init-log-hidden");
+    logBlock.classList.remove("collapsed");
+    toggleBtn.classList.add("active-log-btn");
   }
 }
 
@@ -874,7 +890,6 @@ function resetTerminal() {
 
   currentTab = "futures";
   currentSide = "Long";
-  // ИСПРАВЛЕНИЕ: При полном сбросе системы выставляется market тип
   currentOrderType = "market";
   currentPrRatio = "3";
   currentRiskPercent = 2;
@@ -1046,8 +1061,21 @@ function initWebSocketInformer() {
     }
     calculate();
   };
-
+  /* === КОНЕЦ ЧАСТИ 16 === */
+  /* === НАЧАЛО ЧАСТИ 17 === */
   informerWs.onmessage = (event) => {
+    const selectedPair = document.getElementById("pair")
+      ? document.getElementById("pair").value
+      : "BTCUSDT";
+    const informerContainer = document.querySelector(".bybit-live-informer");
+    const livePriceEl = document.getElementById("live-price");
+    const arrowEl = document.getElementById("live-arrow");
+    const askEl = document.getElementById("live-ask");
+    const bidEl = document.getElementById("live-bid");
+    const spreadEl = document.getElementById("live-spread");
+    const fundingBox = document.getElementById("live-funding-box");
+    const fundingRateEl = document.getElementById("live-funding-rate");
+
     const res = JSON.parse(event.data);
     if (res.op === "pong") return;
 
@@ -1147,6 +1175,9 @@ function initWebSocketInformer() {
       if (t.nextFundingTime !== undefined)
         infNextFundingTimestamp = parseInt(t.nextFundingTime);
     }
+
+    // МГНОВЕННОЕ УДЕРЖАНИЕ СТЭЙТА ВИДИМОСТИ ЖУРНАЛА ОТ СБРОСА КОТИРОВКАМИ СОКЕТА
+    syncLogVisibilityState();
   };
 }
 
@@ -1171,21 +1202,9 @@ function loadFromStorageManual() {
 
 window.onload = () => {
   loadFromStorageManual();
-  // ИСПРАВЛЕНИЕ БАГА: Добавлен принудительный запуск визуального рендеринга табов при загрузке DOM дерева
   restoreTabsVisualOnly();
   initWebSocketInformer();
   renderLogTable();
-
-  const savedLogState = localStorage.getItem("bybit_log_visible");
-  const logBlock = document.getElementById("global-table-log-block");
-  const toggleBtn = document.getElementById("log-global-toggle-btn");
-
-  if (savedLogState === "hidden" && logBlock && toggleBtn) {
-    logBlock.classList.add("collapsed");
-    toggleBtn.classList.remove("active-log-btn");
-  } else if (toggleBtn) {
-    document.documentElement.classList.remove("init-log-hidden");
-    toggleBtn.classList.add("active-log-btn");
-  }
+  syncLogVisibilityState();
 };
-/* === КОНЕЦ ЧАСТИ 16 === */
+/* === КОНЕЦ ЧАСТИ 17 === */
