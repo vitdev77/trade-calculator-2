@@ -745,8 +745,8 @@ html.light-theme .google-utility-capsule {
   font-weight: 700;
 }
 .google-action-icon-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   fill: var(--text-muted);
 }
 .google-action-icon-btn:hover {
