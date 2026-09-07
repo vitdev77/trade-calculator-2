@@ -680,10 +680,32 @@ function forceCloseOrder(id) {
   const tr = document.querySelector(`tr[data-id="${id}"]`);
   if (tr) {
     tr.classList.add("historical-closed-row");
-    // Удаляем кнопку завершения, так как ордер уже закрыт
-    const actionCell = tr.cells[tr.cells.length - 1]; // Последняя ячейка Действия
-    if (actionCell) actionCell.innerHTML = "—";
+    // Перерисовываем ячейку действия, оставляя только кнопку полного удаления в стиле приложения
+    const actionCell = tr.cells[tr.cells.length - 1];
+    if (actionCell) {
+      actionCell.innerHTML = `
+        <button onclick="event.stopPropagation(); deleteOrderFromLog(${id})" class="google-copy-btn btn-red" style="width:24px; height:24px;" title="Полностью удалить ордер из истории">
+          <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:var(--text-muted); transition:fill 0.2s ease;">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+          </svg>
+        </button>`;
+    }
   }
+}
+
+// НОВАЯ ФУНКЦИЯ: Полное физическое удаление записи из массива и локального хранилища
+function deleteOrderFromLog(id) {
+  const targetOrder = tradingLog.find((o) => o.id === id);
+  if (!targetOrder) return;
+
+  const confirmDelete = confirm(
+    `Вы уверены, что хотите ПОЛНОСТЬЮ удалить расчет по паре ${targetOrder.pair} из журнала безвозвратно?`,
+  );
+  if (!confirmDelete) return;
+
+  tradingLog = tradingLog.filter((o) => o.id !== id);
+  localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+  renderLogTable();
 }
 
 function renderLogTable(currentMidPrice) {
@@ -760,7 +782,7 @@ function renderLogTable(currentMidPrice) {
       beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
     }
 
-    // Инкрементальный патч: обновляем ячейку BE в уже существующей DOM-строке
+    // ИСПРАВЛЕНИЕ БАГА ИСКАЖЕНИЯ ЦЕН: Точечно обновляем ячейку BE, но НЕ блокируем первоначальный рендеринг исторических данных
     if (!isNewRow) {
       if (tr.cells && tr.cells[6]) {
         tr.cells[6].innerHTML = beCellMarkup;
@@ -775,21 +797,34 @@ function renderLogTable(currentMidPrice) {
 
     let detailsCellContent = `<div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>`;
 
-    let actionCellMarkup = "—";
-    if (item.outcome !== "closed") {
+    // SVG-корзина внедрена в дизайн-систему (используются классы google-copy-btn и btn-red)
+    let actionCellMarkup = "";
+    const deleteBtnMarkup = `
+      <button onclick="event.stopPropagation(); deleteOrderFromLog(${item.id})" class="google-copy-btn btn-red" style="width:24px; height:24px;" title="Полностью удалить ордер из истории">
+        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:var(--text-muted); transition:fill 0.2s ease;">
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+        </svg>
+      </button>`;
+
+    if (item.outcome === "closed") {
+      actionCellMarkup = deleteBtnMarkup;
+    } else {
       actionCellMarkup = `
-        <button onclick="event.stopPropagation(); forceCloseOrder(${item.id})" class="log-close-trigger" title="Завершить сделку вручную (приглушить строчку)">
-          ✕
-        </button>`;
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button onclick="event.stopPropagation(); forceCloseOrder(${item.id})" class="log-close-trigger" title="Завершить сделку вручную (приглушить строчку)">
+            ✕
+          </button>
+          ${deleteBtnMarkup}
+        </div>`;
     }
 
+    // ФИКСАЦИЯ ИСТОРИЧЕСКИХ ДАННЫХ: Привязываемся СТРОГО к сохраненным параметрам item.tp и item.sl, а не к текущим данным калькулятора
     const combinedTpSlMarkup = `
       <div style="display:flex; flex-direction:column; gap:1px; line-height:1.2;">
         <span style="color:var(--c-green); font-weight:700;">${item.tp}</span>
         <span style="color:var(--c-red); font-weight:600; opacity:0.85;">${item.sl}</span>
       </div>`;
 
-    // ОБЪЕДИНЕННАЯ СТРУКТУРА ДЛЯ СТОЛБЦА РЕЖИМ / ТИП ОРДЕРА
     const combinedMarketTypeMarkup = `
       <div style="display:flex; flex-direction:column; line-height:1.2;">
         <span class="${item.badgeClass}" style="font-weight:700;">${item.market}</span>
@@ -856,10 +891,13 @@ function syncLogVisibilityState() {
   }
 }
 
+// ФИКС МГНОВЕННОЙ ОЧИСТКИ: Принудительно затираем DOM-таблицу, предотвращая появление фантомных данных
 function clearLog() {
   if (confirm("Очистить всю историю журнала расчетов?")) {
     tradingLog = [];
     localStorage.removeItem("bybit_trading_log");
+    const tbody = document.getElementById("log-table-body");
+    if (tbody) tbody.innerHTML = "";
     renderLogTable();
   }
 }
@@ -869,7 +907,7 @@ function exportLogToCSV() {
     return alert("Журнал пуст. Нечего экспортировать.");
   let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
   csvContent +=
-    "Дата и Время;Деп;Пара;Плечо;Рынок;Тип Ордера;Цена Входа;TP;SL;Объем и Монеты\r\n";
+    "Дата и Время;Депозит;Пара;Плечо;Режим / Тип;Вход (USDT);БУ;TP;SL;Объем и Монеты\r\n";
 
   tradingLog.forEach((row) => {
     const line = [
@@ -877,9 +915,9 @@ function exportLogToCSV() {
       row.dep || "—",
       row.pair,
       row.leverage || "",
-      row.market,
-      row.type,
+      `${row.market} / ${row.type}`,
       row.entry,
+      row.bePrice,
       row.tp,
       row.sl,
       row.details,
@@ -992,12 +1030,17 @@ function injectPriceToCalculator(value) {
   calculate();
 }
 
+// ФИКС УТЕЧКИ ИНТЕРВАЛОВ: Тотальное и гарантированное уничтожение старых таймеров ДО перезаписи переменных ссылок
 function initWebSocketInformer() {
+  if (informerPingInterval) clearInterval(informerPingInterval);
+  if (informerCountdownInterval) clearInterval(informerCountdownInterval);
+  if (informerFlatTimeout) clearTimeout(informerFlatTimeout);
+
   if (informerWs) {
-    clearInterval(informerPingInterval);
-    clearInterval(informerCountdownInterval);
-    clearTimeout(informerFlatTimeout);
-    informerWs.close();
+    try {
+      informerWs.close();
+    } catch (e) {}
+    informerWs = null;
   }
 
   localCachedBid = 0;
