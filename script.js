@@ -353,21 +353,24 @@ function calculate() {
     const exitFeeSL = 0.00055,
       exitFeeTP = 0.00055;
 
+    // СТРОГОЕ ИСПРАВЛЕНИЕ МАТЕМАТИКИ: Делим процент риска на leverage, а не на статичную пятерку
     if (currentSide === "Long") {
-      sl = entryPrice * ((1 - rPct / 5 - entryFee) / (1 + exitFeeSL));
+      sl = entryPrice * ((1 - rPct / leverage - entryFee) / (1 + exitFeeSL));
       tp =
         entryPrice *
-        ((1 + (rewardMultiplier * rPct) / 5 + entryFee) / (1 - exitFeeTP));
+        ((1 + (rewardMultiplier * rPct) / leverage + entryFee) /
+          (1 - exitFeeTP));
       liq = entryPrice * (1 - 1 / leverage + MMR);
       pctChangeSL = ((sl - entryPrice) / entryPrice) * 100;
       pctChangeTP = ((tp - entryPrice) / entryPrice) * 100;
       bybitRawProfit = (tp - entryPrice) * qty;
       bybitRawLoss = (entryPrice - sl) * qty;
     } else {
-      sl = entryPrice * ((1 + rPct / 5 + entryFee) / (1 - exitFeeSL));
+      sl = entryPrice * ((1 + rPct / leverage + entryFee) / (1 - exitFeeSL));
       tp =
         entryPrice *
-        ((1 - (rewardMultiplier * rPct) / 5 - entryFee) / (1 + exitFeeTP));
+        ((1 - (rewardMultiplier * rPct) / leverage - entryFee) /
+          (1 + exitFeeTP));
       liq = entryPrice * (1 + 1 / leverage - MMR);
       pctChangeSL = ((entryPrice - sl) / entryPrice) * 100;
       pctChangeTP = ((entryPrice - tp) / entryPrice) * 100;
