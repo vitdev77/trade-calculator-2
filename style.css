@@ -1193,6 +1193,7 @@ html.light-theme .table-log-counter {
   font-weight: 500;
   padding: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: left;
 }
 .premium-log-table td {
   padding: 8px 10px;
