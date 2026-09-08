@@ -810,7 +810,7 @@ function renderLogTable(currentMidPrice) {
       actionCellMarkup = deleteBtnMarkup;
     } else {
       actionCellMarkup = `
-        <div style="display:flex; align-items:center; gap:6px;">
+        <div style="display:flex; align-items:center; gap:6px; justify-content: right;">
           <button onclick="event.stopPropagation(); forceCloseOrder(${item.id})" class="log-close-trigger" title="Завершить сделку вручную (приглушить строчку)">
             ✕
           </button>
@@ -827,7 +827,7 @@ function renderLogTable(currentMidPrice) {
 
     const combinedMarketTypeMarkup = `
       <div style="display:flex; flex-direction:column; line-height:1.2;">
-        <span class="${item.badgeClass}" style="font-weight:700;">${item.market}</span>
+        <span class="${item.badgeClass}" style="font-weight:800; text-transform: uppercase;">${item.market}</span>
         <span style="color:var(--text-muted); font-size:9px; font-weight:500; margin-top:1px;">${item.type}</span>
       </div>`;
 
