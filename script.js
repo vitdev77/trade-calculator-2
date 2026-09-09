@@ -305,6 +305,7 @@ function calculate() {
   const marketVolatility = cachedVolatilityATR[selectedPair] || 0.025;
   let leverage = config.baseLeverage;
   if (currentTab === "futures") {
+    /* ЖЕСТКАЯ СИНХРОНИЗАЦИЯ: Округляем плечо СРАЗУ, чтобы исключить расхождения в формулах SL/TP/Liq */
     leverage = Math.max(
       1,
       Math.min(
@@ -891,7 +892,6 @@ function syncLogVisibilityState() {
   }
 }
 
-// ФИКС МГНОВЕННОЙ ОЧИСТКИ: Принудительно затираем DOM-таблицу, предотвращая появление фантомных данных
 function clearLog() {
   if (confirm("Очистить всю историю журнала расчетов?")) {
     tradingLog = [];
@@ -944,6 +944,7 @@ function handlePairChange() {
   initWebSocketInformer();
 }
 
+/* ЭЛЕГАНТНОЕ ИСПРАВЛЕНИЕ: Переключаем класс без деструктуризации DOM, убирая любые смещения */
 function copyData(elementId, btnElement) {
   const valueText = document.getElementById(elementId).innerText;
   if (valueText === "—" || btnElement.closest(".disabled-element")) return;
@@ -953,14 +954,11 @@ function copyData(elementId, btnElement) {
     : valueText;
   navigator.clipboard.writeText(textToCopy);
 
-  const oldSvg = btnElement.innerHTML;
-  btnElement.innerHTML = `<svg class="icon-copy" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
   btnElement.classList.add("copied");
 
   setTimeout(() => {
-    btnElement.innerHTML = oldSvg;
     btnElement.classList.remove("copied");
-  }, 1200);
+  }, 1250);
 }
 
 function resetTerminal() {
@@ -1030,14 +1028,18 @@ function injectPriceToCalculator(value) {
   calculate();
 }
 
-// ФИКС УТЕЧКИ ИНТЕРВАЛОВ: Тотальное и гарантированное уничтожение старых таймеров ДО перезаписи переменных ссылок
 function initWebSocketInformer() {
   if (informerPingInterval) clearInterval(informerPingInterval);
   if (informerCountdownInterval) clearInterval(informerCountdownInterval);
   if (informerFlatTimeout) clearTimeout(informerFlatTimeout);
 
+  /* ИСПРАВЛЕНИЕ УТЕЧКИ: Полное зануление сетевых слушателей перед закрытием сокета */
   if (informerWs) {
     try {
+      informerWs.onopen = null;
+      informerWs.onmessage = null;
+      informerWs.onerror = null;
+      informerWs.onclose = null;
       informerWs.close();
     } catch (e) {}
     informerWs = null;

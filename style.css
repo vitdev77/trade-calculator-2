@@ -912,20 +912,46 @@ html.light-theme .field-sub {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  transition:
+    transform 0.1s ease,
+    background 0.2s ease !important;
 }
+.google-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+html.light-theme .google-copy-btn:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
 .google-copy-btn .icon-copy {
-  width: 18px;
-  height: 18px;
-  fill: var(--text-muted);
+  width: 16px !important;
+  height: 16px !important;
+  fill: var(--text-muted) !important;
+  transition:
+    fill 0.2s ease,
+    transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: block;
 }
 .btn-orange:hover .icon-copy {
-  fill: var(--c-orange);
+  fill: var(--c-orange) !important;
 }
 .btn-green:hover .icon-copy {
-  fill: var(--c-green);
+  fill: var(--c-green) !important;
 }
 .btn-red:hover .icon-copy {
-  fill: var(--c-red);
+  fill: var(--c-red) !important;
+}
+
+/* ИНЖЕНЕРНЫЙ МОРФИНГ: Подменяем внутренний вектор пути SVG на лету, сохраняя идеальный центр */
+.google-copy-btn.copied .icon-copy {
+  fill: var(--c-green) !important;
+  transform: scale(1.2) rotate(360deg);
+}
+.google-copy-btn.copied .icon-copy path {
+  d: path("M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
+}
+.google-copy-btn:active {
+  transform: scale(0.85);
 }
 
 .disabled-element {
