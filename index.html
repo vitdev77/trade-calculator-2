@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bybit Премиум Терминал</title>
+    <!-- ПРОФЕССИОНАЛЬНЫЙ СТАТИЧЕСКИЙ FAVICON В BASE64: Абсолютно автономен и завязан на HTML -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHBvbHlnb24gcG9pbnRzPScxNiwyIDI5LDkuNSAyOSwyNC41IDE2LDMyIDMsMjQuNSAzLDkuNScgZmlsbD0nbm9uZScgc3Ryb2tlPScjZmZiMTFhJyBzdHJva2Utd2lkdGg9JzIuNScvPjxwYXRoIGQ9J005IDE5IGw3IC04IGw3IDgnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzAwZmY5ZCcgc3Ryb2tlLXdpZHRoPSczJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnLz48L3N2Zz4=" />
     <link rel="stylesheet" href="./style.css" />
     <script>
       // ЖЕСТКАЯ FLICKER-ЗАЩИТА: Проверяем все состояния DO рендеринга страницы
@@ -26,8 +28,8 @@
     </script>
   </head>
   <body>
-    <!-- === КОНЕЦ ЧАСТИ 1 === -->
-    <!-- === НАЧАЛО ЧАСТИ 2 === -->
+<!-- === КОНЕЦ ЧАСТИ 1 === -->
+<!-- === НАЧАЛО ЧАСТИ 2 === -->
     <!-- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
     <div class="terminal-top-bar">
       <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА И КНОПКИ РИСКА -->
@@ -135,8 +137,8 @@
           <span id="live-funding-time" class="funding-time-val">--:--:--</span>
         </div>
       </div>
-      <!-- === КОНЕЦ ЧАСТИ 2 === -->
-      <!-- === НАЧАЛО ЧАСТИ 3 === -->
+<!-- === КОНЕЦ ЧАСТИ 2 === -->
+<!-- === НАЧАЛО ЧАСТИ 3 === -->
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
         <div class="input-item full-width">
@@ -250,8 +252,8 @@
           </button>
         </div>
       </div>
-      <!-- === КОНЕЦ ЧАСТИ 3 === -->
-      <!-- === НАЧАЛО ЧАСТИ 4 === -->
+<!-- === КОНЕЦ ЧАСТИ 3 === -->
+<!-- === НАЧАЛО ЧАСТИ 4 === -->
       <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="panel-right">
         <div class="results-display">
@@ -320,18 +322,12 @@
               </div>
             </div>
           </div>
-          <!-- === КОНЕЦ ЧАСТИ 4 === -->
-          <!-- === НАЧАЛО ЧАСТИ 5 === -->
-          <div class="results-section">
-            <!-- КОНТРОЛЬНЫЙ ДУБЛИКАТ ЦЕНЫ ВХОДА С ДИНАМИЧЕСКИМ ЛЕЙБЛОМ -->
+<!-- === КОНЕЦ ЧАСТИ 4 === -->
+<!-- === НАЧАЛО ЧАСТИ 5 === -->
             <div class="display-row val-orange-text">
               <div class="field-info">
-                <span class="field-name" id="res-entry-label"
-                  >Цена входа (USDT)</span
-                >
-                <span class="field-sub"
-                  >Контрольный дубль цены из калькулятора</span
-                >
+                <span class="field-name" id="res-entry-label">Цена входа (USDT)</span>
+                <span class="field-sub">Контрольный дубль цены из калькулятора</span>
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-entry-dup">—</span>
@@ -354,9 +350,7 @@
                 <span class="field-name">Тейк Профит</span>
                 <span class="field-sub">
                   <span id="pct-tp">+0.78%</span>
-                  <span id="cash-tp" style="opacity: 0.8; margin-left: 4px"
-                    >(+$4.00)</span
-                  >
+                  <span id="cash-tp" style="opacity: 0.8; margin-left: 4px">(+$4.00)</span>
                 </span>
               </div>
               <div class="value-action">
@@ -379,9 +373,7 @@
                 <span class="field-name">Стоп Лосс</span>
                 <span class="field-sub">
                   <span id="pct-sl">-0.39%</span>
-                  <span id="cash-sl" style="opacity: 0.8; margin-left: 4px"
-                    >(-$2.00)</span
-                  >
+                  <span id="cash-sl" style="opacity: 0.8; margin-left: 4px">(-$2.00)</span>
                 </span>
               </div>
               <div class="value-action">
@@ -411,7 +403,6 @@
               </div>
             </div>
 
-            <!-- МОДИФИКАЦИЯ: РАСШИРЕННЫЙ КАНАЛ ИНФОРМАТИВНОЙ ШКАЛЫ СОВЕТНИКА -->
             <div
               id="res-liq-bar-wrapper"
               style="width: 100%; display: none; margin: 4px 0 8px 0"
@@ -448,14 +439,10 @@
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Запас маржи (Остаток)</span>
-                <span class="field-sub" id="margin-trades"
-                  >Запас на 4 сделки</span
-                >
+                <span class="field-sub" id="margin-trades">Запас на 4 сделки</span>
               </div>
               <div class="value-action">
-                <span class="display-value small-val" id="res-margin-free"
-                  >$80.00</span
-                >
+                <span class="display-value small-val" id="res-margin-free">$80.00</span>
               </div>
             </div>
           </div>
@@ -466,9 +453,7 @@
           >
             <div class="analytic-footer-item">
               <span class="an-label">Депозит</span>
-              <span class="an-value an-v-blue" id="res-analytics-balance"
-                >$100.00</span
-              >
+              <span class="an-value an-v-blue" id="res-analytics-balance">$100.00</span>
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">Риск</span>
@@ -476,9 +461,7 @@
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">Объем сделки</span>
-              <span class="an-value an-v-main" id="res-volume-badge"
-                >$400.00</span
-              >
+              <span class="an-value an-v-main" id="res-volume-badge">$400.00</span>
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">P/R Ratio</span>
@@ -529,9 +512,8 @@
         </div>
       </div>
     </div>
-    <!-- ЗДЕСЬ МЫ ЗАКРЫЛИ .glass-container ОСТАВИВ КАЛЬКУЛЯТОР НЕЗАВИСИМЫМ -->
-    <!-- === КОНЕЦ ЧАСТИ 5 === -->
-    <!-- === НАЧАЛО ЧАСТИ 6 === -->
+<!-- === КОНЕЦ ЧАСТИ 5 === -->
+<!-- === НАЧАЛО ЧАСТИ 6 === -->
     <!-- НЕЗАВИСИМЫЙ ШИРОКИЙ ДАШБОРД ЖУРНАЛА ОРДЕРОВ -->
     <div
       class="table-log-container standalone-log-layout"

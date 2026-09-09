@@ -60,12 +60,12 @@ function toggleTheme() {
     currentTheme = "light";
     document.documentElement.classList.add("light-theme");
     if (btn)
-      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg>`;
+      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg>`;
   } else {
     currentTheme = "dark";
     document.documentElement.classList.remove("light-theme");
     if (btn)
-      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>`;
+      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focus0able="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>`;
   }
   saveToStorage();
 }
@@ -78,7 +78,7 @@ function loadFromStorage() {
   if (currentTheme === "light") {
     document.documentElement.classList.add("light-theme");
     if (btn)
-      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg>`;
+      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg>`;
   } else {
     document.documentElement.classList.remove("light-theme");
     if (btn)
@@ -113,7 +113,6 @@ function loadFromStorage() {
       coinConfig[selectedPair].price;
   }
 
-  // ИСПРАВЛЕНИЕ: Прямой поиск ID без Math.round защищает от сбоев кэша при инициализации
   document
     .querySelectorAll(".risk-toggle-btn")
     .forEach((b) => b.classList.remove("active"));
@@ -129,7 +128,7 @@ function restoreTabsVisualOnly() {
   const themeBtn = document.getElementById("theme-toggle-btn");
   if (themeBtn) {
     if (currentTheme === "light") {
-      themeBtn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.45-1-1-1-1-1s1.45,13,2,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg>`;
+      themeBtn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg>`;
     } else {
       themeBtn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>`;
     }
@@ -167,7 +166,6 @@ function restoreTabsVisualOnly() {
   const targetRiskBtn = document.getElementById(`risk-${currentRiskPercent}`);
   if (targetRiskBtn) targetRiskBtn.classList.add("active");
 
-  // ИСПРАВЛЕНИЕ: Жесткая фиксация лаконичного имени лейбла без динамики
   const targetValueSpan = document.querySelector(
     ".analytic-footer-item span.an-v-red",
   );
@@ -180,8 +178,13 @@ function restoreTabsVisualOnly() {
 
   const entryLabel = document.getElementById("entry-label");
   const resEntryLabel = document.getElementById("res-entry-label");
-  /* === КОНЕЦ ЧАСТИ 5 === */
-  /* === НАЧАЛО ЧАСТИ 6 === */
+}
+/* === КОНЕЦ ЧАСТИ 5 === */
+/* === НАЧАЛО ЧАСТИ 6 === */
+function updateOrderLabels() {
+  const entryLabel = document.getElementById("entry-label");
+  const resEntryLabel = document.getElementById("res-entry-label");
+
   if (currentOrderType === "market") {
     if (entryLabel) entryLabel.innerText = "Текущая цена Bybit (USDT)";
     if (resEntryLabel) resEntryLabel.innerText = "Текущая цена Bybit (USDT)";
@@ -246,6 +249,7 @@ function setOrderType(type) {
   const selectedPair = document.getElementById("pair").value;
   if (entryInput) entryInput.value = coinConfig[selectedPair].price;
   restoreTabsVisualOnly();
+  if (typeof updateOrderLabels === "function") updateOrderLabels();
   saveToStorage();
   calculate();
 }
@@ -354,7 +358,6 @@ function calculate() {
     const exitFeeSL = 0.00055,
       exitFeeTP = 0.00055;
 
-    // СТРОГОЕ ИСПРАВЛЕНИЕ МАТЕМАТИКИ: Делим процент риска на leverage, а не на статичную пятерку
     if (currentSide === "Long") {
       sl = entryPrice * ((1 - rPct / leverage - entryFee) / (1 + exitFeeSL));
       tp =
@@ -602,7 +605,6 @@ function pushToLogManual() {
         ? `log-badge-${currentSide.toLowerCase()}`
         : "log-badge-long",
     pair: pairText,
-    // МОДИФИКАЦИЯ: Замена сокращенных названий типов на развернутые биржевые термины
     type: currentOrderType === "limit" ? "Лимитный" : "Рыночный",
     entry: entryPrice,
     bePrice: computedBePrice,
@@ -663,44 +665,45 @@ function pushToLogManual() {
 }
 /* === КОНЕЦ ЧАСТИ 12 === */
 /* === НАЧАЛО ЧАСТИ 13 === */
-// РЕАКТИВНАЯ РУЧНАЯ МОДИФИКАЦИЯ: Переводим строку в приглушенный стейт С ПОДТВЕРЖДЕНИЕМ
 function forceCloseOrder(id) {
   const targetOrder = tradingLog.find((o) => o.id === id);
   if (!targetOrder) return;
 
-  // ОКНО АЛЕРТА: Запрашиваем жесткое подтверждение трейдера перед архивацией
   const confirmClose = confirm(
-    `Вы уверены, что хотите завершить ордер по паре ${targetOrder.pair}?\nСтрока будет приглушена, кнопка управления удалена.`,
+    "Вы уверены, что хотите завершить ордер по паре " +
+      targetOrder.pair +
+      "?\nСтрока будет приглушена, кнопка управления удалена.",
   );
-  if (!confirmClose) return; // Прерываем выполнение, если нажата отмена
+  if (!confirmClose) return;
 
   targetOrder.outcome = "closed";
   localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
 
-  // Точечно тушим строку в DOM без жесткой перезаписи innerHTML
-  const tr = document.querySelector(`tr[data-id="${id}"]`);
+  const tr = document.querySelector("tr[data-id='" + id + "']");
   if (tr) {
-    tr.classList.add("historical-closed-row");
-    // Перерисовываем ячейку действия, оставляя только кнопку полного удаления в стиле приложения
+    tr.className = tr.className + " historical-closed-row";
     const actionCell = tr.cells[tr.cells.length - 1];
     if (actionCell) {
-      actionCell.innerHTML = `
-        <button onclick="event.stopPropagation(); deleteOrderFromLog(${id})" class="google-copy-btn btn-red" style="width:24px; height:24px;" title="Полностью удалить ордер из истории">
-          <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:var(--text-muted); transition:fill 0.2s ease;">
-            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-          </svg>
-        </button>`;
+      actionCell.innerHTML =
+        "<button onclick='event.stopPropagation(); deleteOrderFromLog(" +
+        id +
+        ")' class='google-copy-btn btn-red' style='width:24px; height:24px;' title='Полностью удалить ордер из истории'>" +
+        "<svg viewBox='0 0 24 24' style='width:14px; height:14px; fill:var(--text-muted); transition:fill 0.2s ease;'>" +
+        "<path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/>" +
+        "</svg>" +
+        "</button>";
     }
   }
 }
 
-// НОВАЯ ФУНКЦИЯ: Полное физическое удаление записи из массива и локального хранилища
 function deleteOrderFromLog(id) {
   const targetOrder = tradingLog.find((o) => o.id === id);
   if (!targetOrder) return;
 
   const confirmDelete = confirm(
-    `Вы уверены, что хотите ПОЛНОСТЬЮ удалить расчет по паре ${targetOrder.pair} из журнала безвозвратно?`,
+    "Вы уверены, что хотите ПОЛНОСТЬЮ удалить расчет по паре " +
+      targetOrder.pair +
+      " из журнала безвозвратно?",
   );
   if (!confirmDelete) return;
 
@@ -727,8 +730,7 @@ function renderLogTable(currentMidPrice) {
     const isSamePair = currentSelectedPair === cleanPairName;
     currentLogIds.add(item.id.toString());
 
-    // Чистый инкрементальный патч DOM
-    let tr = document.querySelector(`tr[data-id="${item.id}"]`);
+    let tr = document.querySelector("tr[data-id='" + item.id + "']");
     const isNewRow = !tr;
 
     if (isNewRow) {
@@ -736,7 +738,6 @@ function renderLogTable(currentMidPrice) {
       tr.setAttribute("data-id", item.id);
     }
 
-    // Приглушаем строку на 65%, если выставился ручной флаг closed
     if (item.outcome === "closed") {
       tr.className = item.sideClass + " historical-closed-row";
     } else {
@@ -745,7 +746,8 @@ function renderLogTable(currentMidPrice) {
 
     const displayDate = item.date || "—";
     const leverageMarkup = item.leverage
-      ? `${item.leverage}<span style="opacity:0.5; font-size:9px; margin-left:1px; font-weight:700; text-transform:lowercase;">x</span>`
+      ? item.leverage +
+        "<span style='opacity:0.5; font-size:9px; margin-left:1px; font-weight:700; text-transform:lowercase;'>x</span>"
       : "";
     const displayDep = item.dep || "—";
     /* === КОНЕЦ ЧАСТИ 13 === */
@@ -755,7 +757,6 @@ function renderLogTable(currentMidPrice) {
       : 2;
     const formattedBe = item.bePrice ? item.bePrice.toFixed(decimals) : "—";
 
-    // УЛУЧШЕННАЯ ЛОГИКА: Флаг активируется либо по живой цене (для текущей пары), либо берется из памяти (если БУ был достигнут ранее)
     let isBeReached = !!item.isBePersistent;
 
     if (
@@ -767,23 +768,31 @@ function renderLogTable(currentMidPrice) {
     ) {
       if (item.rawSide === "Long" && currentMidPrice >= item.bePrice) {
         isBeReached = true;
-        item.isBePersistent = true; // Запоминаем состояние в объекте
+        item.isBePersistent = true;
       } else if (item.rawSide === "Short" && currentMidPrice <= item.bePrice) {
         isBeReached = true;
-        item.isBePersistent = true; // Запоминаем состояние в объекте
+        item.isBePersistent = true;
       }
     }
 
     let beCellMarkup = "";
     if (item.outcome === "closed") {
-      beCellMarkup = `<span style="color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;">${formattedBe}</span>`;
+      beCellMarkup =
+        "<span style='color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;'>" +
+        formattedBe +
+        "</span>";
     } else if (isBeReached) {
-      beCellMarkup = `<span class="be-reached-glow" style="font-weight:700; padding: 2px 6px; border-radius: 4px; display: inline-block;">${formattedBe}</span>`;
+      beCellMarkup =
+        "<span class='be-reached-glow' style='font-weight:700; padding: 2px 6px; border-radius: 4px; display: inline-block;'>" +
+        formattedBe +
+        "</span>";
     } else {
-      beCellMarkup = `<span style="color:var(--text-muted); font-weight:500;">${formattedBe}</span>`;
+      beCellMarkup =
+        "<span style='color:var(--text-muted); font-weight:500;'>" +
+        formattedBe +
+        "</span>";
     }
 
-    // ИСПРАВЛЕНИЕ БАГА ИСКАЖЕНИЯ ЦЕН: Точечно обновляем ячейку BE, но НЕ блокируем первоначальный рендеринг исторических данных
     if (!isNewRow) {
       if (tr.cells && tr.cells[6]) {
         tr.cells[6].innerHTML = beCellMarkup;
@@ -793,66 +802,111 @@ function renderLogTable(currentMidPrice) {
 
     let titleTooltip =
       item.bybitTpData && item.bybitSlData
-        ? `Bybit Ориентиры:\nTP: ${item.bybitTpData}\nSL: ${item.bybitSlData}`
+        ? /* Избегаем символов переноса строки внутри разметки, кодируем для безопасности */
+          "Bybit Ориентиры: TP: " +
+          item.bybitTpData +
+          " SL: " +
+          item.bybitSlData
         : "Расчет объема позиции";
 
-    let detailsCellContent = `<div style="color:var(--c-orange); font-size:10px; cursor:help;" title="${titleTooltip}">${item.details}</div>`;
+    let detailsCellContent =
+      "<div style='color:var(--c-orange); font-size:10px; cursor:help;' title='" +
+      titleTooltip +
+      "'>" +
+      item.details +
+      "</div>";
 
-    // SVG-корзина внедрена в дизайн-систему (используются классы google-copy-btn и btn-red)
     let actionCellMarkup = "";
-    const deleteBtnMarkup = `
-      <button onclick="event.stopPropagation(); deleteOrderFromLog(${item.id})" class="google-copy-btn btn-red" style="width:24px; height:24px;" title="Полностью удалить ордер из истории">
-        <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:var(--text-muted); transition:fill 0.2s ease;">
-          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-        </svg>
-      </button>`;
+    const deleteBtnMarkup =
+      "<button onclick='event.stopPropagation(); deleteOrderFromLog(" +
+      item.id +
+      ")' class='google-copy-btn btn-red' style='width:24px; height:24px;' title='Полностью удалить ордер из истории'>" +
+      "<svg viewBox='0 0 24 24' style='width:14px; height:14px; fill:var(--text-muted); transition:fill 0.2s ease;'>" +
+      "<path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/>" +
+      "</svg>" +
+      "</button>";
 
     if (item.outcome === "closed") {
-      actionCellMarkup = `<div style="display:flex; align-items:center; gap:6px; justify-content: right;">${deleteBtnMarkup}</div>`;
+      actionCellMarkup =
+        "<div style='display:flex; align-items:center; gap:6px; justify-content: right;'>" +
+        deleteBtnMarkup +
+        "</div>";
     } else {
-      actionCellMarkup = `
-        <div style="display:flex; align-items:center; gap:6px; justify-content: right;">
-          <button onclick="event.stopPropagation(); forceCloseOrder(${item.id})" class="log-close-trigger" title="Завершить сделку вручную (приглушить строчку)">
-            ✕
-          </button>
-          ${deleteBtnMarkup}
-        </div>`;
+      actionCellMarkup =
+        "<div style='display:flex; align-items:center; gap:6px; justify-content: right;'>" +
+        "<button onclick='event.stopPropagation(); forceCloseOrder(" +
+        item.id +
+        ")' class='log-close-trigger' title='Завершить сделку вручную (приглушить строчку)'>" +
+        "✕" +
+        "</button>" +
+        deleteBtnMarkup +
+        "</div>";
     }
 
-    // ФИКСАЦИЯ ИСТОРИЧЕСКИХ ДАННЫХ: Привязываемся СТРОГО к сохраненным параметрам item.tp и item.sl, а не к текущим данным калькулятора
-    const combinedTpSlMarkup = `
-      <div style="display:flex; flex-direction:column; gap:1px; line-height:1.2;">
-        <span style="color:var(--c-green); font-weight:700;">${item.tp}</span>
-        <span style="color:var(--c-red); font-weight:600; opacity:0.85;">${item.sl}</span>
-      </div>`;
+    const combinedTpSlMarkup =
+      "<div style='display:flex; flex-direction:column; gap:1px; line-height:1.2;'>" +
+      "<span style='color:var(--c-green); font-weight:700;'>" +
+      item.tp +
+      "</span>" +
+      "<span style='color:var(--c-red); font-weight:600; opacity:0.85;'>" +
+      item.sl +
+      "</span>" +
+      "</div>";
 
-    const combinedMarketTypeMarkup = `
-      <div style="display:flex; flex-direction:column; line-height:1.2;">
-        <span class="${item.badgeClass}" style="font-weight:800; text-transform: uppercase;">${item.market}</span>
-        <span style="color:var(--text-muted); font-size:9px; font-weight:500; margin-top:1px;">${item.type}</span>
-      </div>`;
+    const combinedMarketTypeMarkup =
+      "<div style='display:flex; flex-direction:column; line-height:1.2;'>" +
+      "<span class='" +
+      item.badgeClass +
+      "' style='font-weight:800; text-transform: uppercase;'>" +
+      item.market +
+      "</span>" +
+      "<span style='color:var(--text-muted); font-size:9px; font-weight:500; margin-top:1px;'>" +
+      item.type +
+      "</span>" +
+      "</div>";
 
-    tr.innerHTML = `
-      <td>
-        <div style="display:flex; flex-direction:column; line-height:1.3; font-size:11px;">
-          <span style="color:var(--text-main); font-weight:700;">${displayDate}</span>
-          <span style="color:var(--text-muted); font-size:9px; font-weight:500;">${item.time}</span>
-        </div>
-      </td>
-      <td style="color:var(--text-main); font-weight:700;">${displayDep}</td>
-      <td>${item.pair}</td>
-      <td style="color:var(--text-main); font-weight:700;">${leverageMarkup}</td>
-      <td>${combinedMarketTypeMarkup}</td>
-      <td>${item.entry}</td>
-      <td>${beCellMarkup}</td>
-      <td>${combinedTpSlMarkup}</td>
-      <td>${detailsCellContent}</td>
-      <td>${actionCellMarkup}</td>
-    `;
+    tr.innerHTML =
+      "<td>" +
+      "<div style='display:flex; flex-direction:column; line-height:1.3; font-size:11px;'>" +
+      "<span style='color:var(--text-main); font-weight:700;'>" +
+      displayDate +
+      "</span>" +
+      "<span style='color:var(--text-muted); font-size:9px; font-weight:500;'>" +
+      item.time +
+      "</span>" +
+      "</div>" +
+      "</td>" +
+      "<td style='color:var(--text-main); font-weight:700;'>" +
+      displayDep +
+      "</td>" +
+      "<td>" +
+      item.pair +
+      "</td>" +
+      "<td style='color:var(--text-main); font-weight:700;'>" +
+      leverageMarkup +
+      "</td>" +
+      "<td>" +
+      combinedMarketTypeMarkup +
+      "</td>" +
+      "<td>" +
+      item.entry +
+      "</td>" +
+      "<td>" +
+      beCellMarkup +
+      "</td>" +
+      "<td>" +
+      combinedTpSlMarkup +
+      "</td>" +
+      "<td>" +
+      detailsCellContent +
+      "</td>" +
+      "<td>" +
+      actionCellMarkup +
+      "</td>";
+
     tbody.appendChild(tr);
   });
 
-  // Удаление фантомных записей из таблицы
   Array.from(tbody.querySelectorAll("tr[data-id]")).forEach((row) => {
     const rowId = row.getAttribute("data-id");
     if (!currentLogIds.has(rowId)) row.remove();
@@ -911,11 +965,11 @@ function exportLogToCSV() {
 
   tradingLog.forEach((row) => {
     const line = [
-      `${row.date || "—"} ${row.time}`,
+      (row.date || "—") + " " + row.time,
       row.dep || "—",
       row.pair,
       row.leverage || "",
-      `${row.market} / ${row.type}`,
+      row.market + " / " + row.type,
       row.entry,
       row.bePrice,
       row.tp,
@@ -930,7 +984,7 @@ function exportLogToCSV() {
   link.setAttribute("href", encodedUri);
   link.setAttribute(
     "download",
-    `Bybit_Risk_Log_${new Date().toISOString().slice(0, 10)}.csv`,
+    "Bybit_Risk_Log_" + new Date().toISOString().slice(0, 10) + ".csv",
   );
   document.body.appendChild(link);
   link.click();
@@ -944,7 +998,6 @@ function handlePairChange() {
   initWebSocketInformer();
 }
 
-/* ЭЛЕГАНТНОЕ ИСПРАВЛЕНИЕ: Переключаем класс без деструктуризации DOM, убирая любые смещения */
 function copyData(elementId, btnElement) {
   const valueText = document.getElementById(elementId).innerText;
   if (valueText === "—" || btnElement.closest(".disabled-element")) return;
@@ -1005,9 +1058,12 @@ const INF_CRITICAL_LIMIT = 0.05;
 let localCachedBid = 0;
 let localCachedAsk = 0;
 
-const SVG_TREND_UP = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-green); filter: drop-shadow(0 0 6px var(--c-green-glow)); vertical-align:middle; display:inline-block;'><path d='M12 3l10 16H2z'/></svg>`;
-const SVG_TREND_DOWN = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-red); filter: drop-shadow(0 0 6px var(--c-red-glow)); vertical-align:middle; display:inline-block;'><path d='M12 21L2 5h20z'/></svg>`;
-const SVG_TREND_FLAT = `<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--text-muted); opacity:0.4; vertical-align:middle; display:inline-block;'><path d='M20 13H4v-2h16z'/></svg>`;
+const SVG_TREND_UP =
+  "<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-green); filter: drop-shadow(0 0 6px var(--c-green-glow)); vertical-align:middle; display:inline-block;'><path d='M12 3l10 16H2z'/></svg>";
+const SVG_TREND_DOWN =
+  "<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--c-red); filter: drop-shadow(0 0 6px var(--c-red-glow)); vertical-align:middle; display:inline-block;'><path d='M12 21L2 5h20z'/></svg>";
+const SVG_TREND_FLAT =
+  "<svg viewBox='0 0 24 24' style='width:22px; height:22px; fill:var(--text-muted); opacity:0.4; vertical-align:middle; display:inline-block;'><path d='M20 13H4v-2h16z'/></svg>";
 
 function injectPriceToCalculator(value) {
   if (!value || isNaN(value) || value <= 0) return;
@@ -1033,7 +1089,6 @@ function initWebSocketInformer() {
   if (informerCountdownInterval) clearInterval(informerCountdownInterval);
   if (informerFlatTimeout) clearTimeout(informerFlatTimeout);
 
-  /* ИСПРАВЛЕНИЕ УТЕЧКИ: Полное зануление сетевых слушателей перед закрытием сокета */
   if (informerWs) {
     try {
       informerWs.onopen = null;
@@ -1081,7 +1136,7 @@ function initWebSocketInformer() {
 
   if (livePriceEl) {
     livePriceEl.style.cursor = "copy";
-    livePriceEl.onclick = () => {
+    livePriceEl.onclick = function () {
       if (localCachedBid > 0 && localCachedAsk > 0) {
         const mid = (localCachedAsk + localCachedBid) / 2;
         injectPriceToCalculator(mid);
@@ -1090,13 +1145,13 @@ function initWebSocketInformer() {
   }
   if (askEl) {
     askEl.style.cursor = "copy";
-    askEl.onclick = () => {
+    askEl.onclick = function () {
       if (localCachedAsk > 0) injectPriceToCalculator(localCachedAsk);
     };
   }
   if (bidEl) {
     bidEl.style.cursor = "copy";
-    bidEl.onclick = () => {
+    bidEl.onclick = function () {
       if (localCachedBid > 0) injectPriceToCalculator(localCachedBid);
     };
   }
@@ -1116,28 +1171,32 @@ function initWebSocketInformer() {
 
   informerWs = new WebSocket(wsUrl);
 
-  informerWs.onopen = () => {
+  informerWs.onopen = function () {
     if (informerWs.readyState !== WebSocket.OPEN) return;
+
+    // ЖЕСТКАЯ ПРИВЯЗКА СЛУШАТЕЛЯ: Привязываем обработчик сообщений СРАЗУ при открытии канала сокета
+    informerWs.onmessage = handleInformerMessage;
+
     informerWs.send(
       JSON.stringify({
         op: "subscribe",
-        args: [`orderbook.1.${selectedPair}`],
+        args: ["orderbook.1." + selectedPair],
       }),
     );
 
     if (currentTab === "futures") {
       informerWs.send(
-        JSON.stringify({ op: "subscribe", args: [`tickers.${selectedPair}`] }),
+        JSON.stringify({ op: "subscribe", args: ["tickers." + selectedPair] }),
       );
     }
 
-    informerPingInterval = setInterval(() => {
+    informerPingInterval = setInterval(function () {
       if (informerWs && informerWs.readyState === WebSocket.OPEN)
         informerWs.send(JSON.stringify({ op: "ping" }));
     }, 20000);
 
     if (currentTab === "futures") {
-      informerCountdownInterval = setInterval(() => {
+      informerCountdownInterval = setInterval(function () {
         if (infNextFundingTimestamp <= 0) return;
         const dist = infNextFundingTimestamp - Date.now();
         if (dist <= 0) {
@@ -1148,161 +1207,193 @@ function initWebSocketInformer() {
         const m = Math.floor((dist % 3600000) / 60000);
         const s = Math.floor((dist % 60000) / 1000);
         if (fundingTimeEl)
-          fundingTimeEl.innerText = `через ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+          fundingTimeEl.innerText =
+            "через " +
+            String(h).padStart(2, "0") +
+            ":" +
+            String(m).padStart(2, "0") +
+            ":" +
+            String(s).padStart(2, "0");
       }, 1000);
     }
     calculate();
   };
-  /* === КОНЕЦ ЧАСТИ 16 === */
-  /* === НАЧАЛО ЧАСТИ 17 === */
-  informerWs.onmessage = (event) => {
-    const selectedPair = document.getElementById("pair")
-      ? document.getElementById("pair").value
-      : "BTCUSDT";
-    const informerContainer = document.querySelector(".bybit-live-informer");
-    const livePriceEl = document.getElementById("live-price");
-    const arrowEl = document.getElementById("live-arrow");
-    const askEl = document.getElementById("live-ask");
-    const bidEl = document.getElementById("live-bid");
-    const spreadEl = document.getElementById("live-spread");
-    const fundingBox = document.getElementById("live-funding-box");
-    const fundingRateEl = document.getElementById("live-funding-rate");
+}
+/* === КОНЕЦ ЧАСТИ 16 === */
+/* === НАЧАЛО ЧАСТИ 17 === */
+let lastTitleUpdateTime = 0;
 
-    const res = JSON.parse(event.data);
-    if (res.op === "pong") return;
+// ИСПРАВЛЕНИЕ ОБЛАСТИ ВИДИМОСТИ: Функция handleInformerMessage объявлена глобально, сокет цепляет её без сбоев
+function handleInformerMessage(event) {
+  const selectedPair = document.getElementById("pair")
+    ? document.getElementById("pair").value
+    : "BTCUSDT";
+  const informerContainer = document.querySelector(".bybit-live-informer");
+  const livePriceEl = document.getElementById("live-price");
+  const arrowEl = document.getElementById("live-arrow");
+  const askEl = document.getElementById("live-ask");
+  const bidEl = document.getElementById("live-bid");
+  const spreadEl = document.getElementById("live-spread");
+  const fundingBox = document.getElementById("live-funding-box");
+  const fundingRateEl = document.getElementById("live-funding-rate");
 
-    if (res.topic === `orderbook.1.${selectedPair}` && res.data) {
-      const ob = res.data;
-      let hasUpdate = false;
+  const res = JSON.parse(event.data);
+  if (res.op === "pong") return;
 
-      if (ob.b && ob.b.length > 0) {
-        localCachedBid = parseFloat(ob.b) || localCachedBid;
-        hasUpdate = true;
+  if (res.topic === "orderbook.1." + selectedPair && res.data) {
+    const ob = res.data;
+    let hasUpdate = false;
+
+    if (ob.b && ob.b.length > 0) {
+      localCachedBid = parseFloat(ob.b) || localCachedBid;
+      hasUpdate = true;
+    }
+    if (ob.a && ob.a.length > 0) {
+      localCachedAsk = parseFloat(ob.a) || localCachedAsk;
+      hasUpdate = true;
+    }
+
+    if (localCachedBid > 0 && localCachedAsk > 0 && hasUpdate) {
+      const mid = (localCachedAsk + localCachedBid) / 2;
+      const decimals = coinConfig[selectedPair]
+        ? coinConfig[selectedPair].priceDecimals
+        : 2;
+
+      if (askEl) askEl.innerText = formatSmartValue(localCachedAsk, decimals);
+      if (bidEl) bidEl.innerText = formatSmartValue(localCachedBid, decimals);
+      if (livePriceEl) livePriceEl.innerText = formatSmartValue(mid, decimals);
+
+      clearTimeout(informerFlatTimeout);
+
+      const formattedPrice = mid.toFixed(decimals);
+      let trendIcon = "";
+
+      if (informerLastPrice > 0) {
+        if (mid > informerLastPrice) {
+          if (livePriceEl) livePriceEl.className = "live-price-val up";
+          if (arrowEl) {
+            arrowEl.className = "live-arrow up";
+            arrowEl.innerHTML = SVG_TREND_UP;
+          }
+          if (informerContainer) {
+            informerContainer.classList.remove("trend-down");
+            informerContainer.classList.add("trend-up");
+          }
+          trendIcon = "▲ ";
+        } else if (mid < informerLastPrice) {
+          if (livePriceEl) livePriceEl.className = "live-price-val down";
+          if (arrowEl) {
+            arrowEl.className = "live-arrow down";
+            arrowEl.innerHTML = SVG_TREND_DOWN;
+          }
+          if (informerContainer) {
+            informerContainer.classList.remove("trend-up");
+            informerContainer.classList.add("trend-down");
+          }
+          trendIcon = "▼ ";
+        }
+      } else if (arrowEl) {
+        arrowEl.className = "live-arrow flat";
+        arrowEl.innerHTML = SVG_TREND_FLAT;
       }
-      if (ob.a && ob.a.length > 0) {
-        localCachedAsk = parseFloat(ob.a) || localCachedAsk;
-        hasUpdate = true;
+
+      const nowTime = Date.now();
+      if (nowTime - lastTitleUpdateTime > 300) {
+        const targetTitle =
+          trendIcon +
+          formattedPrice +
+          " | " +
+          selectedPair +
+          " | Bybit Премиум Терминал";
+        if (document.title !== targetTitle) {
+          document.title = targetTitle;
+        }
+        lastTitleUpdateTime = nowTime;
       }
 
-      if (localCachedBid > 0 && localCachedAsk > 0 && hasUpdate) {
-        const mid = (localCachedAsk + localCachedBid) / 2;
-        const decimals = coinConfig[selectedPair]
-          ? coinConfig[selectedPair].priceDecimals
-          : 2;
+      if (informerLastPrice === 0) calculate();
+      informerLastPrice = mid;
 
-        if (askEl) askEl.innerText = formatSmartValue(localCachedAsk, decimals);
-        if (bidEl) bidEl.innerText = formatSmartValue(localCachedBid, decimals);
-        if (livePriceEl)
-          livePriceEl.innerText = formatSmartValue(mid, decimals);
+      renderLogTable(mid);
 
-        clearTimeout(informerFlatTimeout);
-        if (informerLastPrice > 0) {
-          if (mid > informerLastPrice) {
-            if (livePriceEl) livePriceEl.className = "live-price-val up";
-            if (arrowEl) {
-              arrowEl.className = "live-arrow up";
-              arrowEl.innerHTML = SVG_TREND_UP;
+      const activeLogItems = tradingLog.filter(function (item) {
+        return item.outcome !== "closed";
+      });
+      let needSave = false;
+
+      activeLogItems.forEach(function (item) {
+        const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
+        if (selectedPair === cleanPairName && item.bePrice) {
+          if (item.rawSide === "Long") {
+            if (mid >= item.bePrice && !item.isBePersistent) {
+              item.isBePersistent = true;
+              needSave = true;
+            } else if (mid < item.bePrice && item.isBePersistent) {
+              item.isBePersistent = false;
+              needSave = true;
             }
-            if (informerContainer) {
-              informerContainer.classList.remove("trend-down");
-              informerContainer.classList.add("trend-up");
-            }
-          } else if (mid < informerLastPrice) {
-            if (livePriceEl) livePriceEl.className = "live-price-val down";
-            if (arrowEl) {
-              arrowEl.className = "live-arrow down";
-              arrowEl.innerHTML = SVG_TREND_DOWN;
-            }
-            if (informerContainer) {
-              informerContainer.classList.remove("trend-up");
-              informerContainer.classList.add("trend-down");
+          } else if (item.rawSide === "Short") {
+            if (mid <= item.bePrice && !item.isBePersistent) {
+              item.isBePersistent = true;
+              needSave = true;
+            } else if (mid > item.bePrice && item.isBePersistent) {
+              item.isBePersistent = false;
+              needSave = true;
             }
           }
-        } else if (arrowEl) {
+        }
+      });
+
+      if (needSave) {
+        localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
+      }
+
+      informerFlatTimeout = setTimeout(function () {
+        if (arrowEl) {
           arrowEl.className = "live-arrow flat";
           arrowEl.innerHTML = SVG_TREND_FLAT;
         }
+        if (livePriceEl) livePriceEl.className = "live-price-val";
+        if (informerContainer)
+          informerContainer.classList.remove("trend-up", "trend-down");
 
-        if (informerLastPrice === 0) calculate();
-        informerLastPrice = mid;
+        document.title =
+          formattedPrice + " | " + selectedPair + " | Bybit Премиум Терминал";
+      }, 1500);
 
-        renderLogTable(mid);
+      const sprAbs = localCachedAsk - localCachedBid;
+      const sprPct = (sprAbs / localCachedBid) * 100;
+      if (spreadEl)
+        spreadEl.innerText =
+          sprAbs.toFixed(decimals) + " (" + sprPct.toFixed(3) + "%)";
+    }
+  }
 
-        // ДВУСТОРОННИЙ ДИНАМИЧЕСКИЙ ТРЕКИНГ БЕЗУБЫТКА ДЛЯ АКТИВНОЙ ПАРЫ
-        const activeLogItems = tradingLog.filter(
-          (item) => item.outcome !== "closed",
-        );
-        let needSave = false;
-
-        activeLogItems.forEach((item) => {
-          const cleanPairName = item.pair ? item.pair.replace("/", "") : "";
-          if (selectedPair === cleanPairName && item.bePrice) {
-            if (item.rawSide === "Long") {
-              if (mid >= item.bePrice && !item.isBePersistent) {
-                item.isBePersistent = true;
-                needSave = true;
-              } else if (mid < item.bePrice && item.isBePersistent) {
-                item.isBePersistent = false;
-                needSave = true;
-              }
-            } else if (item.rawSide === "Short") {
-              if (mid <= item.bePrice && !item.isBePersistent) {
-                item.isBePersistent = true;
-                needSave = true;
-              } else if (mid > item.bePrice && item.isBePersistent) {
-                item.isBePersistent = false;
-                needSave = true;
-              }
-            }
-          }
-        });
-
-        if (needSave) {
-          localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
-        }
-
-        informerFlatTimeout = setTimeout(() => {
-          if (arrowEl) {
-            arrowEl.className = "live-arrow flat";
-            arrowEl.innerHTML = SVG_TREND_FLAT;
-          }
-          if (livePriceEl) livePriceEl.className = "live-price-val";
-          if (informerContainer)
-            informerContainer.classList.remove("trend-up", "trend-down");
-        }, 1500);
-
-        const sprAbs = localCachedAsk - localCachedBid;
-        const sprPct = (sprAbs / localCachedBid) * 100;
-        if (spreadEl)
-          spreadEl.innerText = `${sprAbs.toFixed(decimals)} (${sprPct.toFixed(3)}%)`;
+  if (
+    currentTab === "futures" &&
+    res.topic === "tickers." + selectedPair &&
+    res.data
+  ) {
+    const t = res.data;
+    if (t.fundingRate !== undefined) {
+      const rate = parseFloat(t.fundingRate) * 100;
+      if (fundingRateEl) {
+        fundingRateEl.innerText =
+          "Fnd: " + (rate > 0 ? "+" : "") + rate.toFixed(4) + "%";
+        fundingRateEl.style.color =
+          rate >= 0 ? "var(--c-green)" : "var(--c-red)";
+      }
+      if (fundingBox) {
+        if (Math.abs(rate) >= INF_CRITICAL_LIMIT)
+          fundingBox.classList.add("critical-alert");
+        else fundingBox.classList.remove("critical-alert");
       }
     }
+    if (t.nextFundingTime !== undefined)
+      infNextFundingTimestamp = parseInt(t.nextFundingTime);
+  }
 
-    if (
-      currentTab === "futures" &&
-      res.topic === `tickers.${selectedPair}` &&
-      res.data
-    ) {
-      const t = res.data;
-      if (t.fundingRate !== undefined) {
-        const rate = parseFloat(t.fundingRate) * 100;
-        if (fundingRateEl) {
-          fundingRateEl.innerText = `Fnd: ${rate > 0 ? "+" : ""}${rate.toFixed(4)}%`;
-          fundingRateEl.style.color =
-            rate >= 0 ? "var(--c-green)" : "var(--c-red)";
-        }
-        if (fundingBox) {
-          if (Math.abs(rate) >= INF_CRITICAL_LIMIT)
-            fundingBox.classList.add("critical-alert");
-          else fundingBox.classList.remove("critical-alert");
-        }
-      }
-      if (t.nextFundingTime !== undefined)
-        infNextFundingTimestamp = parseInt(t.nextFundingTime);
-    }
-
-    syncLogVisibilityState();
-  };
+  syncLogVisibilityState();
 }
 
 const balanceInput = document.getElementById("balance");
@@ -1324,7 +1415,7 @@ function loadFromStorageManual() {
   }
 }
 
-window.onload = () => {
+window.onload = function () {
   loadFromStorageManual();
   restoreTabsVisualOnly();
   initWebSocketInformer();
