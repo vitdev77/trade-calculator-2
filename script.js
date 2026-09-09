@@ -807,7 +807,7 @@ function renderLogTable(currentMidPrice) {
       </button>`;
 
     if (item.outcome === "closed") {
-      actionCellMarkup = deleteBtnMarkup;
+      actionCellMarkup = `<div style="display:flex; align-items:center; gap:6px; justify-content: right;">${deleteBtnMarkup}</div>`;
     } else {
       actionCellMarkup = `
         <div style="display:flex; align-items:center; gap:6px; justify-content: right;">
