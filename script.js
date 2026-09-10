@@ -9,31 +9,54 @@ let currentRiskPercent =
   parseFloat(localStorage.getItem("bybit_risk_percent")) || 2;
 
 const coinConfig = {
-  BTCUSDT: { price: 79670, priceDecimals: 2, qtyDecimals: 5, baseLeverage: 20 },
-  ETHUSDT: { price: 2510, priceDecimals: 2, qtyDecimals: 4, baseLeverage: 10 },
+  BTCUSDT: { price: 77130, priceDecimals: 2, qtyDecimals: 5, baseLeverage: 20 },
+  ETHUSDT: { price: 2460, priceDecimals: 2, qtyDecimals: 4, baseLeverage: 10 },
   XAUTUSDT: {
-    price: 4582.6,
+    price: 4348.55,
     priceDecimals: 2,
     qtyDecimals: 4,
     baseLeverage: 10,
   },
-  SOLUSDT: { price: 106.45, priceDecimals: 2, qtyDecimals: 3, baseLeverage: 5 },
-  ZECUSDT: { price: 802.84, priceDecimals: 2, qtyDecimals: 3, baseLeverage: 3 },
-  MNTUSDT: { price: 0.5231, priceDecimals: 4, qtyDecimals: 2, baseLeverage: 3 },
-  GRAMUSDT: { price: 5.421, priceDecimals: 3, qtyDecimals: 2, baseLeverage: 5 },
+  SOLUSDT: { price: 99.5, priceDecimals: 2, qtyDecimals: 3, baseLeverage: 5 },
+  ZECUSDT: {
+    price: 1136.11,
+    priceDecimals: 2,
+    qtyDecimals: 3,
+    baseLeverage: 3,
+  },
+  MNTUSDT: { price: 0.5758, priceDecimals: 4, qtyDecimals: 2, baseLeverage: 3 },
+  GRAMUSDT: { price: 1.341, priceDecimals: 3, qtyDecimals: 2, baseLeverage: 5 },
   XRPUSDT: {
-    price: 0.5824,
+    price: 1.3523,
     priceDecimals: 4,
     qtyDecimals: 1,
     baseLeverage: 15,
   },
   DOGEUSDT: {
-    price: 0.1145,
+    price: 0.08336,
     priceDecimals: 5,
     qtyDecimals: 0,
     baseLeverage: 10,
   },
-  SUIUSDT: { price: 1.624, priceDecimals: 4, qtyDecimals: 1, baseLeverage: 5 },
+  SUIUSDT: { price: 0.7366, priceDecimals: 4, qtyDecimals: 1, baseLeverage: 5 },
+  HYPEUSDT: {
+    price: 79.905,
+    priceDecimals: 3,
+    qtyDecimals: 2,
+    baseLeverage: 5,
+  },
+  NEARUSDT: {
+    price: 2.492,
+    priceDecimals: 3,
+    qtyDecimals: 2,
+    baseLeverage: 10,
+  },
+  LINKUSDT: {
+    price: 11.602,
+    priceDecimals: 3,
+    qtyDecimals: 2,
+    baseLeverage: 10,
+  },
 };
 
 let cachedVolatilityATR = {
@@ -47,6 +70,9 @@ let cachedVolatilityATR = {
   XRPUSDT: 0.038,
   DOGEUSDT: 0.065,
   SUIUSDT: 0.058,
+  HYPEUSDT: 0.075,
+  NEARUSDT: 0.048,
+  LINKUSDT: 0.035,
 };
 
 const TAKER_FEE = 0.00055;
