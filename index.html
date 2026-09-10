@@ -5,13 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bybit Премиум Терминал</title>
-    <!-- ПРЕМИАЛЬНЫЙ FAVICON: Золотой квадрат со скругленными углами Bybit-Style, полностью вписанный в холст 32х32 без обрезаний -->
+    <!-- ПРЕМИАЛЬНЫЙ FAVICON: Золотой квадрат со скругленными углами Bybit-Style -->
     <link
       rel="icon"
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2230%22%20height%3D%2230%22%20rx%3D%226%22%20fill%3D%22%23FFB11A%22%2F%3E%3Cpath%20d%3D%22M9%2014%20l5%20-4%20l6%205%20l5%20-4%22%20fill%3D%22none%22%20stroke%3D%22%23101116%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M9%2022%20l5%20-4%20l6%205%20l5%20-4%22%20fill%3D%22none%22%20stroke%3D%22%23101116%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E"
     />
     <link rel="stylesheet" href="./style.css" />
+    <!-- ОФИЦИАЛЬНАЯ БИБЛИОТЕКА TRADINGVIEW: Обеспечивает бесшовную нативную отрисовку живых свечей Bybit -->
+    <script
+      type="text/javascript"
+      src="https://s3.tradingview.com/tv.js"
+    ></script>
     <script>
       // ЖЕСТКАЯ FLICKER-ЗАЩИТА: Проверяем все состояния DO рендеринга страницы
       (function () {
@@ -23,7 +28,6 @@
         if (savedTheme === "light") {
           document.documentElement.classList.add("light-theme");
         }
-        // Скрываем журнал до отрисовки интерфейса, чтобы избежать скачков
         const savedLogState = localStorage.getItem("bybit_log_visible");
         if (savedLogState === "hidden") {
           document.documentElement.classList.add("init-log-hidden");
@@ -553,6 +557,18 @@
     <!-- Закрытие glass-container -->
     <!-- === КОНЕЦ ЧАСТИ 5 === -->
     <!-- === НАЧАЛО ЧАСТИ 6 === -->
+    <!-- НЕЗАВИСИМЫЙ СТАНДОЛОН БЛОК ЖИВОГО ГРАФИКА TRADINGVIEW ДЛЯ BYBIT -->
+    <div
+      class="table-log-container chart-standalone-layout"
+      id="global-chart-block"
+      style="margin-top: 20px; min-height: 450px; padding: 20px"
+    >
+      <!-- Фиксируем высоту родительского контейнера в DOM -->
+      <div id="bybit-tv-chart-container" style="width: 100%; height: 410px">
+        <!-- Сюда скрипт динамически инжектирует продвинутый виджет графика -->
+      </div>
+    </div>
+
     <div
       class="table-log-container standalone-log-layout"
       id="global-table-log-block"
@@ -602,7 +618,6 @@
       onclick="toggleHelpDrawer()"
     >
       <div class="help-drawer-content" onclick="event.stopPropagation()">
-        <!-- КРЕСТИК ЗАКРЫТИЯ ПЕРЕНЕСЕН ВНУТРЬ КОНТЕНТА ДЛЯ ИДЕАЛЬНОГО ВЫРАВНИВАНИЯ -->
         <button class="help-drawer-close" onclick="toggleHelpDrawer()">
           ✕
         </button>
@@ -617,7 +632,7 @@
 
           <h2>📊 1. Математический базис и формулы</h2>
           <p>
-            Торговый движок производит вычисления с учётом комиссионных
+            Торговый движок производив вычисления с учётом комиссионных
             издержек. Биржа списывает комиссию дважды: при входе и при закрытии.
             Алгоритмы терминала закладывают эти издержки непосредственно в цену
             исполнения.

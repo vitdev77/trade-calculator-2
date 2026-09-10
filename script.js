@@ -65,8 +65,10 @@ function toggleTheme() {
     currentTheme = "dark";
     document.documentElement.classList.remove("light-theme");
     if (btn)
-      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focus0able="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>`;
+      btn.innerHTML = `<svg enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24" focusable="false" class="icon-theme"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>`;
   }
+  // РЕАКТИВНЫЙ СКИННИНГ: Мгновенно перекрашиваем график под выбранную тему оформления
+  if (typeof updateLiveChart === "function") updateLiveChart();
   saveToStorage();
 }
 /* === КОНЕЦ ЧАСТИ 3 === */
@@ -231,6 +233,10 @@ function switchTab(tab) {
   restoreTabsVisualOnly();
   if (tab === "spot") setSide("Long");
   if (typeof updateOrderLabels === "function") updateOrderLabels();
+
+  // МГНОВЕННЫЙ ПЕРЕЗАПУСК ГРАФИКА: Заставляет виджет перестроиться на Спот/Фьючерсы без перезагрузки страницы
+  if (typeof updateLiveChart === "function") updateLiveChart();
+
   saveToStorage();
   calculate();
   initWebSocketInformer();
@@ -997,6 +1003,8 @@ function exportLogToCSV() {
 function handlePairChange() {
   const selectedPair = document.getElementById("pair").value;
   document.getElementById("entry-price").value = coinConfig[selectedPair].price;
+  // ПЕРЕКЛЮЧЕНИЕ ГРАФИКА: Подгружаем новый актив при изменении селектора пары
+  if (typeof updateLiveChart === "function") updateLiveChart();
   saveToStorage();
   initWebSocketInformer();
 }
@@ -1046,6 +1054,7 @@ function resetTerminal() {
   if (r2) r2.classList.add("active");
 
   restoreTabsVisualOnly();
+  if (typeof updateLiveChart === "function") updateLiveChart();
   initWebSocketInformer();
 }
 /* === КОНЕЦ ЧАСТИ 15 === */
@@ -1226,7 +1235,6 @@ function initWebSocketInformer() {
 /* === НАЧАЛО ЧАСТИ 17 === */
 let lastTitleUpdateTime = 0;
 
-// ИСПРАВЛЕНИЕ ОБЛАСТИ ВИДИМОСТИ: Функция handleInformerMessage объявлена глобально, сокет цепляет её без сбоев
 function handleInformerMessage(event) {
   const selectedPair = document.getElementById("pair")
     ? document.getElementById("pair").value
@@ -1271,14 +1279,12 @@ function handleInformerMessage(event) {
       const formattedPrice = mid.toFixed(decimals);
       const currentNumericPrice = parseFloat(formattedPrice);
 
-      // Инициализируем иконку на основе текущего состояния заголовка вкладки
       let trendIcon = document.title.startsWith("▲")
         ? "▲ "
         : document.title.startsWith("▼")
           ? "▼ "
           : "";
 
-      // СРАВНЕНИЕ СТРОГО ПО ОКРУГЛЕННОЙ ЦЕНЕ: Устраняет залипание стрелок при микро-тиках
       if (informerLastPrice > 0) {
         if (currentNumericPrice > informerLastPrice) {
           if (livePriceEl) livePriceEl.className = "live-price-val up";
@@ -1308,7 +1314,6 @@ function handleInformerMessage(event) {
         arrowEl.innerHTML = SVG_TREND_FLAT;
       }
 
-      // МГНОВЕННОЕ ОБНОВЛЕНИЕ ТАЙТЛА: Убрана 300мс задержка для абсолютной синхронизации стрелок
       const targetTitle =
         trendIcon +
         formattedPrice +
@@ -1319,7 +1324,6 @@ function handleInformerMessage(event) {
         document.title = targetTitle;
       }
 
-      // Запоминаем округленный прайс для корректного последующего сравнения
       if (
         informerLastPrice === 0 ||
         currentNumericPrice !== informerLastPrice
@@ -1362,7 +1366,6 @@ function handleInformerMessage(event) {
         localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
       }
 
-      // ТАЙМЕР ЗАТУХАНИЯ СТРЕЛКИ В ИНТЕРФЕЙСЕ (БЕЗ УДАЛЕНИЯ ЗНАЧКА ИЗ ТАЙТЛА ВКЛАДКИ)
       informerFlatTimeout = setTimeout(function () {
         if (arrowEl) {
           arrowEl.className = "live-arrow flat";
@@ -1427,11 +1430,12 @@ function loadFromStorageManual() {
   }
 }
 
-// ЖЕСТКАЯ ИНИЦИАЛИЗАЦИЯ: Добавлен вызов updateOrderLabels() для рендеринга обводки при старте приложения
 window.onload = function () {
   loadFromStorageManual();
   restoreTabsVisualOnly();
   if (typeof updateOrderLabels === "function") updateOrderLabels();
+  // АВТОЗАПУСК: Инициализируем iframe продвинутого виджета графика при первой загрузке приложения
+  if (typeof updateLiveChart === "function") updateLiveChart();
   initWebSocketInformer();
   renderLogTable();
   syncLogVisibilityState();
@@ -1452,3 +1456,44 @@ function toggleHelpDrawer() {
   }
 }
 /* === КОНЕЦ ЧАСТИ 18 === */
+/* === НАЧАЛО ЧАСТИ 19 === */
+// НАДЁЖНЫЙ МОДУЛЬ ЖИВОГО ГРАФИКА С ИДЕАЛЬНОЙ СИНХРОНИЗАЦИЕЙ СЕНСОРОВ СПОТ/ФЬЮЧЕРС
+function updateLiveChart() {
+  const container = document.getElementById("bybit-tv-chart-container");
+  if (!container) return;
+
+  const selectedPair = document.getElementById("pair")
+    ? document.getElementById("pair").value
+    : "BTCUSDT";
+  const themeParam = currentTheme === "light" ? "light" : "dark";
+
+  container.innerHTML = "";
+
+  // СИНХРОНИЗАЦИЯ РЫНКОВ: Автоматически подставляем суффикс ".P" для фьючерсов, чтобы цены совпадали до цента
+  let tvSymbol = "BYBIT:" + selectedPair;
+  if (currentTab === "futures") {
+    tvSymbol = "BYBIT:" + selectedPair + ".P";
+  }
+
+  if (typeof TradingView !== "undefined") {
+    new TradingView.widget({
+      width: "100%",
+      height: 410,
+      symbol: tvSymbol, // Передача синхронизированного биржевого тикера
+      interval: "15",
+      timezone: "Exchange",
+      theme: themeParam,
+      style: "1",
+      locale: "ru",
+      toolbar_bg: "#f1f3f6",
+      enable_publishing: false,
+      hide_side_toolbar: false,
+      allow_symbol_change: false,
+      container_id: "bybit-tv-chart-container",
+    });
+  } else {
+    container.innerHTML =
+      "<div style='color:var(--text-muted); font-size:12px; text-align:center; padding-top:190px;'>Ожидание подключения к серверам TradingView...</div>";
+  }
+}
+/* === КОНЕЦ ЧАСТИ 19 === */

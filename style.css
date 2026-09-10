@@ -1379,6 +1379,13 @@ html::-webkit-scrollbar {
   background: transparent;
 }
 
+/* СИНХРОНИЗАЦИЯ ШИРИНЫ ГРАФИКА С ОСНОВНЫМ БЛОКОМ ТЕРМИНАЛА */
+.chart-standalone-layout {
+  width: 100% !important;
+  max-width: 1020px !important;
+  z-index: 1;
+}
+
 /* СТИЛИ БОКОВОЙ ВЫЕЗЖАЮЩЕЙ ПАНЕЛИ (DRAWER) И БЛЮРА ФОНА */
 .help-drawer-overlay {
   position: fixed;
@@ -1549,7 +1556,8 @@ body.drawer-blurred-state {
 
 body.drawer-blurred-state .glass-container,
 body.drawer-blurred-state .terminal-top-bar .clean-balance-widget,
-body.drawer-blurred-state #global-table-log-block {
+body.drawer-blurred-state #global-table-log-block,
+body.drawer-blurred-state #global-chart-block {
   filter: blur(8px) grayscale(0.2);
   pointer-events: none;
 }
