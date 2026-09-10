@@ -1367,26 +1367,107 @@ html.light-theme .log-close-trigger:hover {
 }
 /* === КОНЕЦ ЧАСТИ 10 === */
 /* === НАЧАЛО ЧАСТИ 11 === */
-/* АБСОЛЮТНАЯ СТАБИЛИЗАЦИЯ И СКРЫТИЕ ПОЛОСЫ: Контент больше не прыгает, полоса полностью прозрачна */
+/* АБСОЛЮТНАЯ СТАБИЛИЗАЦИЯ И СКРЫТИЕ ПОЛОСЫ */
 html {
   scrollbar-gutter: stable;
-  scrollbar-width: none; /* Скрытие трека в Firefox */
+  scrollbar-width: none;
 }
 
-/* Полное скрытие системного фона полосы прокрутки для Chrome, Safari и Edge */
 html::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
 
-/* СИНХРОНИЗАЦИЯ ШИРИНЫ ГРАФИКА С ОСНОВНЫМ БЛОКОМ ТЕРМИНАЛА */
 .chart-standalone-layout {
   width: 100% !important;
   max-width: 1020px !important;
   z-index: 1;
 }
 
-/* СТИЛИ БОКОВОЙ ВЫЕЗЖАЮЩЕЙ ПАНЕЛИ (DRAWER) И БЛЮРА ФОНА */
+/* КНОПКА СВОРАЧИВАНИЯ С ПОДДЕРЖКОЙ ДИНАМИЧЕСКОГО ТЕКСТА */
+.terminal-collapse-bar {
+  width: 200px; /* Слегка увеличиваем ширину для размещения текста */
+  height: 16px;
+  margin: 12px auto 6px auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.terminal-collapse-bar:hover {
+  background: rgba(255, 177, 26, 0.08);
+  border-color: rgba(255, 177, 26, 0.3);
+  color: var(--c-king);
+  box-shadow: 0 0 8px rgba(255, 177, 26, 0.1);
+}
+
+.terminal-collapse-bar svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* СИНХРОННЫЙ ЖЕСТКИЙ ПРЕ-ФЛИКЕР ХАК */
+html.init-terminal-hidden #main-terminal-container {
+  max-height: 0px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  border-width: 0px !important;
+  box-shadow: none !important;
+}
+
+html.init-terminal-hidden #main-terminal-container * {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ПЛАВНОЕ СВОРАЧИВАНИЕ ТЕЛА КАЛЬКУЛЯТОРА */
+.glass-container {
+  max-height: 1200px;
+  overflow: hidden;
+  transition:
+    max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    min-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s ease,
+    border-width 0.4s ease,
+    box-shadow 0.4s ease,
+    margin-bottom 0.4s ease,
+    filter 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glass-container.collapsed-terminal {
+  max-height: 0px !important;
+  min-height: 0px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  border-width: 0px !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.glass-container.collapsed-terminal * {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.glass-container * {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.1s;
+}
+
+/* СТИЛИ БОKОВОЙ ПАНЕЛИ (DRAWER) */
 .help-drawer-overlay {
   position: fixed;
   top: 0;
@@ -1469,7 +1550,6 @@ html.light-theme .help-drawer-content {
   transform: scale(0.85);
 }
 
-/* СКРЫТИЕ ВНУТРЕННЕЙ ПОЛОСЫ В DRAWER ДЛЯ ЧИСТОГО ВИДА */
 .help-drawer-scroll {
   width: 100%;
   height: 100%;
@@ -1483,7 +1563,6 @@ html.light-theme .help-drawer-content {
   display: none;
 }
 
-/* Форматирование текста внутри справки */
 .help-drawer-scroll h1 {
   font-size: 18px;
   font-weight: 800;
@@ -1544,12 +1623,6 @@ html.light-theme .help-drawer-content {
   overflow-x: auto;
 }
 
-/* Динамический сильный блюр интерфейса калькулятора при открытии панели */
-.glass-container {
-  transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* Блокируем скролл body при открытии, верстка не прыгает благодаря скрытому gutter */
 body.drawer-blurred-state {
   overflow: hidden !important;
 }
@@ -1557,12 +1630,12 @@ body.drawer-blurred-state {
 body.drawer-blurred-state .glass-container,
 body.drawer-blurred-state .terminal-top-bar .clean-balance-widget,
 body.drawer-blurred-state #global-table-log-block,
-body.drawer-blurred-state #global-chart-block {
+body.drawer-blurred-state #global-chart-block,
+body.drawer-blurred-state .terminal-collapse-bar {
   filter: blur(8px) grayscale(0.2);
   pointer-events: none;
 }
 
-/* Исключаем кнопку вызова из блюра, чтобы её можно было нажать для закрытия */
 body.drawer-blurred-state .terminal-top-bar .google-utility-capsule {
   pointer-events: auto !important;
 }
