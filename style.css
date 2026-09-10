@@ -1493,7 +1493,8 @@ html.init-terminal-hidden #main-terminal-container * {
   height: auto !important;
   max-height: none !important;
 }
-
+/* === КОНЕЦ ЧАСТИ 11 === */
+/* === НАЧАЛО ЧАСТИ 12 === */
 /* ИНТЕЛЛЕКТУАЛЬНЫЙ СКРОЛЛ ВНУТРЕННЕЙ ЗОНЫ: Разрешаем свободный рост строго до 10 строк */
 .table-log-scroll-area {
   height: auto !important;
@@ -1522,7 +1523,7 @@ html.init-terminal-hidden #main-terminal-container * {
   background: rgba(255, 177, 26, 0.4) !important;
 }
 
-/* СТИЛИ БОКОВОЙ ПАНЕЛИ (DRAWER) */
+/* СТИЛИ БОKОВОЙ ПАНЕЛИ (DRAWER) */
 .help-drawer-overlay {
   position: fixed;
   top: 0;
@@ -1694,4 +1695,4 @@ body.drawer-blurred-state .terminal-collapse-bar {
 body.drawer-blurred-state .terminal-top-bar .google-utility-capsule {
   pointer-events: auto !important;
 }
-/* === КОНЕЦ ЧАСТИ 11 === */
+/* === КОНЕЦ ЧАСТИ 12 === */
