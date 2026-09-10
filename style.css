@@ -1366,3 +1366,196 @@ html.light-theme .log-close-trigger:hover {
   }
 }
 /* === КОНЕЦ ЧАСТИ 10 === */
+/* === НАЧАЛО ЧАСТИ 11 === */
+/* АБСОЛЮТНАЯ СТАБИЛИЗАЦИЯ И СКРЫТИЕ ПОЛОСЫ: Контент больше не прыгает, полоса полностью прозрачна */
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: none; /* Скрытие трека в Firefox */
+}
+
+/* Полное скрытие системного фона полосы прокрутки для Chrome, Safari и Edge */
+html::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* СТИЛИ БОКОВОЙ ВЫЕЗЖАЮЩЕЙ ПАНЕЛИ (DRAWER) И БЛЮРА ФОНА */
+.help-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 5, 9, 0.2);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.help-drawer-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.help-drawer-content {
+  position: absolute;
+  top: 0;
+  right: -460px;
+  width: 100%;
+  max-width: 460px;
+  height: 100vh;
+  background: var(--modal-bg);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  padding: 40px 30px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.light-theme .help-drawer-content {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: -10px 0 40px rgba(15, 23, 42, 0.06);
+}
+
+.help-drawer-overlay.active .help-drawer-content {
+  transform: translateX(-460px);
+}
+
+.help-drawer-close {
+  position: absolute;
+  top: 36px;
+  right: 30px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.help-drawer-close:hover {
+  color: var(--c-red);
+  text-shadow: 0 0 8px var(--c-red-glow);
+}
+
+.help-drawer-close:active {
+  transform: scale(0.85);
+}
+
+/* СКРЫТИЕ ВНУТРЕННЕЙ ПОЛОСЫ В DRAWER ДЛЯ ЧИСТОГО ВИДА */
+.help-drawer-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 24px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.help-drawer-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Форматирование текста внутри справки */
+.help-drawer-scroll h1 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--c-king);
+  margin-bottom: 14px;
+  padding-right: 30px;
+}
+
+.help-drawer-scroll h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 20px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--input-border);
+  padding-bottom: 4px;
+}
+
+.help-drawer-scroll h3 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-orange);
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.help-drawer-scroll p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-main);
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+.help-drawer-scroll ul {
+  padding-left: 16px;
+  margin-bottom: 12px;
+}
+
+.help-drawer-scroll li {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-main);
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.help-drawer-scroll code {
+  font-family: monospace;
+  font-size: 11px;
+  background: var(--input-bg);
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--input-border);
+  display: block;
+  margin-bottom: 8px;
+  color: var(--c-green);
+  overflow-x: auto;
+}
+
+/* Динамический сильный блюр интерфейса калькулятора при открытии панели */
+.glass-container {
+  transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Блокируем скролл body при открытии, верстка не прыгает благодаря скрытому gutter */
+body.drawer-blurred-state {
+  overflow: hidden !important;
+}
+
+body.drawer-blurred-state .glass-container,
+body.drawer-blurred-state .terminal-top-bar .clean-balance-widget,
+body.drawer-blurred-state #global-table-log-block {
+  filter: blur(8px) grayscale(0.2);
+  pointer-events: none;
+}
+
+/* Исключаем кнопку вызова из блюра, чтобы её можно было нажать для закрытия */
+body.drawer-blurred-state .terminal-top-bar .google-utility-capsule {
+  pointer-events: auto !important;
+}
+/* === КОНЕЦ ЧАСТИ 11 === */

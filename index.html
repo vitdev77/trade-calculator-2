@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bybit Премиум Терминал</title>
     <!-- ПРОФЕССИОНАЛЬНЫЙ СТАТИЧЕСКИЙ FAVICON В BASE64: Абсолютно автономен и завязан на HTML -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHBvbHlnb24gcG9pbnRzPScxNiwyIDI5LDkuNSAyOSwyNC41IDE2LDMyIDMsMjQuNSAzLDkuNScgZmlsbD0nbm9uZScgc3Ryb2tlPScjZmZiMTFhJyBzdHJva2Utd2lkdGg9JzIuNScvPjxwYXRoIGQ9J005IDE5IGw3IC04IGw3IDgnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzAwZmY5ZCcgc3Ryb2tlLXdpZHRoPSczJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnLz48L3N2Zz4=" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHBvbHlnb24gcG9pbnRzPScxNiwyIDI5LDkuNSAyOSwyNC41IDE2LDMyIDMsMjQuNSAzLDkuNScgZmlsbD0nbm9uZScgc3Ryb2tlPScjZmZiMTFhJyBzdHJva2Utd2lkdGg9JzIuNScvPjxwYXRoIGQ9J005IDE5IGw3IC04IGw3IDgnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzAwZmY5ZCcgc3Ryb2tlLXdpZHRoPSczJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnLz48L3N2Zz4="
+    />
     <link rel="stylesheet" href="./style.css" />
     <script>
       // ЖЕСТКАЯ FLICKER-ЗАЩИТА: Проверяем все состояния DO рендеринга страницы
@@ -28,8 +32,8 @@
     </script>
   </head>
   <body>
-<!-- === КОНЕЦ ЧАСТИ 1 === -->
-<!-- === НАЧАЛО ЧАСТИ 2 === -->
+    <!-- === КОНЕЦ ЧАСТИ 1 === -->
+    <!-- === НАЧАЛО ЧАСТИ 2 === -->
     <!-- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
     <div class="terminal-top-bar">
       <!-- ЧИСТЫЙ МИНИМАЛИСТИЧНЫЙ ВИДЖЕТ БАЛАНСА И КНОПКИ РИСКА -->
@@ -88,6 +92,23 @@
         >
           Журнал
         </button>
+        <!-- ОБНОВЛЕННАЯ КНОПКА СПРАВКИ СО ЗНАКОМ ВОПРОСА -->
+        <button
+          class="google-action-icon-btn"
+          id="help-drawer-toggle-btn"
+          onclick="toggleHelpDrawer()"
+          title="Руководство и Спецификация"
+          style="
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          ?
+        </button>
         <button
           class="google-action-icon-btn"
           id="theme-toggle-btn"
@@ -107,16 +128,14 @@
     <div class="glow-sphere sphere-2"></div>
     <div class="glow-sphere sphere-3"></div>
 
-    <div class="glass-container">
-      <!-- ИНФОРМЕР ВСТРОЕН ВНУТРЬ СТЕКЛЯННОГО КОНТЕЙНЕРА НА ВСЮ ШИРИНУ -->
+    <div class="glass-container" id="main-terminal-container">
+      <!-- ЖИВОЙ ИНФОРМЕР ВНУТРИ СТЕКЛЯННОГО КОНТЕЙНЕРА -->
       <div class="bybit-live-informer">
-        <!-- Блок живой цены со стрелкой -->
         <div class="live-price-block">
           <span id="live-arrow" class="live-arrow"></span>
           <span id="live-price" class="live-price-val">Загрузка...</span>
         </div>
 
-        <!-- Спред и mini-атлас Ask / Bid -->
         <div class="live-book-block">
           <span class="book-tick ask"
             >Ask: <span id="live-ask">0.00</span></span
@@ -131,14 +150,13 @@
           <span id="live-spread" class="spread-val">0.00 (0.00%)</span>
         </div>
 
-        <!-- Блок Фандинга (динамический) -->
         <div id="live-funding-box" class="live-funding-block">
           <span id="live-funding-rate" class="funding-rate-val">0.0000%</span>
           <span id="live-funding-time" class="funding-time-val">--:--:--</span>
         </div>
       </div>
-<!-- === КОНЕЦ ЧАСТИ 2 === -->
-<!-- === НАЧАЛО ЧАСТИ 3 === -->
+      <!-- === КОНЕЦ ЧАСТИ 2 === -->
+      <!-- === НАЧАЛО ЧАСТИ 3 === -->
       <!-- ЛЕВАЯ ПАНЕЛЬ: ВВОД ДАННЫХ -->
       <div class="panel-left">
         <div class="input-item full-width">
@@ -216,6 +234,7 @@
         <div class="side-fade-wrapper" id="side-item-wrapper">
           <div class="input-item full-width">
             <div class="toggle-container container-medium" id="side-container">
+              <!-- ИСПРАВЛЕННЫЙ ТРИГГЕР:onclick теперь корректно передает строковый параметр направления -->
               <button class="side-btn" id="side-long" onclick="setSide('Long')">
                 Лонг
               </button>
@@ -230,7 +249,7 @@
           </div>
         </div>
 
-        <!-- ИНТЕРАКТИВНЫЙ ВЫБОР P/R RATIO В НИЖНЕЙ ЧАСТИ ПАНЕЛИ -->
+        <!-- ИНТЕРАКТИВНЫЙ ВЫБОР P/R RATIO -->
         <div class="input-item full-width" style="margin-top: 4px">
           <div class="select-custom-wrapper">
             <select id="pr-ratio" onchange="handlePrRatioChange()">
@@ -252,8 +271,8 @@
           </button>
         </div>
       </div>
-<!-- === КОНЕЦ ЧАСТИ 3 === -->
-<!-- === НАЧАЛО ЧАСТИ 4 === -->
+      <!-- === КОНЕЦ ЧАСТИ 3 === -->
+      <!-- === НАЧАЛО ЧАСТИ 4 === -->
       <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="panel-right">
         <div class="results-display">
@@ -322,12 +341,17 @@
               </div>
             </div>
           </div>
-<!-- === КОНЕЦ ЧАСТИ 4 === -->
-<!-- === НАЧАЛО ЧАСТИ 5 === -->
+          <!-- === КОНЕЦ ЧАСТИ 4 === -->
+          <!-- === НАЧАЛО ЧАСТИ 5 === -->
+          <div class="results-section">
             <div class="display-row val-orange-text">
               <div class="field-info">
-                <span class="field-name" id="res-entry-label">Цена входа (USDT)</span>
-                <span class="field-sub">Контрольный дубль цены из калькулятора</span>
+                <span class="field-name" id="res-entry-label"
+                  >Цена входа (USDT)</span
+                >
+                <span class="field-sub"
+                  >Контрольный дубль цены из калькулятора</span
+                >
               </div>
               <div class="value-action">
                 <span class="display-value" id="res-entry-dup">—</span>
@@ -350,7 +374,9 @@
                 <span class="field-name">Тейк Профит</span>
                 <span class="field-sub">
                   <span id="pct-tp">+0.78%</span>
-                  <span id="cash-tp" style="opacity: 0.8; margin-left: 4px">(+$4.00)</span>
+                  <span id="cash-tp" style="opacity: 0.8; margin-left: 4px"
+                    >(+$4.00)</span
+                  >
                 </span>
               </div>
               <div class="value-action">
@@ -373,7 +399,9 @@
                 <span class="field-name">Стоп Лосс</span>
                 <span class="field-sub">
                   <span id="pct-sl">-0.39%</span>
-                  <span id="cash-sl" style="opacity: 0.8; margin-left: 4px">(-$2.00)</span>
+                  <span id="cash-sl" style="opacity: 0.8; margin-left: 4px"
+                    >(-$2.00)</span
+                  >
                 </span>
               </div>
               <div class="value-action">
@@ -439,10 +467,14 @@
             <div class="display-row low-accent-row">
               <div class="field-info">
                 <span class="field-name">Запас маржи (Остаток)</span>
-                <span class="field-sub" id="margin-trades">Запас на 4 сделки</span>
+                <span class="field-sub" id="margin-trades"
+                  >Запас на 4 сделки</span
+                >
               </div>
               <div class="value-action">
-                <span class="display-value small-val" id="res-margin-free">$80.00</span>
+                <span class="display-value small-val" id="res-margin-free"
+                  >$80.00</span
+                >
               </div>
             </div>
           </div>
@@ -453,7 +485,9 @@
           >
             <div class="analytic-footer-item">
               <span class="an-label">Депозит</span>
-              <span class="an-value an-v-blue" id="res-analytics-balance">$100.00</span>
+              <span class="an-value an-v-blue" id="res-analytics-balance"
+                >$100.00</span
+              >
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">Риск</span>
@@ -461,7 +495,9 @@
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">Объем сделки</span>
-              <span class="an-value an-v-main" id="res-volume-badge">$400.00</span>
+              <span class="an-value an-v-main" id="res-volume-badge"
+                >$400.00</span
+              >
             </div>
             <div class="analytic-footer-item">
               <span class="an-label">P/R Ratio</span>
@@ -510,11 +546,13 @@
             </button>
           </div>
         </div>
+        <!-- Закрытие results-display -->
       </div>
+      <!-- Закрытие panel-right -->
     </div>
-<!-- === КОНЕЦ ЧАСТИ 5 === -->
-<!-- === НАЧАЛО ЧАСТИ 6 === -->
-    <!-- НЕЗАВИСИМЫЙ ШИРОКИЙ ДАШБОРД ЖУРНАЛА ОРДЕРОВ -->
+    <!-- Закрытие glass-container -->
+    <!-- === КОНЕЦ ЧАСТИ 5 === -->
+    <!-- === НАЧАЛО ЧАСТИ 6 === -->
     <div
       class="table-log-container standalone-log-layout"
       id="global-table-log-block"
@@ -554,6 +592,173 @@
           </thead>
           <tbody id="log-table-body"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ВЫЕЗЖАЮЩАЯ БОКОВАЯ ПАНЕЛЬ (DRAWER) ДЛЯ СПРАВКИ И РУКОВОДСТВА -->
+    <div
+      class="help-drawer-overlay"
+      id="help-drawer"
+      onclick="toggleHelpDrawer()"
+    >
+      <div class="help-drawer-content" onclick="event.stopPropagation()">
+        <!-- КРЕСТИК ЗАКРЫТИЯ ПЕРЕНЕСЕН ВНУТРЬ КОНТЕНТА ДЛЯ ИДЕАЛЬНОГО ВЫРАВНИВАНИЯ -->
+        <button class="help-drawer-close" onclick="toggleHelpDrawer()">
+          ✕
+        </button>
+        <div class="help-drawer-scroll">
+          <h1>🗒 Bybit Премиум Терминал: Руководство</h1>
+          <p>
+            Интеллектуальная торговая консоль для автоматизации расчёта объёма
+            позиций, риск-менеджмента и ведения журнала ордеров в реальном
+            времени с прямой интеграцией по WebSocket Bybit V5 Public Stream
+            API.
+          </p>
+
+          <h2>📊 1. Математический базис и формулы</h2>
+          <p>
+            Торговый движок производит вычисления с учётом комиссионных
+            издержек. Биржа списывает комиссию дважды: при входе и при закрытии.
+            Алгоритмы терминала закладывают эти издержки непосредственно в цену
+            исполнения.
+          </p>
+
+          <h3>Системные коэффициенты:</h3>
+          <ul>
+            <li>
+              <strong>TAKER_FEE (0.00055 / 0.055%):</strong> Комиссия за
+              исполнение ордера по рынку (Market), для Стоп Лосса и Тейк
+              Профита.
+            </li>
+            <li>
+              <strong>MAKER_FEE (0.00020 / 0.020%):</strong> Комиссия за
+              лимитный ордер (Limit).
+            </li>
+            <li>
+              <strong>MMR (0.00400 / 0.40%):</strong> Поддерживающий
+              маржинальный минимум бессрочных USDT-контрактов. Крах позиции.
+            </li>
+            <li>
+              <strong>SPOT_FEE (0.00100 / 0.10%):</strong> Базовая комиссия
+              спотового рынка.
+            </li>
+            <li>
+              <strong>SPOT_SLIPPAGE (0.00050 / 0.05%):</strong> Рыночное
+              проскальзывание спотового маркет-ордера.
+            </li>
+          </ul>
+
+          <h3>Параметры позиции фьючерсов (LONG):</h3>
+          <ul>
+            <li>
+              <strong>Занятая маржа (Cost):</strong> Balance / 5 (личные деньги
+              под залог одной сделки)
+            </li>
+            <li>
+              <strong>Объем сделки (Value):</strong> Cost &times; Leverage
+              (торговый объём с плечом)
+            </li>
+            <li><strong>Количество (Qty):</strong> Value / EntryPrice</li>
+            <li><strong>Запас маржи (FreeMargin):</strong> Balance - Cost</li>
+            <li>
+              <strong>Запас на сделки (RemainingTrades):</strong> FreeMargin /
+              Cost
+            </li>
+          </ul>
+
+          <h3>Формулы фьючерсов LONG:</h3>
+          <p>
+            <code
+              >SL = EntryPrice &times; (1 - Risk% / (100 &times; Leverage) -
+              EntryFee) / (1 + TakerFee)</code
+            >
+          </p>
+          <p>
+            <code
+              >TP = EntryPrice &times; (1 + (P/R &times; Risk%) / (100 &times;
+              Leverage) + EntryFee) / (1 - TakerFee)</code
+            >
+          </p>
+          <p><code>Liq = EntryPrice &times; (1 - 1 / Leverage + MMR)</code></p>
+          <p><code>БУ = EntryPrice &times; (1 + EntryFee + TakerFee)</code></p>
+
+          <h3>Формулы фьючерсов SHORT:</h3>
+          <p>
+            <code
+              >SL = EntryPrice &times; (1 + Risk% / (100 &times; Leverage) +
+              EntryFee) / (1 - TakerFee)</code
+            >
+          </p>
+          <p>
+            <code
+              >TP = EntryPrice &times; (1 - (P/R &times; Risk%) / (100 &times;
+              Leverage) - EntryFee) / (1 + TakerFee)</code
+            >
+          </p>
+          <p><code>Liq = EntryPrice &times; (1 + 1 / Leverage - MMR)</code></p>
+          <p><code>БУ = EntryPrice &times; (1 - EntryFee - TakerFee)</code></p>
+
+          <h3>Формулы спотового рынка (Spot Mode):</h3>
+          <p>
+            <code
+              >SL = EntryPrice &times; (1 - RiskAmount / Cost - SpotFee &times;
+              2 - SpotSlippage)</code
+            >
+          </p>
+          <p>
+            <code
+              >TP = EntryPrice &times; (1 + (RiskAmount &times; P/R) / Cost +
+              SpotFee &times; 2)</code
+            >
+          </p>
+          <p>
+            <code
+              >БУ = EntryPrice &times; (1 + SpotFee &times; 2 +
+              SpotSlippage)</code
+            >
+          </p>
+
+          <h2>➡️ 2. Регламент работы трейдера</h2>
+          <h3>Этап А: Риск-параметры</h3>
+          <p>
+            1. Введите баланс маржинального обеспечения в поле
+            <strong>DEP</strong>.<br />2. Выберите фиксированный процент потери
+            на сделку (1%, 2% или 3%).
+          </p>
+
+          <h3>Этап Б: Конфигурация сессии</h3>
+          <p>
+            1. Выберите режим рынка (Фьючерсы / Спот).<br />2. Задайте тип
+            ордера (Лимитный / Рыночный).<br />3. Установите целевое соотношение
+            в селекторе P/R Ratio.
+          </p>
+
+          <h3>Этап В: Инжекция котировок из информера</h3>
+          <p>
+            1. Клик по центральной цене — вычисляет Mid Price, вставляет в "Цена
+            входа", копирует в буфер обмена и перерасчитывает всё.<br />2. Клик
+            по Ask — инжектирует лучшую цену продажи.<br />3. Клик по Bid —
+            инжектирует лучшую цену покупки.
+          </p>
+
+          <h3>Этап Г: Валидация и перенос на Bybit</h3>
+          <p>
+            1. Если горит <code>🛑 АЛЕРТ</code> (ликвидация ближе стопа) —
+            сделка запрещена! Убавьте риск или смените пару.<br />2. Если горит
+            <code>🟢 ИДЕАЛЬНО</code> — копируйте
+            <strong>Объем в USDT (Value)</strong> в «Стоимость» на Bybit,
+            выставьте <strong>Рабочее плечо</strong> и уровни
+            <strong>TP/SL</strong>.
+          </p>
+
+          <h3>Этап Д: Журнал ордеров</h3>
+          <p>
+            1. Нажмите «Зафиксировать расчет в журнал».<br />2. При пересечении
+            ценой уровня БУ ячейка активирует неоновую анимацию — перенесите
+            Стоп Лосс на бирже в точку входа.<br />3. После закрытия сделки
+            нажмите <strong>✕</strong> для архивации строки.
+          </p>
+        </div>
       </div>
     </div>
 

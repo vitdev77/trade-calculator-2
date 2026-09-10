@@ -230,15 +230,18 @@ function switchTab(tab) {
   currentTab = tab;
   restoreTabsVisualOnly();
   if (tab === "spot") setSide("Long");
+  if (typeof updateOrderLabels === "function") updateOrderLabels();
   saveToStorage();
   calculate();
   initWebSocketInformer();
 }
 
+// ЖЕСТКАЯ ПРИВЯЗКА К СТИЛЯМ: setSide теперь принудительно вызывает обновление подсветки результатов
 function setSide(side) {
   if (currentTab === "spot" && side === "Short") return;
   currentSide = side;
   restoreTabsVisualOnly();
+  if (typeof updateOrderLabels === "function") updateOrderLabels();
   saveToStorage();
   calculate();
 }
@@ -1424,11 +1427,28 @@ function loadFromStorageManual() {
   }
 }
 
+// ЖЕСТКАЯ ИНИЦИАЛИЗАЦИЯ: Добавлен вызов updateOrderLabels() для рендеринга обводки при старте приложения
 window.onload = function () {
   loadFromStorageManual();
   restoreTabsVisualOnly();
+  if (typeof updateOrderLabels === "function") updateOrderLabels();
   initWebSocketInformer();
   renderLogTable();
   syncLogVisibilityState();
 };
 /* === КОНЕЦ ЧАСТИ 17 === */
+/* === НАЧАЛО ЧАСТИ 18 === */
+// УПРАВЛЕНИЕ БОКОВОЙ ВЫЕЗЖАЮЩЕЙ ПАНЕЛЬЮ СПРАВКИ И СИНХРОННЫМ БЛЮРОМ
+function toggleHelpDrawer() {
+  const helpDrawer = document.getElementById("help-drawer");
+  if (!helpDrawer) return;
+
+  const isDrawerActive = helpDrawer.classList.toggle("active");
+
+  if (isDrawerActive) {
+    document.body.classList.add("drawer-blurred-state");
+  } else {
+    document.body.classList.remove("drawer-blurred-state");
+  }
+}
+/* === КОНЕЦ ЧАСТИ 18 === */
