@@ -266,6 +266,23 @@ function updateOrderLabels() {
       resLeverageSection.classList.add("disabled-element");
   }
 
+  /* БЕЗОПАСНАЯ МАСКА СЕЛЕКТОРА ПАР: Меняем текст опций, не трогая value */
+  const pairSelect = document.getElementById("pair");
+  if (pairSelect && pairSelect.options) {
+    for (let i = 0; i < pairSelect.options.length; i++) {
+      const option = pairSelect.options[i];
+      const val = option.value; // Например, "BTCUSDT"
+      if (val && val.endsWith("USDT")) {
+        const baseCurrency = val.replace("USDT", ""); // Извлекаем "BTC", "ETH"
+        if (currentTab === "spot") {
+          option.text = baseCurrency + "/USDT"; // Отображение со слэшем на Споте
+        } else {
+          option.text = val; // Слитное отображение без слэша на Фьючерсах
+        }
+      }
+    }
+  }
+
   const resultsDisplay = document.querySelector(".results-display");
   if (resultsDisplay) {
     if (currentSide === "Long") {
