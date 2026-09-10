@@ -946,6 +946,12 @@ function renderLogTable(currentMidPrice) {
       "</span>" +
       "</div>";
 
+    /* АДАПТИВНОЕ ФОРМАТИРОВАНИЕ ТИКЕРА В ЖУРНАЛЕ: Слэш для Спота, слитный код для Фьючерсов */
+    let finalLogPairDisplay = cleanPairName;
+    if (item.market === "Спот") {
+      finalLogPairDisplay = cleanPairName.replace("USDT", "/USDT");
+    }
+
     tr.innerHTML =
       "<td>" +
       "<div style='display:flex; flex-direction:column; line-height:1.3; font-size:11px;'>" +
@@ -960,8 +966,8 @@ function renderLogTable(currentMidPrice) {
       "<td style='color:var(--text-main); font-weight:700;'>" +
       displayDep +
       "</td>" +
-      "<td>" +
-      item.pair +
+      "<td style='color:var(--text-main); font-weight:700;'>" +
+      finalLogPairDisplay +
       "</td>" +
       "<td style='color:var(--text-main); font-weight:700;'>" +
       leverageMarkup +
