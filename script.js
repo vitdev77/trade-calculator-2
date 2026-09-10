@@ -1266,10 +1266,18 @@ function handleInformerMessage(event) {
       clearTimeout(informerFlatTimeout);
 
       const formattedPrice = mid.toFixed(decimals);
-      let trendIcon = "";
+      const currentNumericPrice = parseFloat(formattedPrice);
 
+      // Инициализируем иконку на основе текущего состояния заголовка вкладки
+      let trendIcon = document.title.startsWith("▲")
+        ? "▲ "
+        : document.title.startsWith("▼")
+          ? "▼ "
+          : "";
+
+      // СРАВНЕНИЕ СТРОГО ПО ОКРУГЛЕННОЙ ЦЕНЕ: Устраняет залипание стрелок при микро-тиках
       if (informerLastPrice > 0) {
-        if (mid > informerLastPrice) {
+        if (currentNumericPrice > informerLastPrice) {
           if (livePriceEl) livePriceEl.className = "live-price-val up";
           if (arrowEl) {
             arrowEl.className = "live-arrow up";
@@ -1280,7 +1288,7 @@ function handleInformerMessage(event) {
             informerContainer.classList.add("trend-up");
           }
           trendIcon = "▲ ";
-        } else if (mid < informerLastPrice) {
+        } else if (currentNumericPrice < informerLastPrice) {
           if (livePriceEl) livePriceEl.className = "live-price-val down";
           if (arrowEl) {
             arrowEl.className = "live-arrow down";
@@ -1292,27 +1300,30 @@ function handleInformerMessage(event) {
           }
           trendIcon = "▼ ";
         }
-      } else if (arrowEl) {
+      } else if (arrowEl && trendIcon === "") {
         arrowEl.className = "live-arrow flat";
         arrowEl.innerHTML = SVG_TREND_FLAT;
       }
 
-      const nowTime = Date.now();
-      if (nowTime - lastTitleUpdateTime > 300) {
-        const targetTitle =
-          trendIcon +
-          formattedPrice +
-          " | " +
-          selectedPair +
-          " | Bybit Премиум Терминал";
-        if (document.title !== targetTitle) {
-          document.title = targetTitle;
-        }
-        lastTitleUpdateTime = nowTime;
+      // МГНОВЕННОЕ ОБНОВЛЕНИЕ ТАЙТЛА: Убрана 300мс задержка для абсолютной синхронизации стрелок
+      const targetTitle =
+        trendIcon +
+        formattedPrice +
+        " | " +
+        selectedPair +
+        " | Bybit Премиум Терминал";
+      if (document.title !== targetTitle) {
+        document.title = targetTitle;
       }
 
-      if (informerLastPrice === 0) calculate();
-      informerLastPrice = mid;
+      // Запоминаем округленный прайс для корректного последующего сравнения
+      if (
+        informerLastPrice === 0 ||
+        currentNumericPrice !== informerLastPrice
+      ) {
+        if (informerLastPrice === 0) calculate();
+        informerLastPrice = currentNumericPrice;
+      }
 
       renderLogTable(mid);
 
@@ -1348,6 +1359,7 @@ function handleInformerMessage(event) {
         localStorage.setItem("bybit_trading_log", JSON.stringify(tradingLog));
       }
 
+      // ТАЙМЕР ЗАТУХАНИЯ СТРЕЛКИ В ИНТЕРФЕЙСЕ (БЕЗ УДАЛЕНИЯ ЗНАЧКА ИЗ ТАЙТЛА ВКЛАДКИ)
       informerFlatTimeout = setTimeout(function () {
         if (arrowEl) {
           arrowEl.className = "live-arrow flat";
@@ -1356,9 +1368,6 @@ function handleInformerMessage(event) {
         if (livePriceEl) livePriceEl.className = "live-price-val";
         if (informerContainer)
           informerContainer.classList.remove("trend-up", "trend-down");
-
-        document.title =
-          formattedPrice + " | " + selectedPair + " | Bybit Премиум Терминал";
       }, 1500);
 
       const sprAbs = localCachedAsk - localCachedBid;
