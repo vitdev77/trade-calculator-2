@@ -410,22 +410,6 @@ html.light-theme .order-btn.active {
   position: absolute;
   pointer-events: none;
 }
-select {
-  padding-right: 26px !important;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-select option {
-  background: #0f1115;
-  color: #ffffff;
-  font-weight: 600;
-}
-html.light-theme select option {
-  background: #ffffff;
-  color: #1e293b;
-}
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -451,6 +435,24 @@ input[type="number"] {
 }
 .reset-link-btn:hover {
   color: var(--c-king);
+}
+
+/* КЛАСС ИНТЕРАКТИВНОЙ ССЫЛКИ ДЛЯ ПАР В ТАБЛИЦЕ ЛОГА */
+.log-pair-link {
+  color: var(--text-main);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.15);
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+html.light-theme .log-pair-link {
+  text-decoration-color: rgba(15, 23, 42, 0.15);
+}
+.log-pair-link:hover {
+  color: var(--c-king) !important;
+  text-decoration-color: var(--c-king);
+  text-shadow: 0 0 8px var(--c-orange-glow);
 }
 /* === КОНЕЦ ЧАСТИ 5 === */
 /* === НАЧАЛО ЧАСТИ 6 === */

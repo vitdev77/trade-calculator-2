@@ -946,11 +946,40 @@ function renderLogTable(currentMidPrice) {
       "</span>" +
       "</div>";
 
-    /* АДАПТИВНОЕ ФОРМАТИРОВАНИЕ ТИКЕРА В ЖУРНАЛЕ: Слэш для Спота, слитный код для Фьючерсов */
+    /* АДАПТИВНОЕ ФОРМАТИРОВАНИЕ ТИКЕРА В ЖУРНАЛЕ */
     let finalLogPairDisplay = cleanPairName;
     if (item.market === "Спот") {
       finalLogPairDisplay = cleanPairName.replace("USDT", "/USDT");
     }
+
+    /* ИНТЕРАКТИВНЫЙ КЛИК: Полная синхронизация таб, пар, направления и типов ордеров исполнения с применением класса премиальной ссылки */
+    const targetTabMode = item.market === "Спот" ? "spot" : "futures";
+    const targetOrderParam = item.type === "Лимитный" ? "limit" : "market";
+    const targetSideParam = item.rawSide || "Long";
+
+    const pairCellMarkup =
+      "<span class='log-pair-link' style='cursor:pointer; font-weight:700;' " +
+      "onclick='event.stopPropagation(); " +
+      'if(currentTab !== "' +
+      targetTabMode +
+      '") { switchTab("' +
+      targetTabMode +
+      '"); } ' +
+      'document.getElementById("pair").value = "' +
+      cleanPairName +
+      '"; ' +
+      'setOrderType("' +
+      targetOrderParam +
+      '"); ' +
+      'if(currentTab === "futures") { setSide("' +
+      targetSideParam +
+      '"); } ' +
+      "handlePairChange();' " +
+      "title='Переключить калькулятор, тип ордера и живой график на " +
+      finalLogPairDisplay +
+      "'>" +
+      finalLogPairDisplay +
+      "</span>";
 
     tr.innerHTML =
       "<td>" +
@@ -966,8 +995,8 @@ function renderLogTable(currentMidPrice) {
       "<td style='color:var(--text-main); font-weight:700;'>" +
       displayDep +
       "</td>" +
-      "<td style='color:var(--text-main); font-weight:700;'>" +
-      finalLogPairDisplay +
+      "<td>" +
+      pairCellMarkup +
       "</td>" +
       "<td style='color:var(--text-main); font-weight:700;'>" +
       leverageMarkup +
