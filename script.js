@@ -1427,7 +1427,6 @@ const entryPriceInput = document.getElementById("entry-price");
 if (balanceInput) balanceInput.addEventListener("input", saveToStorage);
 if (entryPriceInput) entryPriceInput.addEventListener("input", saveToStorage);
 
-// СТАТУС ВЕРИФИКАЦИИ: Эта функция оставлена для обратной совместимости, но больше не используется при старте
 function loadFromStorageManual() {
   if (localStorage.getItem("bybit_balance")) {
     document.getElementById("balance").value =
@@ -1435,15 +1434,40 @@ function loadFromStorageManual() {
   }
 }
 
-// СИНХРОНИЗАЦИЯ СБОРКИ: window.onload теперь вызывает комплексный loadFromStorage()
+// АСИНХРОННЫЙ АВТОПОДГРУЗЧИК СПРАВКИ: Скачивает README.md при первой загрузке страницы
+function initDynamicReadmeLoader() {
+  const contentDiv = document.getElementById("readme-dynamic-content");
+  if (!contentDiv) return;
+
+  fetch("README.md")
+    .then((response) => {
+      if (!response.ok) throw new Error("Файл документации не найден");
+      return response.text();
+    })
+    .then((markdownText) => {
+      if (typeof marked !== "undefined") {
+        // Конвертируем маркдаун в HTML и бесшовно инжектируем в скролл-зону
+        contentDiv.innerHTML = marked.parse(markdownText);
+      }
+    })
+    .catch((error) => {
+      console.error("Ошибка prefetch мануала:", error);
+      contentDiv.innerHTML = `<div style="color:var(--c-red); font-size:11px; text-align:center; padding-top:60px;">🛑 Ошибка синхронизации с README.md. Убедитесь, что файл лежит в одной папке с index.html.</div>`;
+    });
+}
+
+// СИНХРОНИЗАЦИЯ СБОРКИ: window.onload теперь содержит оригинальные вызовы и безопасный загрузчик мануала
 window.onload = function () {
-  loadFromStorage(); // Считывает абсолютно все ключи, включая сворачивание, тему и риски
+  loadFromStorage();
   restoreTabsVisualOnly();
   if (typeof updateOrderLabels === "function") updateOrderLabels();
   if (typeof updateLiveChart === "function") updateLiveChart();
   initWebSocketInformer();
   renderLogTable();
   syncLogVisibilityState();
+
+  // Безопасный фоновый запуск подгрузки текста инструкции без блокировки UI-потока
+  initDynamicReadmeLoader();
 };
 /* === КОНЕЦ ЧАСТИ 17 === */
 /* === НАЧАЛО ЧАСТИ 18 === */
