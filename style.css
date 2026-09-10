@@ -1367,45 +1367,56 @@ html.light-theme .log-close-trigger:hover {
 }
 /* === КОНЕЦ ЧАСТИ 10 === */
 /* === НАЧАЛО ЧАСТИ 11 === */
-/* АБСОЛЮТНАЯ СТАБИЛИЗАЦИЯ И СКРЫТИЕ ПОЛОСЫ */
+/* АБСОЛЮТНАЯ СТАБИЛИЗАЦИЯ И СКРЫТИЕ ПОЛОСЫ: Контент больше не прыгает, полоса полностью прозрачна */
 html {
   scrollbar-gutter: stable;
-  scrollbar-width: none;
+  scrollbar-width: none; /* Скрытие трека в Firefox */
 }
 
+/* Полное скрытие системного фона полосы прокрутки для Chrome, Safari и Edge */
 html::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
 
+/* СИНХРОНИЗАЦИЯ ШИРИНЫ ГРАФИКА С ОСНОВНЫМ БЛОКОМ ТЕРМИНАЛА */
 .chart-standalone-layout {
   width: 100% !important;
   max-width: 1020px !important;
   z-index: 1;
 }
 
-/* КНОПКА СВОРАЧИВАНИЯ С ПОДДЕРЖКОЙ ДИНАМИЧЕСКОГО ТЕКСТА */
+/* ОБЪЕМНАЯ, НО КОРОТКАЯ КНОПКА СВОРАЧИВАНИЯ ПО ЦЕНТРУ (СТАТИЧНАЯ ПРИ ХОВЕРЕ) */
 .terminal-collapse-bar {
-  width: 200px; /* Слегка увеличиваем ширину для размещения текста */
-  height: 16px;
-  margin: 12px auto 6px auto;
-  background: rgba(255, 255, 255, 0.03);
+  width: 220px; /* Короткая по горизонтали */
+  height: 24px; /* Увеличенная высота для солидного и презентабельного вида */
+  margin: 14px auto 8px auto;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  border-radius: 20px; /* Идеальное круглое скругление */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--text-muted);
-  transition: all 0.2s ease;
+  font-size: 9px; /* Читаемый, аккуратный шрифт */
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
   z-index: 10;
 }
 
+/* ЭФФЕКТ НАВЕДЕНИЯ БЕЗ СДВИГОВ: Исключены любые translateY-прыжки */
 .terminal-collapse-bar:hover {
-  background: rgba(255, 177, 26, 0.08);
-  border-color: rgba(255, 177, 26, 0.3);
+  background: rgba(255, 177, 26, 0.12);
+  border-color: rgba(255, 177, 26, 0.4);
   color: var(--c-king);
-  box-shadow: 0 0 8px rgba(255, 177, 26, 0.1);
+  box-shadow: 0 0 12px rgba(255, 177, 26, 0.15);
 }
 
 .terminal-collapse-bar svg {
@@ -1418,6 +1429,7 @@ html::-webkit-scrollbar {
 /* СИНХРОННЫЙ ЖЕСТКИЙ ПРЕ-ФЛИКЕР ХАК */
 html.init-terminal-hidden #main-terminal-container {
   max-height: 0px !important;
+  min-height: 0px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin-bottom: 0 !important;
@@ -1430,7 +1442,7 @@ html.init-terminal-hidden #main-terminal-container * {
   pointer-events: none !important;
 }
 
-/* ПЛАВНОЕ СВОРАЧИВАНИЕ ТЕЛА КАЛЬКУЛЯТОРА */
+/* ПЛАВНОЕ ПОЛНОЕ СВОРАЧИВАНИЕ ВСЕГО GLASS-CONTAINER КОНТЕЙНЕРА */
 .glass-container {
   max-height: 1200px;
   overflow: hidden;
@@ -1445,6 +1457,7 @@ html.init-terminal-hidden #main-terminal-container * {
     filter 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+/* Полное схлопывание всего основного контейнера в абсолютный ноль */
 .glass-container.collapsed-terminal {
   max-height: 0px !important;
   min-height: 0px !important;
@@ -1456,6 +1469,7 @@ html.init-terminal-hidden #main-terminal-container * {
   border-color: transparent !important;
 }
 
+/* Гарантированное скрытие внутренних элементов для бесшовного исчезновения */
 .glass-container.collapsed-terminal * {
   opacity: 0;
   pointer-events: none;
@@ -1467,7 +1481,7 @@ html.init-terminal-hidden #main-terminal-container * {
   transition: opacity 0.3s ease 0.1s;
 }
 
-/* СТИЛИ БОKОВОЙ ПАНЕЛИ (DRAWER) */
+/* СТИЛИ БОКОВОЙ ПАНЕЛИ (DRAWER) */
 .help-drawer-overlay {
   position: fixed;
   top: 0;

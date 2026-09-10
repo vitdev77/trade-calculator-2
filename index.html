@@ -605,10 +605,10 @@
     <div
       class="table-log-container chart-standalone-layout"
       id="global-chart-block"
-      style="margin-top: 20px; min-height: 450px; padding: 20px"
+      style="margin-top: 20px; min-height: 550px; padding: 20px"
     >
-      <!-- Фиксируем высоту родительского контейнера в DOM -->
-      <div id="bybit-tv-chart-container" style="width: 100%; height: 410px">
+      <!-- Высота родительского контейнера в DOM увеличена для масштабного отображения -->
+      <div id="bybit-tv-chart-container" style="width: 100%; height: 510px">
         <!-- Сюда скрипт динамически инжектирует продвинутый виджет графика -->
       </div>
     </div>
@@ -655,7 +655,7 @@
       </div>
     </div>
 
-    <!-- ВЫЕЗЖАЮЩАЯ БОКОВАЯ ПАНЕЛЬ (DRAWER) ДЛЯ СПРАВКИ И РУКОВОДСТВА -->
+    <!-- ВЫЕЗЖАЮЩАЯ БОKОВАЯ ПАНЕЛЬ (DRAWER) ДЛЯ СПРАВКИ И РУКОВОДСТВА -->
     <div
       class="help-drawer-overlay"
       id="help-drawer"
@@ -676,7 +676,7 @@
 
           <h2>📊 1. Математический базис и формулы</h2>
           <p>
-            Торговый движок производив вычисления с учётом комиссионных
+            Торговый движок производит вычисления с учётом комиссионных
             издержек. Биржа списывает комиссию дважды: при входе и при закрытии.
             Алгоритмы терминала закладывают эти издержки непосредственно в цену
             исполнения.
@@ -751,7 +751,7 @@
           <p>
             <code
               >TP = EntryPrice &times; (1 - (P/R &times; Risk%) / (100 &times;
-              Leverage) - EntryFee) / (1 + TakerFee)</code
+              Leverage) - HenryFee) / (1 + TakerFee)</code
             >
           </p>
           <p><code>Liq = EntryPrice &times; (1 + 1 / Leverage - MMR)</code></p>

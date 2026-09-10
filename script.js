@@ -1513,7 +1513,7 @@ function toggleTerminalCollapse() {
 })();
 /* === КОНЕЦ ЧАСТИ 18 === */
 /* === НАЧАЛО ЧАСТИ 19 === */
-// НАДЁЖНЫЙ МОДУЛЬ ЖИВОГО ГРАФИКА С ИДЕАЛЬНОЙ СИНХРОНИЗАЦИЕЙ СЕНСОРОВ СПОТ/ФЬЮЧЕРС
+// НАДЁЖНЫЙ МОДУЛЬ ЖИВОГО ГРАФИКА С ВЫСОТОЙ, ОПТИМИЗИРОВАННОЙ ПОД ГЛУБОКИЙ ТЕХНИЧЕСКИЙ АНАЛИЗ
 function updateLiveChart() {
   const container = document.getElementById("bybit-tv-chart-container");
   if (!container) return;
@@ -1525,7 +1525,6 @@ function updateLiveChart() {
 
   container.innerHTML = "";
 
-  // СИНХРОНИЗАЦИЯ РЫНКОВ: Автоматически подставляем суффикс ".P" для фьючерсов, чтобы цены совпадали до цента
   let tvSymbol = "BYBIT:" + selectedPair;
   if (currentTab === "futures") {
     tvSymbol = "BYBIT:" + selectedPair + ".P";
@@ -1534,8 +1533,8 @@ function updateLiveChart() {
   if (typeof TradingView !== "undefined") {
     new TradingView.widget({
       width: "100%",
-      height: 410,
-      symbol: tvSymbol, // Передача синхронизированного биржевого тикера
+      height: 510, // Высота увеличена с 410 до 510 пикселей для детального обзора свечей
+      symbol: tvSymbol,
       interval: "15",
       timezone: "Exchange",
       theme: themeParam,
@@ -1549,7 +1548,7 @@ function updateLiveChart() {
     });
   } else {
     container.innerHTML =
-      "<div style='color:var(--text-muted); font-size:12px; text-align:center; padding-top:190px;'>Ожидание подключения к серверам TradingView...</div>";
+      "<div style='color:var(--text-muted); font-size:12px; text-align:center; padding-top:240px;'>Ожидание подключения к серверам TradingView...</div>";
   }
 }
 /* === КОНЕЦ ЧАСТИ 19 === */
