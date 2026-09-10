@@ -775,6 +775,11 @@ function forceCloseOrder(id) {
         "</button>";
     }
   }
+
+  // ЖЕСТКАЯ ПЕРЕСБОРКА ПОТОКА: Немедленно переподключаем сокет, полностью удаляя закрытый тикер из сетевых запросов
+  if (typeof initWebSocketInformer === "function") {
+    initWebSocketInformer();
+  }
 }
 
 function deleteOrderFromLog(id) {
@@ -840,26 +845,26 @@ function renderLogTable(currentMidPrice) {
 
     let isBeReached = !!item.isBePersistent;
 
-    if (
-      !isBeReached &&
-      item.outcome !== "closed" &&
-      currentMidPrice &&
-      item.bePrice &&
-      isSamePair
-    ) {
-      if (item.rawSide === "Long" && currentMidPrice >= item.bePrice) {
-        isBeReached = true;
-        item.isBePersistent = true;
-      } else if (item.rawSide === "Short" && currentMidPrice <= item.bePrice) {
-        isBeReached = true;
-        item.isBePersistent = true;
+    // Выполняем калькуляцию БУ только для тех строк, которые НЕ закрыты
+    if (item.outcome !== "closed") {
+      if (!isBeReached && currentMidPrice && item.bePrice && isSamePair) {
+        if (item.rawSide === "Long" && currentMidPrice >= item.bePrice) {
+          isBeReached = true;
+          item.isBePersistent = true;
+        } else if (
+          item.rawSide === "Short" &&
+          currentMidPrice <= item.bePrice
+        ) {
+          isBeReached = true;
+          item.isBePersistent = true;
+        }
       }
     }
 
     let beCellMarkup = "";
     if (item.outcome === "closed") {
       beCellMarkup =
-        "<span style='color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;'>" +
+        "<span style='color:var(--text-muted); opacity:0.5; font-weight:500; text-decoration:line-through;'> " +
         formattedBe +
         "</span>";
     } else if (isBeReached) {
@@ -869,14 +874,21 @@ function renderLogTable(currentMidPrice) {
         "</span>";
     } else {
       beCellMarkup =
-        "<span style='color:var(--text-muted); font-weight:500;'>" +
+        "<span style='color:var(--text-muted); font-weight:500;'> " +
         formattedBe +
         "</span>";
     }
 
+    // БЕЗОПАСНЫЙ СИНХРОННЫЙ ОБНОВЛЯЕМЫЙ ПОРТ:
     if (!isNewRow) {
       if (tr.cells && tr.cells[6]) {
-        tr.cells[6].innerHTML = beCellMarkup;
+        // Если строка закрыта и текст уже на месте — не трогаем её, экономим ресурсы
+        if (item.outcome === "closed") {
+          // Холостой ход для приглушенной строки
+        } else {
+          // Для активной строки — реактивно обновляем ячейку БУ живым потоком цен!
+          tr.cells[6].innerHTML = beCellMarkup;
+        }
       }
       return;
     }
@@ -1439,10 +1451,11 @@ function handleInformerMessage(event) {
         informerLastPrice = currentNumericPrice;
       }
 
+      // ЖЕСТКАЯ ОПТИМИЗАЦИЯ: Метод отрисовки таблицы теперь обрабатывает только активные строки
       renderLogTable(mid);
 
       const activeLogItems = tradingLog.filter(function (item) {
-        return item.outcome !== "closed";
+        return item.outcome !== "closed"; // Полное исключение приглушенных строк
       });
       let needSave = false;
 
@@ -1530,7 +1543,6 @@ function loadFromStorageManual() {
   }
 }
 
-// АСИНХРОННЫЙ АВТОПОДГРУЗЧИК СПРАВКИ: Скачивает README.md при первой загрузке страницы
 function initDynamicReadmeLoader() {
   const contentDiv = document.getElementById("readme-dynamic-content");
   if (!contentDiv) return;
@@ -1542,7 +1554,6 @@ function initDynamicReadmeLoader() {
     })
     .then((markdownText) => {
       if (typeof marked !== "undefined") {
-        // Конвертируем маркдаун в HTML и бесшовно инжектируем в скролл-зону
         contentDiv.innerHTML = marked.parse(markdownText);
       }
     })
@@ -1552,7 +1563,6 @@ function initDynamicReadmeLoader() {
     });
 }
 
-// СИНХРОНИЗАЦИЯ СБОРКИ: window.onload теперь содержит оригинальные вызовы и безопасный загрузчик мануала
 window.onload = function () {
   loadFromStorage();
   restoreTabsVisualOnly();
@@ -1561,8 +1571,6 @@ window.onload = function () {
   initWebSocketInformer();
   renderLogTable();
   syncLogVisibilityState();
-
-  // Безопасный фоновый запуск подгрузки текста инструкции без блокировки UI-потока
   initDynamicReadmeLoader();
 };
 /* === КОНЕЦ ЧАСТИ 17 === */
