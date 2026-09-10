@@ -396,6 +396,7 @@ html.light-theme .order-btn.active {
   box-shadow: 0 0 16px rgba(244, 97, 102, 0.4) !important;
 }
 
+/* ЭТАЛОННАЯ СТИЛИЗАЦИЯ ДЛЯ СЕЛЕКТОРОВ И ИХ ОБЕРТОК */
 .select-custom-wrapper {
   position: relative;
   width: 100%;
@@ -409,6 +410,41 @@ html.light-theme .order-btn.active {
   transform: translateY(-50%);
   position: absolute;
   pointer-events: none;
+  z-index: 5;
+}
+
+select {
+  width: 100% !important;
+  height: 38px !important;
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px !important;
+  padding: 0 26px 0 12px !important;
+  color: var(--text-main) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  outline: none !important;
+  transition: border-color 0.2s ease !important;
+}
+select:hover {
+  border-color: rgba(255, 177, 26, 0.3) !important;
+}
+select:focus {
+  border-color: var(--c-king) !important;
+}
+select option {
+  background: #0f1115 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px !important;
+}
+html.light-theme select option {
+  background: #ffffff !important;
+  color: #1e293b !important;
 }
 
 input::-webkit-outer-spin-button,
