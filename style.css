@@ -1367,6 +1367,16 @@ html.light-theme .log-close-trigger:hover {
 }
 /* === КОНЕЦ ЧАСТИ 10 === */
 /* === НАЧАЛО ЧАСТИ 11 === */
+/* ГЛОБАЛЬНОЕ ИСПРАВЛЕНИЕ ПОЗИЦИОНИРОВАНИЯ: Контент прижимается к верху страницы, убирая баги прокрутки крупного графика */
+body {
+  justify-content: flex-start !important; /* Убирает вертикальное центрирование */
+  align-items: center !important; /* Сохраняет идеальное горизонтальное выравнивание по центру */
+  padding-top: 24px !important; /* Аккуратный премиальный отступ от верхнего края браузера */
+  padding-bottom: 40px !important; /* Защитный отступ снизу страницы под скролл журнала */
+  height: auto !important; /* Разрешает телу документа свободно растягиваться под увеличившийся контент */
+  min-height: 100vh !important;
+}
+
 /* ГЛОБАЛЬНОЕ СКРЫТИЕ СИСТЕМНОЙ ПОЛОСЫ: На основном сайте скроллбар полностью прозрачен */
 html {
   scrollbar-gutter: stable;
@@ -1489,14 +1499,14 @@ html.init-terminal-hidden #main-terminal-container * {
   height: auto !important;
   max-height: 480px !important;
   overflow-y: auto !important;
-  scrollbar-width: thin !important; /* Тонкий ползунок для Firefox */
+  scrollbar-width: thin !important;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent !important;
 }
 
 /* ВОЗВРАЩАЕМ ИЗОЛИРОВАННЫЙ КРАСИВЫЙ СКРОЛЛБАР СТРОГО ДЛЯ ЖУРНАЛА ОРДЕРОВ */
 .table-log-scroll-area::-webkit-scrollbar {
-  width: 5px !important; /* Ультратонкая премиальная ширина */
-  display: block !important; /* Принудительно отменяем display:none от родительских хаков */
+  width: 5px !important;
+  display: block !important;
 }
 
 .table-log-scroll-area::-webkit-scrollbar-track {
@@ -1504,22 +1514,12 @@ html.init-terminal-hidden #main-terminal-container * {
 }
 
 .table-log-scroll-area::-webkit-scrollbar-thumb {
-  background: rgba(
-    255,
-    255,
-    255,
-    0.12
-  ) !important; /* Матовый полупрозрачный ползунок */
+  background: rgba(255, 255, 255, 0.12) !important;
   border-radius: 10px !important;
 }
 
 .table-log-scroll-area::-webkit-scrollbar-thumb:hover {
-  background: rgba(
-    255,
-    177,
-    26,
-    0.4
-  ) !important; /* Фирменная золотая подсветка Bybit при наведении */
+  background: rgba(255, 177, 26, 0.4) !important;
 }
 
 /* СТИЛИ БОКОВОЙ ПАНЕЛИ (DRAWER) */
